@@ -1,3 +1,9 @@
+#!/usr/bin/tclsh8.3
+set LIBTCLDOT /usr/lib/graphviz/libtcldot.so
+set CACHE_ROOT /var/cache/webdot
+set GS /usr/bin/gs
+set PS2EPSI /usr/bin/ps2epsi
+set LOCALHOSTONLY 1
 ###########################################################################
 # WebDot, the Server                                                      #
 #                                                                         #
@@ -912,10 +918,14 @@ set server_port ":$env(SERVER_PORT)"
 if {[string equal $server_port :80]} {set server_port {}}
 
 # SELF is used in the href for help attached to the signature
-if {$LOCALHOSTONLY} {
+if {$LOCALHOSTONLY
+    || [string equal $env(SERVER_ADDR) $server]
+    || [string equal $env(SERVER_NAME) $server]
+    || [string equal localhost $server]
+    || [string equal 127.0.0.1 $server]} {
 	set SELF $env(SCRIPT_NAME)
 } {
-	set SELF http://$env(SERVER_NAME)$server_port$env(SCRIPT_NAME)
+	set SELF http://$env(SERVER_ADDR)$server_port$env(SCRIPT_NAME)
 }
 
 # see if we should use cache copy if it is available
@@ -928,7 +938,7 @@ if {[info exists env(HTTP_PRAGMA)]
 # form absolute url from PATH_INFO
 if {[info exists env(PATH_INFO)]} {
     if {[scan $env(PATH_INFO) {/%[^:]://%[^/]%s} protocol serverport path] != 3} {
-        set serverport $env(SERVER_NAME)$server_port
+        set serverport $env(SERVER_ADDR)$server_port
         set path $env(PATH_INFO)
     } {
         if {![string equal $protocol http]} {
@@ -936,7 +946,7 @@ if {[info exists env(PATH_INFO)]} {
         }
     }
 } {
-    set serverport $env(SERVER_NAME)$server_port
+    set serverport $env(SERVER_ADDR)$server_port
     set path /
 }
 
