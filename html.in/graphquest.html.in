@@ -5,6 +5,7 @@
   width="360"
   height="340"
   frameborder="0"
+  scrolling="no"
 ></iframe>
 <p>
 Webdot can convert the graph into the contents of an &lt;iframe&gt;
@@ -18,9 +19,10 @@ and the source of this page contains (for the graph above):
 &lt;iframe
   name="gq"
   src="$CGIBASE$BASE/$SELF.dot.neato.gq.300,300"
-  width="380"
-  height="360"
+  width="360"
+  height="340"
   frameborder="0"
+  scrolling="no"
 &gt;&lt;/iframe&gt;
 </pre></td></tr></table>
 <p>
@@ -37,7 +39,7 @@ The size of the image does not depend on the contents of the graph,
 but is fixed by the viewport dimensions specified in the URL,
 300x300 in this example.
 This eases page design.
-The width and height of the &lt;iframe&gt; needs to be 80 wider and 60 higher
+The width and height of the &lt;iframe&gt; needs to be 60 wider and 40 higher
 than the graph image to allow for the pan&amp;zoom controls.
 <p>
 The &lt;iframe&gt; must be named "gq" for the pan&amp;zoom updates to be
