@@ -23,7 +23,7 @@ digraph G {
   subgraph cluster_1 {
     graph [label="Server 1"]
     httpd1 [label=httpd URL="http://httpd.apache.org/"]
-    webdot [label="/cgi-bin/webdot" style=filled color=yellow URL="/webdot/"]
+    webdot [label="/cgi-bin/webdot" style=filled fillcolor=yellow color=black URL="/webdot/"]
   }
   subgraph cluster_2 {
     graph [label="Server 2"]
