@@ -1,6 +1,6 @@
 Name:           webdot
 Version:        1.9.0
-Release:        1_RH8.x
+Release:        RH8
 Group:          Applications/Graphics
 License:        BSD-style
 URL:            http://www.graphviz.org/
