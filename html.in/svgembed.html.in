@@ -1,6 +1,7 @@
 <p>
 <embed src=$CGIBASE$BASE/$SELF.dot.dot.svgz
     type="image/svg-xml"
+    coding="gzip"
     palette="foreground"
 >
 <p>
@@ -11,6 +12,7 @@ can be generated for web browsers that support SVGZ viewing with:
 <table border=1><tr><td><pre>
 &lt;embed src=$CGIBASE$BASE/$SELF.dot.dot.svgz 
       type="image/svg-xml"
+      coding="gzip"
       palette="foreground"
 &gt;
 </pre></td></tr></table>
