@@ -996,6 +996,7 @@ if {[info exists env(HTTP_PRAGMA)]
     set no_cache 1
 }
 
+set havequery 0
 # form absolute url from PATH_INFO
 if {[info exists env(PATH_INFO)]} {
     # we allow encoding in PATH_INFO so that an encoded
@@ -1012,9 +1013,7 @@ if {[info exists env(PATH_INFO)]} {
         set serverport $env(SERVER_NAME)$server_port
         set path $path_info
     }
-    if {[scan $path {%[^\?]?%s} path through_query] != 2} {
-	set havequery 0
-    } {
+    if {[scan $path {%[^\?]?%s} path through_query] == 2} {
 	set havequery 1
     }
 } {
