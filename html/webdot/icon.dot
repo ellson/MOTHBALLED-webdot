@@ -1,0 +1,8 @@
+digraph G {
+	graph [ranksep=0.1 size="0.2,0.2"]
+	node [label="" style=filled width=0.2 height=0.2]
+	a [color=red shape=diamond]
+	b [color=green shape=box width=0.15 height=0.15]
+	c [color=blue shape=invtriangle]
+	a -> {b c} [dir=none]
+}
