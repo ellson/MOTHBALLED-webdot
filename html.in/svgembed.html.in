@@ -1,34 +1,41 @@
 <table><tr><td>
-<object
-    data="$CGIBASE$BASE/$SELF.dot.dot.svgz"
-    type="image/svg+xml"
-    width="250" height="250">
+<iframe src="$CGIBASE$BASE/$SELF.dot.dot.svgz"
+    width="100" height="200"
+    frameborder="0" marginwidth="0" marginheight="0">
+<object data="$CGIBASE$BASE/$SELF.dot.dot.svgz"
+    width="100" height="200"
+    type="image/svg+xml">
 <embed src="$CGIBASE$BASE/$SELF.dot.dot.svgz"
     type="image/svg+xml"
     coding="gzip"
     palette="foreground">
 </embed>
 </object>
+</iframe>
 </td></tr></table>
 WebDot can render graphs in SVG or SVGZ formats for use in
-&lt;object&gt; or &lt;embed&gt; tags.  For example this graph:
+embedding.
+For example this graph:
 $DOT
 <p>
 can be generated with:
 <table border=1><tr><td><pre>
-&lt;object
-    data="$CGIBASE$BASE/$SELF.dot.dot.svgz"
-    type="image/svg+xml"
-    width="250" height="250"&gt;
+&lt;iframe src="$CGIBASE$BASE/$SELF.dot.dot.svgz"
+    width="100" height="200"
+    frameborder="0" marginwidth="0" marginheight="0"&gt;
+&lt;object data="$CGIBASE$BASE/$SELF.dot.dot.svgz"
+    width="100" height="200"
+    type="image/svg+xml"&gt;
 &lt;embed src="$CGIBASE$BASE/$SELF.dot.dot.svgz"
     type="image/svg+xml"
     coding="gzip"
     palette="foreground"&gt;
 &lt;/embed&gt;
 &lt;/object&gt;
+&lt;/iframe&gt;
 </pre></td></tr></table>
 <p>
-Note the html trick of nesting &lt;embed&gt; inside &lt;object&gt;
-to get embedded graphs to work in non-HTML-4.01 browsers.
+This ugly hack of nesting &lt;embed&gt; inside &lt;object&gt; inside &lt;iframe&gt;
+is needed at the moment to get embedded graphs to work in both Netscape and IE.
 <p>
 Note that edges are easily clickable in this format.

@@ -1,3 +1,11 @@
+June 7, 2002 - Release 1.8.5
+        - allow encoded QUERY_STRINGS to be passed through to the graph server
+	  Specifically, "%3f" is required to represent the "?"
+	  (non encoded QUERY_STRINGS are used to passed coordinates to
+	  server-side image maps.)
+	- use <iframe> trick from http://richardinfo.com/svg/iframetest.html
+		to avoid Mozilla-1.0 crash with SVG embedding
+	- update newarrows.dot demo graph
 April 17, 2002 - Release 1.8.4
         - strip preamble (DOCTYPE etc) from SVG when using inline.
         - strip extra infor after ";" from Content-type: headers.

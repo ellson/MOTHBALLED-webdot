@@ -299,8 +299,11 @@ proc error {m} {
     return -code error $m
 }
 
+# webdot namespace
+
 namespace eval webdot {
 	namespace export \
+		unencode \
 		get_url \
 		make_absolute_url \
 		fix_graph_urls \
@@ -310,6 +313,25 @@ namespace eval webdot {
 		get_image_size \
 		make_product \
 		send_help
+}
+
+###########################################################################
+# webdot::unencode
+#
+# used to unescape query-strings in cgi scripts
+#
+#remove existing \ escapes
+#translate + to space
+#escape tcl sensitive characters
+#replace all %nn sequences with formats
+#evaluate all formats and lose the tcl escapes, result is return value
+
+proc webdot::unencode {s} {
+ regsub -all {\\(.)} $s {\1} s
+ regsub -all {\+} $s { } s
+ regsub -all {([\\\{$[])} $s {\\\1} s
+ regsub -all {%([a-fA-F0-9][a-fA-F0-9])} $s {[format %c 0x\1]} s
+ subst $s
 }
 
 ###########################################################################
@@ -1060,13 +1082,21 @@ if {[info exists env(HTTP_PRAGMA)]
 
 # form absolute url from PATH_INFO
 if {[info exists env(PATH_INFO)]} {
-    if {[scan $env(PATH_INFO) {/%[^:]://%[^/]%s} protocol serverport path] != 3} {
+    # we allow encoding in PATH_INFO so that an encoded
+    #  QUERY_STRING can be passed through to the graph server
+    set path_info [webdot::unencode $env(PATH_INFO)]
+    if {[scan $path_info {/%[^:]://%[^/]%s} protocol serverport path] != 3} {
         set serverport $env(SERVER_NAME)$server_port
-        set path $env(PATH_INFO)
+        set path $path_info
     } {
         if {![string equal $protocol http]} {
             toperror "Invalid URL. Only http allowed."
         }
+    }
+    if {[scan $path {%[^\?]?%s} path through_query] != 2} {
+	set havequery 0
+    } {
+	set havequery 1
     }
 } {
     set serverport $env(SERVER_NAME)$server_port
@@ -1128,7 +1158,11 @@ if {$LOCALHOSTONLY} {
 	set SELF http://$env(SERVER_NAME)$server_port$env(SCRIPT_NAME)
 }
 # url is used in maps, so needs to keep public address of server
-set url http://$serverport$path
+if {$havequery} {
+	set url http://$serverport$path?$through_query
+} {
+	set url http://$serverport$path
+}
 
 # create a directory name for the cache
 set dirname [file dirname $path]
