@@ -45,7 +45,7 @@ array set MIME {
     png    "image/png"
     ps     "application/postscript"
     src    "text/plain"
-    svg    "application/x-svg"
+    svg    "image/svg"
     tcl    "application/x-tcl"
     tclmap "text/plain"
     txt    "text/plain"
