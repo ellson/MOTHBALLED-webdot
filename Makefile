@@ -98,4 +98,5 @@ clean:
 		html/webdot/tclembed.html \
 		html/webdot/index.html \
 		html/webdot/webdot_op.dot \
-		html/webdot/webdot_libs.dot
+		html/webdot/webdot_libs.dot \
+		html/webdot/demo.html
