@@ -1,9 +1,3 @@
-#!/usr/bin/tclsh8.3
-set LIBTCLDOT /usr/lib/graphviz/libtcldot.so
-set CACHE_ROOT /var/cache/webdot
-set GS /usr/bin/gs
-set PS2EPSI /usr/bin/ps2epsi
-set LOCALHOSTONLY 1
 ###########################################################################
 # WebDot, the Server                                                      #
 #                                                                         #
@@ -656,6 +650,10 @@ proc make_product {url type engine no_cache} {
             }
             if {[catch {
                 set g [read_graph]
+		# set default background to transparent for web use
+		if {[catch {$g queryattr bgcolor}]} {
+		    $g setattr bgcolor transparent
+		}
                 if {[catch {$g layout [string toupper $engine]} err]} {
                     error "Graph layout error: $err" 
                 }
