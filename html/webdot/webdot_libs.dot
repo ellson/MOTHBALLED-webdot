@@ -5,7 +5,7 @@ digraph G {
   subgraph cluster_graphviz {
     graph [label="                                    graphviz"
       style=filled color=yellow]
-    {libgd libgdtclft libdot libneato libcommon libgraph libcdt}->libtcldot
+    {libgd libgdtclft libdot libneato libdotneato libgraph libcdt}->libtcldot
   }
   webdot [style=filled color=yellow]
   {libtcldot tclsh httpd}->webdot
