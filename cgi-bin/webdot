@@ -919,13 +919,9 @@ if {[string equal $server_port :80]} {set server_port {}}
 
 # SELF is used in the href for help attached to the signature
 if {$LOCALHOSTONLY} {
-    || [string equal $env(SERVER_ADDR) $server]
-    || [string equal $env(SERVER_NAME) $server]
-    || [string equal localhost $server]
-    || [string equal 127.0.0.1 $server]
 	set SELF $env(SCRIPT_NAME)
 } {
-	set SELF http://$env(SERVER_NAME)$server_port$env(SCRIPT_NAME)
+	set SELF http://$env(SERVER_ADDR)$server_port$env(SCRIPT_NAME)
 }
 
 # see if we should use cache copy if it is available
