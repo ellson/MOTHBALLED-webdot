@@ -1,3 +1,11 @@
+December 2, 01 - Release 1.7.12
+	- [ I haven't been maintaining this Changes file properly, sorry. ]
+	- SVG support added
+	- Support for "twopi" layouts
+	- RPM package surrport for RedHat 7.x systems
+	- more tutorials and demos
+	
+
 November 1, 00 - Release 1.7.2
 
 	- use webfonts installed with graphviz with path builtin to gdtclft.

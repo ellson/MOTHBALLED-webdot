@@ -1,6 +1,5 @@
 digraph abstract {
-size="6,6";
-	S8 -> 9;
+	size="6,6";
 	S24 -> 27;
 	S24 -> 25;
 	S1 -> 10;

@@ -1,0 +1,32 @@
+<html><head>
+<title>WebDot Tutorial: Clickable edges</title>
+<link rel="shortcut icon" href="/webdot/icon.png">
+</head><body bgcolor=white>
+<a href=/webdot/hnodes.html>[previous]</a>
+<a href=/webdot/svgembed.html>[next]</a>
+<font size=+2><b>WebDot Tutorial: Clickable edges</b></font>
+<p>
+<a href=/cgi-bin/webdot/webdot/hedges.dot.dot.map>
+<img src=/cgi-bin/webdot/webdot/hedges.dot.dot.png border=0 ismap>
+</a>
+<p>
+Dot supports a "\N" short form so that the URLs of the nodes can be
+based on the node name.  Edges can also have URLs, but because
+of the limited abilities of image maps, a label must exist and the
+URL is attached to it.
+<table border=1><tr><td><pre>
+digraph G {
+	graph [URL="default.html"]
+	node [URL="\N.html"]
+	a -&gt; b -&gt; c
+	a -&gt; c [URL="a-&gt;c.html", label="a-&gt;c"]
+}
+</pre></td></tr></table>
+<p>
+The box around the clickable image can be suppressed with "border=0"
+<table border=1><tr><td><pre>
+&lt;a href=/cgi-bin/webdot/webdot/hedges.dot.dot.map&gt;
+&lt;img src=/cgi-bin/webdot/webdot/hedges.dot.dot.png border=0 ismap&gt;
+&lt;/a&gt;
+</pre></td></tr></table>
+</body></html>

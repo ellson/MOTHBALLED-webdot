@@ -1,0 +1,6 @@
+digraph G {
+	node [URL="\N.html"]
+	edge [URL="\N.html"]
+	{a b c} -> d
+}
+

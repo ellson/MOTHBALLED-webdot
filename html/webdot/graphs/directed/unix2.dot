@@ -1,5 +1,10 @@
-/* courtesy Ian Darwin and Geoff Collyer, Softquad Inc. */
+/* Courtesy of Ian Darwin <ian@darwinsys.com>
+ * and Geoff Collyer <geoff@plan9.bell-labs.com>
+ * Mildly updated by Ian Darwin in 2000.
+ */
 digraph unix {
+	size="6,6";
+	node [color=lightblue2, style=filled];
 	"5th Edition" -> "6th Edition";
 	"5th Edition" -> "PWB 1.0";
 	"6th Edition" -> "LSX";
@@ -18,6 +23,7 @@ digraph unix {
 	"7th Edition" -> "UniPlus+";
 	"V7M" -> "Ultrix-11";
 	"8th Edition" -> "9th Edition";
+	"9th Edition" -> "10th Edition";
 	"1 BSD" -> "2 BSD";
 	"2 BSD" -> "2.8 BSD";
 	"2.8 BSD" -> "Ultrix-11";
@@ -30,6 +36,10 @@ digraph unix {
 	"4.1 BSD" -> "8th Edition";
 	"4.2 BSD" -> "4.3 BSD";
 	"4.2 BSD" -> "Ultrix-32";
+	"4.3 BSD" -> "4.4 BSD";
+	"4.4 BSD" -> "FreeBSD";
+	"4.4 BSD" -> "NetBSD";
+	"4.4 BSD" -> "OpenBSD";
 	"PWB 1.0" -> "PWB 1.2";
 	"PWB 1.0" -> "USG 1.0";
 	"PWB 1.2" -> "PWB 2.0";
@@ -49,4 +59,5 @@ digraph unix {
 	"TS 4.0" -> "System V.0";
 	"System V.0" -> "System V.2";
 	"System V.2" -> "System V.3";
+	"System V.3" -> "System V.4";
 }

@@ -1,0 +1,40 @@
+<p>
+<webdot src=$BASE/$SELF.dot engine=neato type=png target=new>
+<p>
+In order to support client-side maps, WebDot can filter an
+html page and replace all occurrences of &lt;webdot...&gt; tags
+with a client-side map and an image reference.  
+
+For example, $SELF.dot contains:
+$DOT
+and the source of this page contains (for the graph on the right):
+<table border=1><tr><td><pre>
+&lt;webdot src=$BASE/$SELF.dot engine=neato type=png target=new&gt;
+</pre></td></tr></table>
+<p>
+after serving this page through $CGIBASE, this &lt;webdot...&gt;
+tag is replaced by:
+<table border=1><tr><td><pre>
+&lt;map name="webdot0"&gt;
+&lt;area href="$CGIBASE/http://127.0.0.1$BASE/$SELF.dot.neato.png.help" shape="rect" coords="160,223,248,235" target="new"&gt;
+&lt;area href="$BASE/a.html" shape="rect" coords="1,126,73,174" target="new"&gt;
+&lt;area href="$BASE/b.html" shape="rect" coords="101,101,173,149" target="new"&gt;
+&lt;area href="$BASE/c.html" shape="rect" coords="173,173,245,221" target="new"&gt;
+&lt;area href="$BASE/d.html" shape="rect" coords="128,2,200,50" target="new"&gt;
+&lt;area href="$BASE/default.html" shape="default" target="new"&gt;
+&lt;/map&gt;
+&lt;img src="$CGIBASE/http://127.0.0.1$BASE/$SELF.dot.neato.png" width="248" height="235" usemap="#webdot0" border="0" alt="Graph by WebDot"&gt;
+</pre></td></tr></table>
+<p>
+The advantages of this mode of WebDot are the much simpler authoring and
+the responsiveness of client-side mapping.  Notice that the URL that
+would be reached by clicking on a node is flashed into the
+status bar at the bottom of the browser.
+<p>
+The disadvantages are that the html source now contains non-standard markup and 
+the page has to be served through the $CGIBASE program.
+Care must be taken that relative URLs in the html don't also get served
+through the WebDot cgi program so it is important to use "rooted" hrefs
+in documents and graphs served this way.
+<p>
+Embedded SVG is probably a better choice assuming SVG clients are available.

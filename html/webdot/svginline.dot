@@ -1,0 +1,5 @@
+graph G {
+	node [URL="svginline/\N.html"]
+	a -- b -- c; b -- d;
+}
+

@@ -1,0 +1,13 @@
+<p>
+<img src=http://webdot.graphviz.org/cgi-bin/webdot/http://www.graphviz.org/demo.dot.dot.png>
+<p>
+If a public WebDot server is available then graphs can be served without
+installing WebDot locally.  For example, if there is a graph at:
+<a href=http://www.graphviz.org/demo.dot>http://www.graphviz.org/demo.dot</a>
+<p>
+then this img tag in an html web page:
+<table border=1><tr><td><pre>
+&lt;img src=http://webdot.graphviz.org/cgi-bin<b>/http://www.graphviz.org/demo.dot</b>.dot<b>.png</b>&gt;
+</pre></td></tr></table>
+<p>
+will produce the graph layout at the top of this page.

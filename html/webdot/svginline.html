@@ -1,0 +1,39 @@
+<html><head>
+<title>WebDot Tutorial: Inline SVG graphs</title>
+<link rel="shortcut icon" href="/cgi-bin/webdot/webdot/icon.png">
+</head><body bgcolor=white>
+<a href=/cgi-bin/webdot/webdot/clientmap.html>[previous]</a>
+<a href=/cgi-bin/webdot/webdot/tclembed.html>[next]</a>
+<font size=+2><b>WebDot Tutorial: Inline SVG graphs</b></font>
+<p>
+<webdot src=/cgi-bin/webdot/webdot/svginline.dot engine=neato type=svg>
+<p>
+Similarly to the support for client-side maps, WebDot can filter an
+html page and replace all occurrences of &lt;webdot...&gt; tags
+with a client-side SVG image.
+
+For example, svginline.dot contains:
+<table border=1><tr><td><pre>
+graph G {
+	node [URL="svginline/\N.html"]
+	a -- b -- c; b -- d;
+}
+</pre></td></tr></table>
+and the source of this page contains:
+<table border=1><tr><td><pre>
+&lt;webdot src=/cgi-bin/webdot/webdot/svginline.dot engine=neato type=svg&gt;
+</pre></td></tr></table>
+which serving through /cgi-bin/webdot replaces the &lt;webdot...&gt; tag. 
+To see the result please view the source of this page.
+<p>
+The advantages of this mode of WebDot are the much simpler authoring and
+the responsiveness of client-side mapping.
+<p>
+The disadvantages are that the html source now contains non-standard markup and
+the page has to be served through the /cgi-bin/webdot program.
+Care must be taken that relative URLs in the html don't also get served
+through the WebDot cgi program so it is important to use "rooted" hrefs
+in documents and graphs served this way.
+<p>
+Embedded SVG is probably a better choice.
+</body></html>

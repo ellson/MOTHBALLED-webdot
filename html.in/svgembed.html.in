@@ -1,0 +1,18 @@
+<p>
+<embed src=$CGIBASE$BASE/$SELF.dot.dot.svg 
+    type="image/svg-xml"
+    palette="foreground"
+>
+<p>
+WebDot also supports SVG as an output format.  For example this graph:
+$DOT
+<p>
+can be generated for web browsers that support SVG viewing with:
+<table border=1><tr><td><pre>
+&lt;embed src=$CGIBASE$BASE/$SELF.dot.dot.svg 
+      type="image/svg-xml"
+      palette="foreground"
+&gt;
+</pre></td></tr></table>
+<p>
+Note that edges are easily clickable in this format.

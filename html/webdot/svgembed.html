@@ -1,0 +1,33 @@
+<html><head>
+<title>WebDot Tutorial: Embedded SVG graph</title>
+<link rel="shortcut icon" href="/webdot/icon.png">
+</head><body bgcolor=white>
+<a href=/webdot/hedges.html>[previous]</a>
+<a href=/cgi-bin/webdot/webdot/clientmap.html>[next]</a>
+<font size=+2><b>WebDot Tutorial: Embedded SVG graph</b></font>
+<p>
+<embed src=/cgi-bin/webdot/webdot/svgembed.dot.dot.svg 
+    type="image/svg-xml"
+    palette="foreground"
+>
+<p>
+WebDot also supports SVG as an output format.  For example this graph:
+<table border=1><tr><td><pre>
+digraph G {
+	node [URL="\N.html"]
+	edge [URL="\N.html"]
+	a -&gt; b -&gt; c
+	a -&gt; c
+}
+</pre></td></tr></table>
+<p>
+can be generated for web browsers that support SVG viewing with:
+<table border=1><tr><td><pre>
+&lt;embed src=/cgi-bin/webdot/webdot/svgembed.dot.dot.svg 
+      type="image/svg-xml"
+      palette="foreground"
+&gt;
+</pre></td></tr></table>
+<p>
+Note that edges are easily clickable in this format.
+</body></html>

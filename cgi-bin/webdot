@@ -804,7 +804,7 @@ proc webdot::make_product {url type engine no_cache} {
 	    }
        	    close $f_out
         }
-        dot {
+        dot - gv {
             # for client side we use canonical dot format and don't bother with server side layout.
             set g [webdot::read_graph]
             webdot::fix_graph_urls $g $serverport $dirname
@@ -917,24 +917,40 @@ proc webdot::send_help {url type engine} {
     global SELF MIME
 
     puts "Content-Type: text/html\n
-<html><head><title>WebDot Help Page</title></head>
-<body bgcolor=white><h1>WebDot Help Page</h1>"
+<html>
+<head>
+<title>WebDot Help Page</title>
+<link rel=\"shortcut icon\" href=\"/webdot/icon.png\">
+</head>
+<body bgcolor=white>
+<h1>WebDot Help Page</h1>"
 
     webdot::make_client_map $url $type $engine 0 0 new
 
-    if {[string equal [string toupper $engine] DOT]} {
-	set thisengine DOT
-	set otherengine NEATO
-    } {
-	set thisengine NEATO
-	set otherengine DOT
+    switch -- [string toupper $engine] {
+        DOT {
+	    set thisengine DOT
+	    set otherengine1 NEATO
+	    set otherengine2 TWOPI
+	}
+	NEATO {
+	    set thisengine NEATO
+	    set otherengine1 DOT
+	    set otherengine2 TWOPI
+	}
+	TWOPI {
+	    set thisengine TWOPI
+	    set otherengine1 DOT
+	    set otherengine2 NEATO
+	}
     }
 
     puts "<p>This <a href=$url>graph</a> can be rendered by
-WebDot using the $thisengine layout engine, in any of the following formats:<pre>"
+WebDot using the $thisengine layout engine, in any of the following
+formats:<pre>"
 
     set column 0
-    foreach t {gv epsi fig gif hpgl jpeg mif pcl pdf pic png ps src svg tcl vrml vtx} {
+    foreach t {dot epsi fig gif gv hpgl jpeg mif pcl pdf pic png ps src svg tcl vrml vtx} {
 	set mime "($MIME($t))"
 	if {[string equal $t src]} {
 	    set anchor "<a href=$SELF/$url.$t>$t $mime</a>"
@@ -946,7 +962,10 @@ WebDot using the $thisengine layout engine, in any of the following formats:<pre
     }
     puts "</pre>
 <p>It can also be formatted by the 
-<a href=$SELF/$url.[string tolower $otherengine].$type.help>$otherengine layout engine</a>.
+<a href=$SELF/$url.[string tolower $otherengine1].$type.help>$otherengine1</a>
+or the
+<a href=$SELF/$url.[string tolower $otherengine2].$type.help>$otherengine2</a>
+layout engines.
 <p> Sources for WebDot can be found at:
 <a href=http://www.graphviz.org/pub/graphviz/>http://www.graphviz.org/pub/graphviz/</a>
 <p>

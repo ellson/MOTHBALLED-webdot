@@ -1,0 +1,6 @@
+graph G {
+	graph [URL="default.html"]
+	node [URL="\N.html"]
+	a -- b -- c; b -- d;
+}
+
