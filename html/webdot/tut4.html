@@ -43,5 +43,11 @@ tag is replaced by:
 &lt;img src="http://127.0.0.1/cgi-bin/webdot/http://127.0.0.1/webdot/tut4.dot.neato.png" width="248" height="235" usemap="#webdot0" border="0" alt="Graph"&gt;
 </pre>
 </td></tr></table>
+<p>
+The advantages of this mode of WebDot are the much simpler authoring and
+the responsiveness of client-side mapping.  The disadvantage is that 
+is has to be served through the /cgi-bin/webdot program, and that 
+relative hrefs in the html will also get served through the script, so
+it is important to use "rooted" hrefs in documents served this way.
 </body>
 </html>

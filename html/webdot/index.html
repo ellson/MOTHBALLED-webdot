@@ -1,34 +1,44 @@
 <html>
 <head>
-<title>webdot demo</title>
+<title>WebDot Home Page</title>
 </head>
 <body bgcolor=white>
-<h1>webdot demo</h1>
+<h1>WebDot Home Page</h1>
+<p align=center>
+<a href=/cgi-bin/webdot/webdot/webdot_op.dot.dot.map>
+<img src=/cgi-bin/webdot/webdot/webdot_op.dot.dot.png border=0 ismap>
+</a>
+<p>
+WebDot is a CGI program that converts a graph description from
+a .dot file into an image that can be included on a web page.
+(As distributed, "Server 1" and "Server 2" are constrained to
+be the same host. If anyone wants to run a public WebDot server
+they can easily relax this constraint.)
+<p align=center>
+<a href=/cgi-bin/webdot/webdot/webdot_libs.dot.dot.map>
+<img src=/cgi-bin/webdot/webdot/webdot_libs.dot.dot.png border=0 ismap>
+</a>
+<p>
+WebDot is written in Tcl using the Tcldot package from Graphviz.
 
-<p>To see the graph images on this page, this page must be viewed
-through the webdot cgi-bin program.
-<a href=/cgi-bin/webdot/webdot/index.html>Try this instead.</a>
-
-<p>To see the what extended-html the author wrote to generate the graph images
-look at the source of this page when it is
-<a href=/webdot/index.html>not processed by the webdot cgi-bin program.</a>
-<hr>
-
-<p>This figure shows a directed graph formatted into a PNG image with
-client-side mapping, first with the dot layout engine, then with neato:
-<br><webdot src=demo1.dot type=png target=new>
-<webdot src=demo1.dot engine=neato type=png target=new>
-
-<p>This figure shows an undirected graph formatted into a GIF image with
-client-side mapping, first with the dot layout engine, then with neato:
-<br><webdot src=demo2.dot type=gif target=new>
-<webdot src=demo2.dot engine=neato type=gif target=new>
-
-<p>The next figure is a directed graph with neato layout,
- formatted for presentation by a Tclet.
-<br><webdot src=demo1.dot engine=neato type=tcl>
-<br>(The tcl plugin is available from
-<a href=http://www.demailly.com/tcl/plugin/download.html>http://www.demailly.com/tcl/plugin/download.html</a>)
-
+<h2>Where can I get it?</h2>
+The latest version of WebDot is available from:
+<a href=http://www.graphviz.org/pub/graphviz/>http://www.graphviz.org/pub/graphviz/</a>
+<h2>What does it need to run?</h2>
+WebDot requires: graphviz, jpeg, libpng, zlib, freetype, tclsh8.3 and an httpd such as apache.  WebDot has been developed and tested primarily on RedHat 6.2 and 7.0 systems.  On RedHat 7.0 systems the glibc update is required.
+<h2>Demos?</h2>
+The demo page lists all of the demo graphs currently distributed with the graphviz package, with links to neato or dot layouts, in png, tcl, or pdf output formats.  Other formats are available from the png format page.
+<h2>How do I use it?</h2>
+There is an online tutorial describing how to use WebDot:
+<ul>
+<li><a href=tut1.html>basic graph creation</a>
+<li><a href=tut2.html>clickable nodes</a>
+<li><a href=tut3.html>clickable edges</a>
+<li><a href=tut4.html>client side maps</a>
+<li><a href=tut5.html>Graphs in Tclets</a>
+</ul>
+<h2>Who wrote it?</h2>
+WebDot was written by <a mailto:ellson@graphviz.org>John Ellson</a>
+and is released under a BSD-style license.
 </body>
 </html>

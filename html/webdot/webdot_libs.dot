@@ -1,0 +1,12 @@
+digraph G {
+  graph [rankdir=LR nodesep=0.1]
+  node [shape=box height=0.1]
+  {libttf libjpeg libpng libz}->libtcldot
+  subgraph cluster_graphviz {
+    graph [label="                                    graphviz"
+      style=filled color=yellow]
+    {libgd libgdtclft libdot libneato libcommon libgraph libcdt}->libtcldot
+  }
+  webdot [style=filled color=yellow]
+  {libtcldot tclsh httpd}->webdot
+}
