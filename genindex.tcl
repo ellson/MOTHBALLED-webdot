@@ -3,8 +3,17 @@
 set f [open html/webdot/demo.html w]
 set h /webdot/
 set w /cgi-bin/webdot
-set p /webdot/graphs/directed
-cd html/webdot/graphs/directed
+
+set layout_engines {dot neato}
+set nl [llength $layout_engines]
+
+set formats {{png help} {gif help} {tcl help} ps pdf svg}
+set nf [llength $formats]
+
+set directions {Directed Undirected}
+set nd [llength $directions]
+
+set ncol 2
 
 puts $f "<html>
 <head>
@@ -12,68 +21,51 @@ puts $f "<html>
 </head>
 <body bgcolor=#ffffff>
 <h1><a href=$h>WebDot</a> Demo Graphs</h1>
-<table border=1><tr>
-<th>Directed</th>
-<th colspan=6>DOT</th><th></th><th colspan=6>NEATO</th>
-<th colspan=2></th>
-<th colspan=6>DOT</th><th></th><th colspan=6>NEATO</th>
-<th colspan=2></th>
-<th colspan=6>DOT</th><th></th><th colspan=6>NEATO</th>
-</tr><tr>"
+<table border=1><tr>"
 
-set e dot
-set oe neato
-set i 0
-foreach dd [lsort [glob *.dot]] {
-	set d [file rootname $dd]
-	if {$i%2} {puts $f "<td></td>"}
-	puts $f "<td><a href=$w$p/$dd.src>$d</a></td>
-<td><a href=$w$p/$dd.$e.png.help>png</a></td>
-<td><a href=$w$p/$dd.$e.gif.help>gif</a></td>
-<td><a href=$w$p/$dd.$e.tcl.help>tcl</a></td>
-<td><a href=$w$p/$dd.$e.svg>svg</a></td>
-<td><a href=$w$p/$dd.$e.ps>ps</a></td>
-<td><a href=$w$p/$dd.$e.pdf>pdf</a></td>
-<td></td>
-<td><a href=$w$p/$dd.$oe.png.help>png</a></td>
-<td><a href=$w$p/$dd.$oe.gif.help>gif</a></td>
-<td><a href=$w$p/$dd.$oe.tcl.help>tcl</a></td>
-<td><a href=$w$p/$dd.$oe.svg>svg</a></td>
-<td><a href=$w$p/$dd.$oe.ps>ps</a></td>
-<td><a href=$w$p/$dd.$oe.pdf>pdf</a></td>"
-	if {!([incr i]%2)} {puts $f "</tr><tr>"}
-}
+set oldpwd [pwd]
 
-set p /webdot/graphs/undirected
-cd ../undirected
-puts $f "</tr><tr></tr><tr>
-<th>Undirected</th>
-<th colspan=6>DOT</th><th></th><th colspan=6>NEATO</th>
-<th colspan=2></th>
-<th colspan=6>DOT</th><th></th><th colspan=6>NEATO</th>
-<th colspan=2></th>
-<th colspan=6>DOT</th><th></th><th colspan=6>NEATO</th>
-</tr><tr>"
+set k 0
+foreach dir {Directed Undirected} {
+  set p /webdot/graphs/[string tolower $dir]
+  cd $oldpwd/html/webdot/graphs/[string tolower $dir]
 
-set i 0
-foreach dd [lsort [glob *.dot]] {
-	set d [file rootname $dd]
-	if {$i%2} {puts $f "<td></td>"}
-	puts $f "<td><a href=$w$p/$dd.src>$d</a></td>
-<td><a href=$w$p/$dd.$e.png.help>png</a></td>
-<td><a href=$w$p/$dd.$e.gif.help>gif</a></td>
-<td><a href=$w$p/$dd.$e.tcl.help>tcl</a></td>
-<td><a href=$w$p/$dd.$e.svg>svg</a></td>
-<td><a href=$w$p/$dd.$e.ps>ps</a></td>
-<td><a href=$w$p/$dd.$e.pdf>pdf</a></td>
-<td></td>
-<td><a href=$w$p/$dd.$oe.png.help>png</a></td>
-<td><a href=$w$p/$dd.$oe.gif.help>gif</a></td>
-<td><a href=$w$p/$dd.$oe.tcl.help>tcl</a></td>
-<td><a href=$w$p/$dd.$oe.svg>svg</a></td>
-<td><a href=$w$p/$dd.$oe.ps>ps</a></td>
-<td><a href=$w$p/$dd.$oe.pdf>pdf</a></td>"
-	if {!([incr i]%2)} {puts $f "</tr><tr>"}
+  for {set i 1} {$i <= $ncol} {incr i} {
+    puts $f "<th>$dir</th><th colspan=$nf>DOT</th><th></th><th colspan=$nf>NEATO</th>"
+    if {$i != $ncol} {
+      puts $f "<th></th>"
+    } {
+      puts $f "</tr><tr>"
+    }
+  }
+
+  set i 0
+  foreach dd [lsort [glob *.dot]] {
+    set d [file rootname $dd]
+    if {$i%$ncol} {
+      puts $f "<td></td>"
+    }
+    puts $f "<td><a href=$w$p/$dd.src>$d</a></td>"
+    set j 0
+    foreach le $layout_engines {
+      foreach fo $formats {
+        if {[llength $fo] == 2} {
+          foreach {fo hl} $fo {break}
+          set hl .$hl
+        } {
+          set hl {}
+        }
+        puts $f "<td><a href=$w$p/$dd.$le.$fo$hl>$fo</a></td>"
+      }
+      if {[incr j] != $nl} {
+        puts $f "<td></td>"
+      }
+    }
+    if {!([incr i]%$ncol)} {puts $f "</tr><tr>"}
+  }
+  if {[incr k] != $nd} {
+    puts $f "</tr><tr></tr><tr>"
+  }
 }
 
 puts $f "</tr>
