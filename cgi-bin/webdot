@@ -685,10 +685,10 @@ proc make_product {url type no_cache} {
                 # Sign this piece of art (signature is hyperlinked to help)
                 # first work out size of the signature in this font
                 foreach {x0 y0 x1 y1 x2 y2 x3 y3} [gd text {} 0 \
-                    times.ttf 8.0 0.0 0 0 $SIGNATURE] {break}
+                    times 8.0 0.0 0 0 $SIGNATURE] {break}
                 # then place it accordingly in lower right corner
                 gd text $gd $hyperlink_blue \
-                    times.ttf 8.0 0.0 [expr $sizex - $x2 - 2] \
+                    times 8.0 0.0 [expr $sizex - $x2 - 2] \
                     [expr $sizey - $y0 - 2] $SIGNATURE
     
                 # render graph
@@ -712,7 +712,7 @@ proc make_product {url type no_cache} {
                 set red [gd color new $gd 255 0 0]
                 set y 5
 		foreach l [split $err \n] {
-                    gd text $gd $red times.ttf 10.0 0.0 5 [incr y 20] $l
+                    gd text $gd $red times 10.0 0.0 5 [incr y 20] $l
                 }
                 gd write[string toupper $type] $gd $f_out
                 gd destroy $gd
@@ -749,7 +749,7 @@ proc make_product {url type no_cache} {
             if {$sizex < 94} {set sizex 94}
             puts $f_out "bb ($sizex,$sizey)"
             foreach {x0 y0 x1 y1 x2 y2 x3 y3} [gd text {} 0 \
-                times.ttf 8.0 0.0 0 0 $SIGNATURE] {break}
+                times 8.0 0.0 0 0 $SIGNATURE] {break}
             puts $f_out "rectangle ([expr $sizex - $x2 - 4],$sizey) ($sizex,[expr $sizey - ($x0 - $y2) - 4]) $SELF/$url.$type.help $SIGNATURE"
             flush $f_out
             $g write $f_out ismap

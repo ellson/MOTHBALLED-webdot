@@ -19,27 +19,50 @@ graphviz rpm.
 %prep
 %setup -n %{name}-%{version}
 
-%build
-
-%define cgibindir %(rpm -ql apache | grep '/cgi-bin$')
-%define htmldir   %(rpm -ql apache | grep '/html$')
-%define cachedir  /var/cache/webdot
-#%define tclsh8    %(rpm -ql tcl | grep tclsh8)
-#%define libtcldot %(rpm -ql graphviz | grep 'libtcldot.so$')
-#%define gs        %(which gs)
-#%define ps2epsi   %(which ps2epsi)
+%define cgibindir  %(rpm -ql apache | grep '/cgi-bin$')
+%define htmldir    %(rpm -ql apache | grep '/html$')
+%define cachedir   /var/cache/webdot
+%define tclsh8bin  %(rpm -ql tcl | grep tclsh8)
+%define libtcldot  %(rpm -ql graphviz | grep 'libtcldot.so$')
+%define gsbin      %(which gs)
+%define ps2epsibin %(which ps2epsi)
 
 %install
-#rm -rf $RPM_BUILD_ROOT
-#mkdir -p $RPM_BUILD_ROOT%{cgibindir}
-#mkdir -p $RPM_BUILD_ROOT%{htmldir}
-#mkdir -p $RPM_BUILD_ROOT/var/cache/webdot
-#cp cgi-bin/webdot $RPM_BUILD_ROOT%{cgibindir}
-#cp -r html/webdot $RPM_BUILD_ROOT%{htmldir}
-make install
+mkdir -p $RPM_BUILD_ROOT/%{cgibindir}
+mkdir -p $RPM_BUILD_ROOT/%{htmldir}
+mkdir -p $RPM_BUILD_ROOT/%{cachedir}
+cat > $RPM_BUILD_ROOT/%{cgibindir}/webdot << '__EOF__'
+#!%{tclsh8bin}
+set LIBTCLDOT %{libtcldot}
+set CACHE_ROOT %{cachedir}
+set GS %{gsbin}
+set PS2EPSI %{ps2epsibin}
+set LOCALHOSTONLY 1
+__EOF__
+cat $RPM_SOURCE_DIR/cgi-bin/webdot >> $RPM_BUILD_ROOT/%{cgibindir}/webdot
+chmod 755 $RPM_BUILD_ROOT/%{cgibindir}/webdot
+cp -r $RPM_SOURCE_DIR/html/webdot $RPM_BUILD_ROOT/%{htmldir}/
+chown apache:apache $RPM_BUILD_ROOT/%{cachedir}
+chmod 700 $RPM_BUILD_ROOT/%{cachedir}
 %{?suse_check}
 
 %files
-%attr(-,root,root) %{cgibindir}/webdot
+%attr(755,root,root) %{cgibindir}/webdot
 %attr(-,root,root) %{htmldir}/webdot/
-%attr(-,apache,apache) %{cachedir}
+%attr(700,apache,apache) %{cachedir}/
+
+%post
+cat > %{cgibindir}/webdot.new << '__EOF__'
+#!%{tclsh8bin}
+set LIBTCLDOT %{libtcldot}
+set CACHE_ROOT %{cachedir}
+set GS %{gsbin}
+set PS2EPSI %{ps2epsibin}
+set LOCALHOSTONLY 1
+__EOF__
+tail +7 %{cgibindir}/webdot >> %{cgibindir}/webdot.new
+mv -f %{cgibindir}/webdot.new %{cgibindir}/webdot
+chmod +x %{cgibindir}/webdot
+
+%clean
+rm -rf $RPM_BUILD_ROOT
