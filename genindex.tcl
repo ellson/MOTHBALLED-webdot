@@ -19,8 +19,6 @@ puts $f "<html>
 <th colspan=3>DOT</th><th></th><th colspan=3>NEATO</th>
 <th colspan=2></th>
 <th colspan=3>DOT</th><th></th><th colspan=3>NEATO</th>
-<th colspan=2></th>
-<th colspan=3>DOT</th><th></th><th colspan=3>NEATO</th>
 </tr><tr>"
 
 set e dot
@@ -28,16 +26,20 @@ set oe neato
 set i 0
 foreach dd [lsort [glob *.dot]] {
 	set d [file rootname $dd]
-	if {$i%4} {puts $f "<td></td>"}
+	if {$i%3} {puts $f "<td></td>"}
 	puts $f "<td><a href=$w$p/$dd.src>$d</a></td>
 <td><a href=$w$p/$dd.$e.png.help>png</a></td>
 <td><a href=$w$p/$dd.$e.tcl.help>tcl</a></td>
+<td><a href=$w$p/$dd.$e.svg>svg</a></td>
+<!-- <td><a href=$w$p/$dd.$e.ps>ps</a></td> -->
 <td><a href=$w$p/$dd.$e.pdf>pdf</a></td>
 <td></td>
 <td><a href=$w$p/$dd.$oe.png.help>png</a></td>
 <td><a href=$w$p/$dd.$oe.tcl.help>tcl</a></td>
+<td><a href=$w$p/$dd.$oe.svg>svg</a></td>
+<!-- <td><a href=$w$p/$dd.$oe.ps>ps</a></td> -->
 <td><a href=$w$p/$dd.$oe.pdf>pdf</a></td>"
-	if {!([incr i]%4)} {puts $f "</tr><tr>"}
+	if {!([incr i]%3)} {puts $f "</tr><tr>"}
 }
 
 set p /webdot/graphs/undirected
@@ -49,25 +51,25 @@ puts $f "</tr><tr></tr><tr>
 <th colspan=3>DOT</th><th></th><th colspan=3>NEATO</th>
 <th colspan=2></th>
 <th colspan=3>DOT</th><th></th><th colspan=3>NEATO</th>
-<th colspan=2></th>
-<th colspan=3>DOT</th><th></th><th colspan=3>NEATO</th>
 </tr><tr>"
 
 set i 0
 foreach dd [lsort [glob *.dot]] {
 	set d [file rootname $dd]
-	if {$i%4} {puts $f "<td></td>"}
+	if {$i%3} {puts $f "<td></td>"}
 	puts $f "<td><a href=$w$p/$dd.src>$d</a></td>
 <td><a href=$w$p/$dd.$e.png.help>png</a></td>
 <td><a href=$w$p/$dd.$e.tcl.help>tcl</a></td>
+<td><a href=$w$p/$dd.$e.svg>svg</a></td>
 <!-- <td><a href=$w$p/$dd.$e.ps>ps</a></td> -->
 <td><a href=$w$p/$dd.$e.pdf>pdf</a></td>
 <td></td>
 <td><a href=$w$p/$dd.$oe.png.help>png</a></td>
 <td><a href=$w$p/$dd.$oe.tcl.help>tcl</a></td>
+<td><a href=$w$p/$dd.$oe.svg>svg</a></td>
 <!-- <td><a href=$w$p/$dd.$oe.ps>ps</a></td> -->
 <td><a href=$w$p/$dd.$oe.pdf>pdf</a></td>"
-	if {!([incr i]%4)} {puts $f "</tr><tr>"}
+	if {!([incr i]%3)} {puts $f "</tr><tr>"}
 }
 
 puts $f "</tr>
