@@ -1,3 +1,7 @@
+November 1, 00 - Release 1.7.2
+
+	- use webfonts installed with graphviz with path builtin to gdtclft.
+
 Oct 30, 00 - Release 1.7.1
 
 	- Support for tags in html pages.  tags are of the form:

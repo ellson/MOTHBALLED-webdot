@@ -8,10 +8,6 @@ HTML_DIR=/var/www/html
 # (make install creates a webdot subdirectory in this dir.)
 CACHE_DIR=/var/cache
 
-# location of some TrueType fonts.
-# Minimally times.ttf is required in this # directory.
-DOTFONTPATH=/usr/share/ttf
-
 # The uid:gid in effect when cgi-bin programs are running, only this
 # user should be able to read/write the webdot cache.
 HTTPD-USER-GROUP=apache:apache
@@ -35,7 +31,7 @@ PS2EPSI=/usr/bin/ps2epsi
 LOCALHOSTONLY=1
 
 # version number for webdot-*.tar.gz
-VERSION=1.7-1
+VERSION=1.7.1
 
 ###############################################################
 
@@ -45,7 +41,6 @@ install:
 	echo "#!$(TCLSH_EXECUTABLE)" > $(CGI-BIN_DIR)/webdot
 	echo "set LIBTCLDOT $(LIBTCLDOT)" >> $(CGI-BIN_DIR)/webdot
 	echo "set CACHE_ROOT $(CACHE_DIR)/webdot" >> $(CGI-BIN_DIR)/webdot
-	echo "set env(DOTFONTPATH) $(DOTFONTPATH)" >> $(CGI-BIN_DIR)/webdot
 	echo "set GS $(GS)" >> $(CGI-BIN_DIR)/webdot
 	echo "set PS2EPSI $(PS2EPSI)" >> $(CGI-BIN_DIR)/webdot
 	echo "set LOCALHOSTONLY  $(LOCALHOSTONLY)" >> $(CGI-BIN_DIR)/webdot
@@ -67,7 +62,8 @@ distdir=webdot-$(VERSION)
 dist: 
 	rm -rf $(distdir)*
 	mkdir -p $(distdir)/cgi-bin $(distdir)/html/webdot
-	cp AUTHORS CHANGES COPYING INSTALL Makefile README $(distdir)
+	cp AUTHORS CHANGES COPYING INSTALL README $(distdir)
+	cp Makefile webdot.spec $(distdir)
 	cp cgi-bin/webdot $(distdir)/cgi-bin/
 	cp html/webdot/*.html $(distdir)/html/webdot/
 	cp html/webdot/*.dot $(distdir)/html/webdot/
