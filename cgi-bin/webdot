@@ -62,6 +62,7 @@ array set MIME {
 }
 
 # signature that is hyperlinked to help
+# comment out the next line if you do't want a signature
 set SIGNATURE "Graph by WebDot"
 
 # timeout for network operations (webdot::get_url)
@@ -721,27 +722,28 @@ proc webdot::get_image_size {g} {
         set landscape 0
     }
     if {[catch {$g queryattr size} sz]} {
-    	scan [$g queryattr bb] "{%d %d %d %d}" lrx lry ulx uly
+        foreach {lrx lry ulx uly} [lindex [$g queryattr bb] 0] {break}
     	#  size of image is size of graph + (2 * margin)
     	set sizex [expr int(($ulx - $lrx + (2 * 10)) * 96./72)]
     	set sizey [expr int(($uly - $lry + (2 * 10)) * 96./72)]
     } {
-	# this sucks!
 	if {$landscape} {
-		foreach {sizey sizex} [split $sz ,] {break}
+		foreach {sizey sizex} [split [lindex $sz 0] ,] {break}
 	} {
-		foreach {sizex sizey} [split $sz ,] {break}
+		foreach {sizex sizey} [split [lindex $sz 0] ,] {break}
 	}
-	set sizex [string trim $sizex {{} }]
-	set sizey [string trim $sizey {{} }]
     	set sizex [expr int($sizex * 96)]
     	set sizey [expr int($sizey * 96)]
     }
-    #  add a bit more for the signature
-    incr sizex 5
+    # FIXME - add a fudge factor because apparently bb is innaccurate
     incr sizey 10
-    # enforce a minimum width
-    if {$sizex < 50} {set sizex 50}
+    if {[info exists SIGNATURE]} {
+        #  add a bit more for the signature
+        incr sizex 5
+        incr sizey 5
+        # enforce a minimum width
+        if {$sizex < 50} {set sizex 50}
+    }
     list $sizex $sizey
 }
 
@@ -827,15 +829,17 @@ proc webdot::make_product {url type engine no_cache} {
                 # render graph
                 $g rendergd $gd
 
-                # Sign this piece of art (signature is hyperlinked to help)
-                # first work out size of the signature in this font
-                foreach {x0 y0 x1 y1 x2 y2 x3 y3} [gd text {} 0 \
-                    times 8.0 0.0 0 0 $SIGNATURE] {break}
-                # then place it accordingly in lower right corner
-                gd text $gd $hyperlink_blue \
-                    times 8.0 0.0 [expr $sizex - $x2 - 2] \
-                    [expr $sizey - $y0 - 2] $SIGNATURE
-    
+                if {[info exists SIGNATURE]} {
+                    # Sign this piece of art (signature is hyperlinked to help)
+                    # first work out size of the signature in this font
+                    foreach {x0 y0 x1 y1 x2 y2 x3 y3} [gd text {} 0 \
+                        times 8.0 0.0 0 0 $SIGNATURE] {break}
+                    # then place it accordingly in lower right corner
+                    gd text $gd $hyperlink_blue \
+                        times 8.0 0.0 [expr $sizex - $x2 - 2] \
+                        [expr $sizey - $y0 - 2] $SIGNATURE
+                }
+
                 gd write[string toupper $type] $gd $f_out
                 gd destroy $gd
                 close $f_out
@@ -845,7 +849,10 @@ proc webdot::make_product {url type engine no_cache} {
                     error "Unable to open cache file for write: $engine.cmap"
                 }
                 puts $f_out "<!-- bb ($sizex,$sizey) -->"
-                puts $f_out "<area shape=\"rect\" href=\"$SELF/$url.$cachename.help\" title=\"$SIGNATURE\" alt=\"$SIGNATURE\" coords=\"[expr $sizex - $x2 - 4],[expr $sizey - ($x0 - $y2) - 4],$sizex,$sizey\">"
+                if {[info exists SIGNATURE]} {
+                    # make the signature area a hyperlink to a help page.
+                    puts $f_out "<area shape=\"rect\" href=\"$SELF/$url.$cachename.help\" title=\"$SIGNATURE\" alt=\"$SIGNATURE\" coords=\"[expr $sizex - $x2 - 4],[expr $sizey - ($x0 - $y2) - 4],$sizex,$sizey\">"
+                }
                 flush $f_out
                 $g write $f_out cmap
             	$g delete
@@ -897,10 +904,12 @@ proc webdot::make_product {url type engine no_cache} {
             }
             foreach {sizex sizey} [webdot::get_image_size $g] {break}
             puts $f_out "bb ($sizex,$sizey)"
-            # work out size of the signature in this font
-            foreach {x0 y0 x1 y1 x2 y2 x3 y3} [gd text {} 0 \
-                times 8.0 0.0 0 0 $SIGNATURE] {break}
-            puts $f_out "rectangle ([expr $sizex - $x2 - 4],$sizey) ($sizex,[expr $sizey - ($x0 - $y2) - 4]) $SELF/$url.$cachename.help $SIGNATURE"
+	    if {[info exists SIGNATURE]} {
+                # work out size of the signature in this font
+                foreach {x0 y0 x1 y1 x2 y2 x3 y3} [gd text {} 0 \
+                    times 8.0 0.0 0 0 $SIGNATURE] {break}
+                puts $f_out "rectangle ([expr $sizex - $x2 - 4],$sizey) ($sizex,[expr $sizey - ($x0 - $y2) - 4]) $SELF/$url.$cachename.help $SIGNATURE"
+            }
             flush $f_out
             $g write $f_out ismap
             close $f_out
@@ -917,10 +926,12 @@ proc webdot::make_product {url type engine no_cache} {
             }
             foreach {sizex sizey} [webdot::get_image_size $g] {break}
             puts $f_out "<!-- bb ($sizex,$sizey) -->"
-            # work out size of the signature in this font
-            foreach {x0 y0 x1 y1 x2 y2 x3 y3} [gd text {} 0 \
-                times 8.0 0.0 0 0 $SIGNATURE] {break}
-            puts $f_out "<area shape=\"rect\" href=\"$SELF/$url.$cachename.help\" title=\"$SIGNATURE\" alt=\"$SIGNATURE\" coords=\"[expr $sizex - $x2 - 4],[expr $sizey - ($x0 - $y2) - 4],$sizex,$sizey\">"
+            if {[info exists SIGNATURE]} {
+                # work out size of the signature in this font
+                foreach {x0 y0 x1 y1 x2 y2 x3 y3} [gd text {} 0 \
+                    times 8.0 0.0 0 0 $SIGNATURE] {break}
+                puts $f_out "<area shape=\"rect\" href=\"$SELF/$url.$cachename.help\" title=\"$SIGNATURE\" alt=\"$SIGNATURE\" coords=\"[expr $sizex - $x2 - 4],[expr $sizey - ($x0 - $y2) - 4],$sizex,$sizey\">"
+            }
             flush $f_out
             $g write $f_out cmap
             close $f_out
