@@ -26,7 +26,7 @@ graphviz rpm.
 %define apachegroup %(grep -i '^group ' %{httpdconf} | awk '{print $2}')
 
 %define cachedir   /var/cache/webdot
-%define tclsh8bin  %(rpm -ql tcl | grep tclsh8)
+%define tclsh83bin  %(rpm -ql tcl | grep '/tclsh8.3$')
 %define libtcldot  %(rpm -ql graphviz | grep 'libtcldot.so$')
 %define gsbin      %(which gs)
 %define ps2epsibin %(which ps2epsi)
@@ -36,7 +36,7 @@ mkdir -p $RPM_BUILD_ROOT/%{cgibindir}
 mkdir -p $RPM_BUILD_ROOT/%{htmldir}
 mkdir -p $RPM_BUILD_ROOT/%{cachedir}
 cat > $RPM_BUILD_ROOT/%{cgibindir}/webdot << '__EOF__'
-#!%{tclsh8bin}
+#!%{tclsh83bin}
 set LIBTCLDOT %{libtcldot}
 set CACHE_ROOT %{cachedir}
 set GS %{gsbin}
@@ -57,7 +57,7 @@ chmod 700 $RPM_BUILD_ROOT/%{cachedir}
 
 %post
 cat > %{cgibindir}/webdot.new << '__EOF__'
-#!%{tclsh8bin}
+#!%{tclsh83bin}
 set LIBTCLDOT %{libtcldot}
 set CACHE_ROOT %{cachedir}
 set GS %{gsbin}
