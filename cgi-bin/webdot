@@ -59,6 +59,11 @@ set SIGNATURE "Graph by WebDot"
 # timeout for network operations (get_url)
 set TIMEOUT 5000
 
+# latest mtime of LIBTCLDOT and this script
+set t1 [file mtime $LIBTCLDOT]
+set t2 [file mtime $argv0]
+set SELFMTIME [expr $t1>$t2?$t1:$t2]
+
 ###########################################################################
 #
 # tclet preamble code that runs in the browser (no wish reqired on server)
@@ -617,7 +622,7 @@ proc filter_html {serverport dirname no_cache} {
 # convert "src" into "$type" in current directory
 #
 proc make_product {url type engine no_cache} {
-    global env SIGNATURE GS PS2EPSI SELF TCLET LIBTCLDOT
+    global env SIGNATURE GS PS2EPSI SELF TCLET SELFMTIME
 
     if {[scan $url {http://%[^/]%s} serverport path] != 2} {
         error "Invalid url: $url"
@@ -626,12 +631,13 @@ proc make_product {url type engine no_cache} {
     set cachename $engine.$type
 
     # see if we can use product from cache
-    if {[file exists $cachename]
-      && [file mtime $cachename] >= [file mtime src]
-      && [file mtime $cachename] > [file mtime $LIBTCLDOT]
-      && [file size $cachename] != 0
-      && ! $no_cache} {
-        return
+    if {[file exists $cachename] && [file size $cachename] && ! $no_cache} {
+        set t [file mtime $cachename]
+	# must be later than the source, and later than the last modification
+	# to this webdot script or libtcldot.so
+        if {$t >= [file mtime src] && $t > $SELFMTIME} {
+            return
+        }
     }
     
     # no - so now we need to build it and save it in cache
@@ -1045,7 +1051,7 @@ if {[info exists env(HTTP_IF_MODIFIED_SINCE)]} {
     if {[catch {clock scan $Expires -gmt 1} t]} {
        error "failed to parse time in env(HTTP_IF_MODIFIED_SINCE): $env(HTTP_IF_MODIFIED_SINCE)"
     }
-    if {$LastModified <= $t && [file mtime $LIBTCLDOT] < $t} {
+    if {$t >= $LastModified && $t > $SELFMTIME} {
         puts "Status: 304 Not Modified\n"
         exit
     }
