@@ -1,9 +1,8 @@
 #!/usr/bin/tclsh8.3
 
+set f [open html/webdot/demo.html w]
 set w http://localhost/cgi-bin/webdot
 set p http://localhost/webdot/graphs/directed
-
-set f [open html/webdot/demo.html w]
 cd html/webdot/graphs/directed
 
 puts $f "<html>
@@ -12,39 +11,85 @@ puts $f "<html>
 </head>
 <body bgcolor=#ffffff>
 <h1><a href=$w>WebDot</a> Demo Graphs</h1>
-<table border=1>"
+<table border=1><tr>
+<th>Directed</th>
+<th colspan=3>DOT</th><th></th><th colspan=3>NEATO</th>
+<th colspan=2></th>
+<th colspan=3>DOT</th><th></th><th colspan=3>NEATO</th>
+<th colspan=2></th>
+<th colspan=3>DOT</th><th></th><th colspan=3>NEATO</th>
+<th colspan=2></th>
+<th colspan=3>DOT</th><th></th><th colspan=3>NEATO</th>
+</tr><tr>"
 
 set e dot
+set oe neato
 set i 0
-foreach d [lsort [glob *.dot]] {
-	if {$i%4} {puts $f "<td><td>"}
-	puts $f "<td><a href=$w/$p/$d.src>$d</a></td>
-<td><a href=$w/$p/$d.$e.png>png</a></td>
-<td><a href=$w/$p/$d.$e.tcl>tcl</a></td>
-<td><a href=$w/$p/$d.$e.ps>ps</a></td>
-<td><a href=$w/$p/$d.$e.pdf>pdf</a></td>"
+foreach dd [lsort [glob *.dot]] {
+	set d [file rootname $dd]
+	if {$i%4} {puts $f "<td></td>"}
+	puts $f "<td><a href=$w/$p/$dd.src>$d</a></td>
+<td><a href=$w/$p/$dd.$e.png.help>png</a></td>
+<td><a href=$w/$p/$dd.$e.tcl.help>tcl</a></td>
+<td><a href=$w/$p/$dd.$e.pdf>pdf</a></td>
+<td></td>
+<td><a href=$w/$p/$dd.$oe.png.help>png</a></td>
+<td><a href=$w/$p/$dd.$oe.tcl.help>tcl</a></td>
+<td><a href=$w/$p/$dd.$oe.pdf>pdf</a></td>"
+	if {!([incr i]%4)} {puts $f "</tr><tr>"}
+}
+
+set p http://localhost/webdot/graphs/undirected
+cd ../undirected
+puts $f "</tr><tr></tr><tr>
+<th>Undirected</th>
+<th colspan=3>DOT</th><th></th><th colspan=3>NEATO</th>
+<th colspan=2></th>
+<th colspan=3>DOT</th><th></th><th colspan=3>NEATO</th>
+<th colspan=2></th>
+<th colspan=3>DOT</th><th></th><th colspan=3>NEATO</th>
+<th colspan=2></th>
+<th colspan=3>DOT</th><th></th><th colspan=3>NEATO</th>
+</tr><tr>"
+
+set i 0
+foreach dd [lsort [glob *.dot]] {
+	set d [file rootname $dd]
+	if {$i%4} {puts $f "<td></td>"}
+	puts $f "<td><a href=$w/$p/$dd.src>$d</a></td>
+<td><a href=$w/$p/$dd.$e.png.help>png</a></td>
+<td><a href=$w/$p/$dd.$e.tcl.help>tcl</a></td>
+<!-- <td><a href=$w/$p/$dd.$e.ps>ps</a></td> -->
+<td><a href=$w/$p/$dd.$e.pdf>pdf</a></td>
+<td></td>
+<td><a href=$w/$p/$dd.$oe.png.help>png</a></td>
+<td><a href=$w/$p/$dd.$oe.tcl.help>tcl</a></td>
+<!-- <td><a href=$w/$p/$dd.$oe.ps>ps</a></td> -->
+<td><a href=$w/$p/$dd.$oe.pdf>pdf</a></td>"
 	if {!([incr i]%4)} {puts $f "</tr><tr>"}
 }
 
 puts $f "</tr>
 </table>
 <p>
-For viewing <b>pdf</b> files you will need the pdf plugin:
-<a href=http://www.adobe.com/prodindex/acrobat/readstep.html>
+<table>
+<tr>
+<td>For viewing <b>pdf</b> files you will need the pdf plugin:</td>
+<td><a href=http://www.adobe.com/prodindex/acrobat/readstep.html>
 <img src=getacro.png width=89 height=30 align=center
-border=0 alt=\"get acrobat reader\"></a>
-<p> 
-For viewing <b>tcl</b> files you will need the tcl plugin:
-<a href=http://www.scriptics.com/plugin/>
+border=0 alt=\"get acrobat reader\"></a></td>
+<td>and for viewing <b>tcl</b> files you will need the tcl plugin:</td>
+<td><a href=http://www.scriptics.com/plugin/>
 <img src=tclp.png width=42 height=64 align=center
-border=0 alt=\"get tcl plugin\"></a>
+border=0 alt=\"get tcl plugin\"></a></td>
+</tr>
+</table>
 
 <p>
 The graph renderings are produced on-demand by the 
 <a href=$w>WebDot Graph Server</a>.
-<br>
-Please send any suggestions for improvement, or
-problem reports to:
+Please send problem reports first to the person that installed
+this server locally.  WebDot was written by:
 <a href=mailto:ellson@lucent.com>John Ellson</a>.
 <p>
 Thanks for trying <a href=$w>WebDot</a>.
