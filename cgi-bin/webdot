@@ -1182,14 +1182,14 @@ switch -- [llength $parts] {
 	default {foreach {engine type} $parts {break}}
 }
 
-# nasty hack to workaround bugis in Apache/2.0.36
-if {[info exists env(SERVER_SOFTWARE)]
-    && [string equal $env(SERVER_SOFTWARE) "Apache/2.0.36 (Red Hat Linux)"]} {
-	set env(SCRIPT_NAME) /cgi-bin/$argv0
+# nasty hack to workaround bugs in Apache/2.0.36 and later
+#if {[info exists env(SERVER_SOFTWARE)]
+#    && [string equal $env(SERVER_SOFTWARE) "Apache/2.0.36 (Red Hat Linux)"]} {
+	set env(SCRIPT_NAME) /cgi-bin/[file tail $argv0]
 	if {[info exists env(PATH_INFO)]} {
-		regsub -- {http:/} $env(PATH_INFO) {http://} env(PATH_INFO)
+		regsub -- {http:/[^/]} $env(PATH_INFO) {http://} env(PATH_INFO)
 	}
-}
+#}
 
 # form url for upstream get 
 # and form SELF url to used in the href for help attached to the signature
