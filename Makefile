@@ -36,6 +36,8 @@ VERSION=1.10.3
 ###############################################################
 
 all:
+	tclsh linktut.tcl
+	tclsh genindex.tcl
 
 install:
 	mkdir -p $(CGI-BIN_DIR)
@@ -62,7 +64,7 @@ uninstall:
 
 distdir=webdot-$(VERSION)
 
-dist: 
+dist:
 	rm -rf $(distdir)*
 	mkdir -p $(distdir)/cgi-bin $(distdir)/html/webdot
 	cp AUTHORS CHANGES COPYING INSTALL README $(distdir)
@@ -77,3 +79,23 @@ dist:
 	cp -r html/webdot/graphs $(distdir)/html/webdot/
 	tar cf - $(distdir) | gzip > $(distdir).tar.gz
 	rm -rf $(distdir)
+
+clean:
+	rm -f html/webdot/basic.dot \
+		html/webdot/basic.html \
+		html/webdot/basicpublic.html \
+		html/webdot/hnodes.dot \
+		html/webdot/hnodes.html \
+		html/webdot/hedges.dot \
+		html/webdot/hedges.html \
+		html/webdot/svgembed.dot \
+		html/webdot/svgembed.html \
+		html/webdot/clientmap.dot \
+		html/webdot/clientmap.html \
+		html/webdot/svginline.dot \
+		html/webdot/svginline.html \
+		html/webdot/tclembed.dot \
+		html/webdot/tclembed.html \
+		html/webdot/index.html \
+		html/webdot/webdot_op.dot \
+		html/webdot/webdot_libs.dot
