@@ -21,16 +21,14 @@ they can easily relax this constraint.)
 </a>
 <p>
 WebDot is written in Tcl using the Tcldot package from
-<a href="http://www.graphviz.org/pub/graphviz">graphviz-tcl</a>.
+<a href="http://www.graphviz.org/">graphviz-tcl</a>.
 <h2>Where can I get it?</h2>
 The latest version of WebDot is available from:
-<a href="http://www.graphviz.org/pub/graphviz/">http://www.graphviz.org/pub/graphviz/</a>
+<a href="http://www.graphviz.org/">http://www.graphviz.org/</a>
 <h2>What does it need to run?</h2>
-WebDot requires: <a href="http://www.graphviz.org/pub/graphviz/">graphviz-tcl</a>
-(which may need <a href="http://www.graphviz.org/pub/graphviz/">webfonts</a>
-from the same place)
+WebDot requires: <a href="http://www.graphviz.org/">graphviz-tcl</a>
 and a web server (an httpd) such as <a href="http://httpd.apache.org/">Apache</a>.
-WebDot has been developed and tested primarily on RedHat 7.x systems.
+WebDot has been developed and tested primarily on RedHat 7.x thuough Fedora systems.
 <p>
 <table>
 <tr>
