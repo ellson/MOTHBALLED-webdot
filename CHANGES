@@ -1,36 +1,26 @@
-December 11, 01 - Release 1.7.14
+January 2, 2002 - Release 1.7.16
+	- some improvements to demo graphs
+December 11, 2001 - Release 1.7.14
 	- add ps to demo formats
 	- add svgz format support
 	- use svgz instead of svg in demo
-December 2, 01 - Release 1.7.12
+December 2, 2001 - Release 1.7.12
 	- [ I haven't been maintaining this Changes file properly, sorry. ]
 	- SVG support added
 	- Support for "twopi" layouts
 	- RPM package surrport for RedHat 7.x systems
 	- more tutorials and demos
-	
-
-November 1, 00 - Release 1.7.2
-
+November 1, 2000 - Release 1.7.2
 	- use webfonts installed with graphviz with path builtin to gdtclft.
-
-Oct 30, 00 - Release 1.7.1
-
+October 30, 2000 - Release 1.7.1
 	- Support for tags in html pages.  tags are of the form:
 		<webdot src=demo.dot type=png> 
-	and get replaced by a client side map and an <img ...> 
-	
+	  and get replaced by a client side map and an <img ...> 
 	- New local host installation.  Option to serve graphs only
-	from the same server. 
-
+	  from the same server. 
 	- Security.  No more support for file: urls, or any other
-	local files (except for private cache area).  All upstream
-	files are obtained by http even if in LOCALHOSTONLY mode, so
-	the security is provided by the httpd configuration.
-
+	  local files (except for private cache area).  All upstream
+	  files are obtained by http even if in LOCALHOSTONLY mode, so
+	  the security is provided by the httpd configuration.
 	- Support for clickable edge labels in gif, png, and jpegs.
-
 	- Upgrade to use graphviz-1.7
-
-
-
