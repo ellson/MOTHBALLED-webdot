@@ -832,14 +832,16 @@ proc webdot::make_product {url type engine viewport no_cache} {
 	    }
 	    # use cached layout
             set g [webdot::read_graph $engine.dot]
+	    # use position info from cached layout
+	    $g layout nop
 	    foreach {X Y Z x y} [split $viewport ,] {break}
             if {[string equal $Z {}]} {
+		# initial zoom
 		set Z 125
-#		foreach {llx lly urx ury} [lindex [$g queryattributes bb] 0] {break}
-#		set x [expr {$urx / 2}]
-#		set y [expr {$ury / 2}]
-		set x [expr {($X * 100)/($Z * 2)}]
-		set y [expr {($Y * 100)/($Z * 2)}]
+		# inital position with viewport centered over graph
+		foreach {llx lly urx ury} [lindex [$g queryattributes bb] 0] {break}
+		set x [expr {$urx / 2}]
+		set y [expr {$ury / 2}]
 	    }
 	    $g setattribute viewport "$X,$Y,[expr {$Z/100.}],$x,$y"
 	    # create viewport image
@@ -857,7 +859,7 @@ proc webdot::make_product {url type engine viewport no_cache} {
             }
 
 	    # precompute pans
-	    set pansize 100
+	    set pansize 75
 	    set north [expr {$y+$Y*$pansize/$Z}]
 	    set south [expr {$y-$Y*$pansize/$Z}]
 	    set west [expr {$x-$X*$pansize/$Z}]
