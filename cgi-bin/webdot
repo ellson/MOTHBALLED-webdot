@@ -587,42 +587,19 @@ proc webdot::make_client_map {url type engine no_cache count target} {
 		error $err
 	    }
             # generate map
-            if {[catch {open $engine.map r} f]} {
-                error "Unable to open cache file for read: $file_cache_dir/$engine.map"
+            if {[catch {open $engine.cmap r} f]} {
+                error "Unable to open cache file for read: $file_cache_dir/$engine.cmap"
             }
             puts "<map name=\"webdot$count\">"
             set default ""
             foreach l [split [read $f] \n] {
-                if {[scan $l {bb (%d,%d)} sizex sizey] == 2} {
-    
+                if {[scan $l {<!-- bb (%d,%d)} sizex sizey] == 2} {
                     # save bb for size
-                } elseif {[scan $l {rectangle (%d,%d) (%d,%d) %s %[^\n]} x1 y1 x2 y2 ref_url label] == 6} {
-                    # fix up coordinate order to that expected by browsers.
-                    if {$x2<$x1} {
-                        set t $x1
-                        set x1 $x2
-                        set x2 $t
-                    }
-                    if {$y2<$y1} {
-                        set t $y1
-                        set y1 $y2
-                        set y2 $t
-                    }
-		    #  FIXME - should use cmap output but cmap has no bb
-		    # escape >
-		    regsub -all -- {>} $ref_url {\&gt;} ref_url
-                    puts "<area href=\"$ref_url\"
-	shape=\"rect\"
-        coords=\"$x1,$y1,$x2,$y2\"
-	target=\"$target\">"
-                } elseif {[scan $l {default %s %[^\n]} ref_url label] == 2} {
-                     set default "<area href=\"$ref_url\"
-	shape=\"default\"
-	target=\"$target\">"
+                } elseif {[string length $l]} {
+                    puts $l
                 }
             }
             close $f
-            puts $default
             puts "</map>"
             puts "<img src=\"$SELF/$url.$engine.$type\"
 	width=\"$sizex\" height=\"$sizey\" border=\"0\"
@@ -859,13 +836,13 @@ proc webdot::make_product {url type engine no_cache} {
                 close $f_out
 
                 # generate map
-                if {[catch {open $engine.map w} f_out]} {
-                    error "Unable to open cache file for write: $engine.map"
+                if {[catch {open $engine.cmap w} f_out]} {
+                    error "Unable to open cache file for write: $engine.cmap"
                 }
-                puts $f_out "bb ($sizex,$sizey)"
-                puts $f_out "rectangle ([expr $sizex - $x2 - 4],$sizey) ($sizex,[expr $sizey - ($x0 - $y2) - 4]) $SELF/$url.$cachename.help $SIGNATURE"
+                puts $f_out "<!-- bb ($sizex,$sizey) -->"
+                puts $f_out "<area href=\"$SELF/$url.$cachename.help\" alt=\"$SIGNATURE\" coords=\"[expr $sizex - $x2 - 4],$sizey,$sizex,[expr $sizey - ($x0 - $y2) - 4]\">"
                 flush $f_out
-                $g write $f_out ismap
+                $g write $f_out cmap
             	$g delete
             } err]} {
 		# try to output an error message 
@@ -886,10 +863,10 @@ proc webdot::make_product {url type engine no_cache} {
                 close $f_out
 
                 # generate empty map with bb info of error message
-                if {[catch {open $engine.map w} f_out]} {
-                    error "Unable to open cache file for write: $engine.map"
+                if {[catch {open $engine.cmap w} f_out]} {
+                    error "Unable to open cache file for write: $engine.cmap"
                 }
-		puts $f_out "bb (500,100)"
+		puts $f_out "<!-- bb (500,100) -->"
 	    }
        	    close $f_out
         }
@@ -921,6 +898,26 @@ proc webdot::make_product {url type engine no_cache} {
             puts $f_out "rectangle ([expr $sizex - $x2 - 4],$sizey) ($sizex,[expr $sizey - ($x0 - $y2) - 4]) $SELF/$url.$cachename.help $SIGNATURE"
             flush $f_out
             $g write $f_out ismap
+            close $f_out
+            $g delete
+	}
+        cmap {
+            set g [webdot::read_graph]
+            webdot::fix_graph_urls $g $serverport $dirname
+            if {[catch {$g layout [string toupper $engine]} err]} {
+                error "Graph layout error: $err" 
+            }
+            if {[catch {open $cachename w} f_out]} {
+                error "Unable to open cache file for write: $cachename"
+            }
+            foreach {sizex sizey} [webdot::get_image_size $g] {break}
+            puts $f_out "<!-- bb ($sizex,$sizey) -->"
+            # work out size of the signature in this font
+            foreach {x0 y0 x1 y1 x2 y2 x3 y3} [gd text {} 0 \
+                times 8.0 0.0 0 0 $SIGNATURE] {break}
+            puts $f_out "<area href=\"$SELF/$url.$cachename.help\" alt=\"$SIGNATURE\" coords=\"[expr $sizex - $x2 - 4],$sizey,$sizex,[expr $sizey - ($x0 - $y2) - 4]\">"
+            flush $f_out
+            $g write $f_out cmap
             close $f_out
             $g delete
         }
@@ -984,7 +981,7 @@ proc webdot::make_product {url type engine no_cache} {
             }
             exec $PS2EPSI $engine.ps $cachename
         }
-        hpgl - fig - imap - cmap - mif - pcl - pic - ps - ps2 - svg - svgz - vtx - vrml {
+        hpgl - fig - imap - mif - pcl - pic - ps - ps2 - svg - svgz - vtx - vrml {
             set g [webdot::read_graph]
             if {[catch {$g layout [string toupper $engine]} err]} {
                 error "Graph layout error: $err" 

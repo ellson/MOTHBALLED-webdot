@@ -1,12 +1,12 @@
 Name:           webdot
 Version:        1.8.5
-Release:        0_RH7
+Release:        1_alpha
 Group:          Applications/Graphics
-Copyright:      BSD-style
+License:        BSD-style
 URL:            http://www.graphviz.org/
-Summary:        A CGI graph server script that uses tcldot from graphviz.
+Summary:        A CGI graph server script that uses tcldot from graphviz-tcl.
 Packager:       John Ellson (ellson@lucent.com)
-Requires:       graphviz ghostscript tcl
+Requires:       graphviz-tcl ghostscript tcl
 Source:         http://www.graphviz.org/pub/graphviz/%{name}-%{version}.tar.gz
 BuildArchitectures: noarch
 BuildRoot:	%{_tmppath}/%{name}-root
@@ -14,7 +14,7 @@ BuildRoot:	%{_tmppath}/%{name}-root
 %description
 A cgi-bin program that produces clickable graphs in web pages
 when provided with an href to a .dot file.  Uses Tcldot from the
-graphviz rpm.
+graphviz-tcl rpm.
 
 %prep
 %setup -n %{name}-%{version}
@@ -27,7 +27,7 @@ graphviz rpm.
 
 %define cachedir   /var/cache/webdot
 %define tclshbin   %(rpm -ql tcl | grep '/tclsh$')
-%define tcldotlib  %(rpm -ql graphviz | grep '/libtcldot\\\.so$')
+%define tcldotlib  %(rpm -ql graphviz-tcl | grep '/libtcldot\\\.so$')
 %define gsbin      %(which gs)
 %define ps2epsibin %(which ps2epsi)
 

@@ -16,33 +16,16 @@ after serving this page through $CGIBASE, this &lt;webdot...&gt;
 tag is replaced by:
 <table border=1><tr><td><pre>
 &lt;map name="webdot0"&gt;
-&lt;area href="$CGIBASE/http://127.0.0.1$BASE/$SELF.dot.neato.png.help"
-	shape="rect"
-	coords="160,223,248,235"
-	target="new"&gt;
-&lt;area href="$BASE/a.html"
-	shape="rect"
-	coords="1,126,73,174"
-	target="new"&gt;
-&lt;area href="$BASE/b.html"
-	shape="rect" coords="101,101,173,149"
-	target="new"&gt;
-&lt;area href="$BASE/c.html"
-	shape="rect"
-	coords="173,173,245,221"
-	target="new"&gt;
-&lt;area href="$BASE/d.html"
-	shape="rect"
-	coords="128,2,200,50"
-	target="new"&gt;
-&lt;area href="$BASE/default.html"
-	shape="default"
-	target="new"&gt;
+&lt;area href="/cgi-bin/webdot/http://localhost/cgi-bin/webdot/webdot/clientmap.dot.neato.png.help" alt="Graph by WebDot" coords="147,240,235,228"&gt;
+&lt;area shape="rect" href="http://localhost/webdot/a.html" title="a" alt="" coords="8,132,37,161"&gt;
+&lt;area shape="rect" href="http://localhost/webdot/b.html" title="b" alt="" coords="108,105,137,135"&gt;
+&lt;area shape="rect" href="http://localhost/webdot/c.html" title="c" alt="" coords="180,179,209,208"&gt;
+&lt;area shape="rect" href="http://localhost/webdot/d.html" title="d" alt="" coords="135,7,164,36"&gt;
 &lt;/map&gt;
-&lt;img src="$CGIBASE/http://127.0.0.1$BASE/$SELF.dot.neato.png"
-	width="248" height="235" border="0"
+&lt;img src="/cgi-bin/webdot/http://localhost/cgi-bin/webdot/webdot/clientmap.dot.neato.png"
+	width="235" height="240" border="0"
 	usemap="#webdot0"
-	alt="Graph by WebDot"&gt;
+	alt="Graph by WebDot">
 </pre></td></tr></table>
 <p>
 The advantages of this mode of WebDot are the much simpler authoring and
