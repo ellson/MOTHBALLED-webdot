@@ -47,6 +47,7 @@ array set MIME {
     epsi   "application/postscript"
     fig    "application/x-fig"
     gif    "image/gif"
+    gq     "text/html"
     gv     "application/x-graphviz"
     hpgl   "application/x-hpgl"
     html   "text/html"
@@ -824,7 +825,7 @@ proc webdot::make_product {url type engine viewport no_cache} {
             $g delete
         }
 	src {}
-	html {
+	gq {
 	    # make a layout graph
 	    if {[catch {webdot::make_product $url dot $engine {} $no_cache} err]} {
 		error $err
@@ -849,8 +850,8 @@ proc webdot::make_product {url type engine viewport no_cache} {
             $g write $f_out png
             close $f_out
 
-	    # create viewport html and map
-	    set cachename $engine.html.$viewport
+	    # create graphquest (gq) html and map
+	    set cachename $engine.gq.$viewport
             if {[catch {open $cachename w} f_out]} {
                 error "Unable to open cache file for write: $cachename"
             }
@@ -866,37 +867,37 @@ proc webdot::make_product {url type engine viewport no_cache} {
             puts $f_out "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\" \"http://www.w3.org/TR/html4/loose.dtd\">
 <html><head>
   <title>Graphquest</title>
-  <base target=\"graphquest\">
+  <base target=\"gq\">
 </head><body>
   <h1>Graphquest</h1>
   <table><tr>
-    <td><a href=\"$SELF/$url.$engine.html.$X,$Y,$Z,$west,$north\"><img src=\"$SELF/blue.png\" border=\"0\" width=\"5\" height=\"5\" /></a></td>
-    <td><a href=\"$SELF/$url.$engine.html.$X,$Y,$Z,$x,$north\"><img src=\"$SELF/blue.png\" border=\"0\" width=\"$X\" height=\"5\" /></a></td>
-    <td><a href=\"$SELF/$url.$engine.html.$X,$Y,$Z,$east,$north\"><img src=\"$SELF/blue.png\" border=\"0\" width=\"5\" height=\"5\" /></a></td>
+    <td><a href=\"$SELF/$url.$engine.gq.$X,$Y,$Z,$west,$north\"><img src=\"$SELF/blue.png\" border=\"0\" width=\"5\" height=\"5\" /></a></td>
+    <td><a href=\"$SELF/$url.$engine.gq.$X,$Y,$Z,$x,$north\"><img src=\"$SELF/blue.png\" border=\"0\" width=\"$X\" height=\"5\" /></a></td>
+    <td><a href=\"$SELF/$url.$engine.gq.$X,$Y,$Z,$east,$north\"><img src=\"$SELF/blue.png\" border=\"0\" width=\"5\" height=\"5\" /></a></td>
     <td rowspan=\"3\"><table><tr>"
 	    foreach z {200 175 150 125 100 75 50 25} {
 		if {$z == $Z} {
-		    puts $f_out "    <td><a href=\"$SELF/$url.$engine.html.$X,$Y,$z,$x,$y\"><img src=\"$SELF/green.png\" border=\"0\" width=\"15\" height=\"5\" /></a></td>
+		    puts $f_out "    <td><a href=\"$SELF/$url.$engine.gq.$X,$Y,$z,$x,$y\"><img src=\"$SELF/green.png\" border=\"0\" width=\"15\" height=\"5\" /></a></td>
     </tr><tr><td></td></tr><tr>"
 		} {
-		    puts $f_out "    <td><a href=\"$SELF/$url.$engine.html.$X,$Y,$z,$x,$y\"><img src=\"$SELF/blue.png\" border=\"0\" width=\"15\" height=\"5\" /></a></td>
+		    puts $f_out "    <td><a href=\"$SELF/$url.$engine.gq.$X,$Y,$z,$x,$y\"><img src=\"$SELF/blue.png\" border=\"0\" width=\"15\" height=\"5\" /></a></td>
     </tr><tr><td></td></tr><tr>"
 		}
             }
             puts $f_out "    </tr></table></td>
   </tr><tr>
-    <td><a href=\"$SELF/$url.$engine.html.$X,$Y,$Z,$west,$y\"><img src=\"$SELF/blue.png\" border=\"0\" width=\"5\" height=\"$Y\" /></a></td>
+    <td><a href=\"$SELF/$url.$engine.gq.$X,$Y,$Z,$west,$y\"><img src=\"$SELF/blue.png\" border=\"0\" width=\"5\" height=\"$Y\" /></a></td>
     <td>"
             flush $f_out
             $g write $f_out cmapx
             flush $f_out
             puts $f_out "      <img src=\"$SELF/$url.$engine.png.$viewport\" width=\"$X\" height=\"$Y\" border=\"0\" usemap=\"G\" alt=\"Graph by WebDot\" />
     </td>
-    <td><a href=\"$SELF/$url.$engine.html.$X,$Y,$Z,$east,$y\"><img src=\"$SELF/blue.png\" border=\"0\" width=\"5\" height=\"$Y\" /></a></td>
+    <td><a href=\"$SELF/$url.$engine.gq.$X,$Y,$Z,$east,$y\"><img src=\"$SELF/blue.png\" border=\"0\" width=\"5\" height=\"$Y\" /></a></td>
   </tr><tr>
-    <td><a href=\"$SELF/$url.$engine.html.$X,$Y,$Z,$west,$south\"><img src=\"$SELF/blue.png\" border=\"0\" width=\"5\" height=\"5\" /></a></td>
-    <td><a href=\"$SELF/$url.$engine.html.$X,$Y,$Z,$x,$south\"><img src=\"$SELF/blue.png\" border=\"0\" width=\"$X\" height=\"5\" /></a></td>
-    <td><a href=\"$SELF/$url.$engine.html.$X,$Y,$Z,$east,$south\"><img src=\"$SELF/blue.png\" border=\"0\" width=\"5\" height=\"5\" /></a></td>
+    <td><a href=\"$SELF/$url.$engine.gq.$X,$Y,$Z,$west,$south\"><img src=\"$SELF/blue.png\" border=\"0\" width=\"5\" height=\"5\" /></a></td>
+    <td><a href=\"$SELF/$url.$engine.gq.$X,$Y,$Z,$x,$south\"><img src=\"$SELF/blue.png\" border=\"0\" width=\"$X\" height=\"5\" /></a></td>
+    <td><a href=\"$SELF/$url.$engine.gq.$X,$Y,$Z,$east,$south\"><img src=\"$SELF/blue.png\" border=\"0\" width=\"5\" height=\"5\" /></a></td>
   </tr></table>
 </body></html>"
             close $f_out
@@ -1072,11 +1073,11 @@ if {[string equal $path /blue.png] || [string equal $path /green.png]} {
 #
 #	filename.dot.<type>				(short for filename.dot.dot.<type>)
 #	filename.dot.<eng>.<type>			convert to <type> using <eng>
-#	filename.dot.<eng>.<type>.<viewport>		viewport request
+#	filename.dot.<eng>.gq.<viewport>		graphquest (gq) request (html)
+#	filename.dot.<eng>.png.<viewport>		   image for graphquest
 #
 #	filename.dot.<type>.help			(short for filename.dot.dot.<type>.help)
 #	filename.dot.<eng>.<type>.help			put <eng> result in a help page
-#	filename.dot.<eng>.<type>.<viewport>.help	put <eng> result in a help page
 #
 # <eng> is one of: dot neato twopi ...
 # <type> is one of: png gif jpg ....
@@ -1247,7 +1248,7 @@ if {[string length $LastModified]} {
 
 # send output header
 switch -- $type {
-    gv - dot - png - gif - jpeg - mif - ps - ps2 - epsi - pdf - hpgl - pic - pcl - vrml - vtx - fig - svg - svgz - src - imap - cmap - html {
+    gv - dot - png - gif - jpeg - mif - ps - ps2 - epsi - pdf - hpgl - pic - pcl - vrml - vtx - fig - svg - svgz - src - imap - cmap - gq {
         puts [join $header \n]
     }
     tcl {
