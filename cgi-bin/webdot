@@ -593,9 +593,12 @@ proc webdot::make_client_map {url type engine no_cache count target} {
             }
             puts "<map name=\"webdot$count\">"
             set default ""
+            set havetarget [string length $target]
             foreach l [split [read $f] \n] {
                 if {[scan $l {<!-- bb (%d,%d)} sizex sizey] == 2} {
                     # save bb for size
+                } elseif {$havetarget && [regexp {<area (.*)>} $l . allbuttarget]} {
+                    puts "<area $allbuttarget target=\"$target\">"
                 } elseif {[string length $l]} {
                     puts $l
                 }
@@ -623,6 +626,7 @@ proc webdot::make_client_map {url type engine no_cache count target} {
                 error "Unable to open cache file for read: $file_cache_dir/$engine.$type"
             }
             while {![eof $f]} {
+                # remove leading comment when embedding svg in an html page
 		if {[string equal [string range [gets $f] end-2 end] {-->}]} {break}
             }
             fcopy $f stdout
