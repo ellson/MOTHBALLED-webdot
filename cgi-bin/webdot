@@ -287,6 +287,14 @@ after idle {
 #
 # generate an error with an error message
 #
+proc toperror {m} {
+	puts "Content-type: text/plain\n\nWebDot Error:\n\n$m"
+	flush stdout
+	puts {}
+	exit
+}
+
+# propogate error to top
 proc error {m} {
     return -code error $m
 }
@@ -385,6 +393,7 @@ proc webdot::get_url {url no_cache} {
             if {! $inbody} {
                 # still processing header
                 if {[catch {gets $skt} line]} {
+		    close $skt
                     error "failure reading from: $url\nresponse was: $line"
                 }
                 regsub -all \r $line {} line
@@ -394,14 +403,17 @@ proc webdot::get_url {url no_cache} {
                         switch $ResponseCode {
                             200 {
                                 if {[catch {open $file_cache_dir/src w} f_src]} {
+        			    close $skt
                                     error "failure to open $file_cache_dir/src for write"
                                 }
                             }
                             304 {set inbody 2}
                             404 {
+        			close $skt
                                 error "URL \"http://$server:$port$lpath\" was not found"
                             }
                             default {
+        			close $skt
                                 error "Response Code = $ResponseCode"
                             }
                         }
@@ -413,6 +425,7 @@ proc webdot::get_url {url no_cache} {
                         incr inbody
                         if {[string equal $ResponseCode 200]} {
                             if {[catch {open $file_cache_dir/info w} f_info]} {
+        			close $skt
                                 error "failure to open $file_cache_dir/info for write"
                             }
                             puts -nonewline $f_info [list $LastModified $Expires $ContentType]
@@ -536,11 +549,15 @@ proc webdot::make_client_map {url type engine no_cache count target} {
     switch -- $type {
         png - gif - jpeg {
             # get source file into cache (may already be there)
-            foreach {file_cache_dir LastModified Expires ContentType} \
-                        [webdot::get_url $url $no_cache] {break}
+	    if {[catch {webdot::get_url $url $no_cache} res]} {
+		error $res
+	    }
+            foreach {file_cache_dir LastModified Expires ContentType} $res {break}
             # some types (e.g. vrml) result in mutiple files, so cd to target directory
             cd $file_cache_dir
-            webdot::make_product $url $type $engine $no_cache
+	    if {[catch {webdot::make_product $url $type $engine $no_cache} err]} {
+		error $err
+	    }
             # generate map
             if {[catch {open $engine.map r} f]} {
                 error "Unable to open cache file for read: $file_cache_dir/$engine.map"
@@ -572,12 +589,16 @@ proc webdot::make_client_map {url type engine no_cache count target} {
         }
 	svg - svgz {
             # get source file into cache (may already be there)
-            foreach {file_cache_dir LastModified Expires ContentType} \
-                        [webdot::get_url $url $no_cache] {break}
+	    if {[catch {webdot::get_url $url $no_cache} res]} {
+		error $res
+	    }
+            foreach {file_cache_dir LastModified Expires ContentType} $res {break}
             # some types (e.g. vrml) result in mutiple files, so cd to target directory
             cd $file_cache_dir
             # generate svg
-            webdot::make_product $url $type $engine $no_cache
+	    if {[catch {webdot::make_product $url $type $engine $no_cache} err]} {
+		error $err
+	    }
             if {[catch {open $engine.$type r} f]} {
                 error "Unable to open cache file for read: $file_cache_dir/$engine.$type"
             }
@@ -630,7 +651,7 @@ proc webdot::filter_html {serverport dirname no_cache} {
                 set arg [string tolower $arg]
     
                 # trim any quotes around val
-                set val [string trim $val {"}]
+                set val [string trim $val "\""]
     
                 # check for legal args only
                 switch -- $arg {
@@ -752,8 +773,10 @@ proc webdot::make_product {url type engine no_cache} {
                     set bgurl [lindex $bgurl 0]
                     if {[string length $bgurl]} {
                         set bgurl [webdot::make_absolute_url $serverport $dirname $bgurl [$g showname]]
-                        foreach {bg_file_cache_dir . . ContentType} \
-                            [webdot::get_url $bgurl $no_cache] {break}
+	                if {[catch {webdot::get_url $bgurl $no_cache} res]} {
+                	    error $res
+            		}
+                        foreach {bg_file_cache_dir . . ContentType} $res {break}
                         if {[catch {open $bg_file_cache_dir/src r} bgf]} {
                             error "Unable to open background image file: $bg_file_cache_dir/src"
                         }
@@ -900,11 +923,15 @@ proc webdot::make_product {url type engine no_cache} {
             $g delete
         }
         pdf {
-            webdot::make_product $url ps2 $engine $no_cache
+            if {[catch {webdot::make_product $url ps2 $engine $no_cache} err]} {
+                error $err
+            }
             exec $GS -q -dNOPAUSE -dBATCH -sPAPERSIZE=a0 -sDEVICE=pdfwrite -sOutputFile=$cachename $engine.ps2
         }
         epsi {
-            webdot::make_product $url ps $engine $no_cache
+            if {[catch {webdot::make_product $url ps $engine $no_cache} err]} {
+                error $err
+            }
             exec $PS2EPSI $engine.ps $cachename
         }
         hpgl - fig - mif - pcl - pic - ps - ps2 - svg - svgz - vtx - vrml {
@@ -1003,7 +1030,7 @@ set STARTED_CONTENT_TYPE {}
 
 # check cgi environment
 foreach v {REMOTE_ADDR SERVER_NAME SERVER_PORT SCRIPT_NAME REQUEST_METHOD} {
-        if {![info exists env($v)]} {error "Missing: $v"}
+        if {![info exists env($v)]} {toperror "Missing: $v"}
 }
 # some httpd don't provide SERVER_ADDR
 if {![info exists env(SERVER_ADDR)]} {
@@ -1013,7 +1040,7 @@ if {![info exists env(SERVER_ADDR)]} {
 }
 if {!([string equal $env(REQUEST_METHOD) GET]
     || [string equal $env(REQUEST_METHOD) HEAD])} {
-        error "Missing or unsupported: REQUEST_METHOD"
+        toperror "Missing or unsupported: REQUEST_METHOD"
 }
 set server_port ":$env(SERVER_PORT)"
 if {[string equal $server_port :80]} {set server_port {}}
@@ -1032,7 +1059,7 @@ if {[info exists env(PATH_INFO)]} {
         set path $env(PATH_INFO)
     } {
         if {![string equal $protocol http]} {
-            error "Invalid URL. Only http allowed."
+            toperror "Invalid URL. Only http allowed."
         }
     }
 } {
@@ -1112,7 +1139,7 @@ switch -- $type {
     }
     {} {
 	# shouldn't happen, but just in case
-        error "Missing type specification"
+        toperror "Missing type specification"
     }
 }
 
@@ -1134,8 +1161,10 @@ if {[string length $help]} {
 # OK so maybe we have real work to do!
 
 # get source file into cache (may already be there)
-foreach {file_cache_dir LastModified Expires ContentType} \
-    [webdot::get_url $url $no_cache] {break}
+if {[catch {webdot::get_url $url $no_cache} res]} {
+	toperror $res
+}
+foreach {file_cache_dir LastModified Expires ContentType} $res {break}
 
 # some types (e.g. vrml) result in mutiple files, so cd to target directory
 cd $file_cache_dir
@@ -1151,7 +1180,7 @@ if {! ([string equal $ContentType $MIME(dot)]
        || [string equal $ContentType $MIME(gv)]
        || [string equal $srctype gv]
        || [string equal $srctype dot])} {
-    error "unrecognized mimetype for graph: $ContentType and unrecognized file extension: $srctype"
+    toperror "Unrecognized mimetype for graph: $ContentType\nand unrecognized file extension: $srctype"
 }
 
 # Support for client-side caching
@@ -1168,7 +1197,7 @@ if {! ([string equal $ContentType $MIME(dot)]
 #
 if {[info exists env(HTTP_IF_MODIFIED_SINCE)]} {
     if {[catch {clock scan $Expires -gmt 1} t]} {
-       error "failed to parse time in env(HTTP_IF_MODIFIED_SINCE): $env(HTTP_IF_MODIFIED_SINCE)"
+       toperror "failed to parse time in env(HTTP_IF_MODIFIED_SINCE): $env(HTTP_IF_MODIFIED_SINCE)"
     }
     if {$t >= $LastModified && $t > $SELFMTIME} {
         puts "Status: 304 Not Modified\n"
@@ -1177,7 +1206,9 @@ if {[info exists env(HTTP_IF_MODIFIED_SINCE)]} {
 }
 
 # convert the graph
-webdot::make_product $url $type $engine $no_cache
+if {[catch {webdot::make_product $url $type $engine $no_cache} err]} {
+    toperror $err
+}
 # now the product is in the cache and we can ship it
 if {[string equal $type src]} {
     set cachename src
@@ -1185,7 +1216,7 @@ if {[string equal $type src]} {
     set cachename $engine.$type
 }
 if {[catch {open $cachename r} f]} {
-    error "Unable to open cache file for read: $file_cache_dir/$cachename"
+    toperror "Unable to open cache file for read: $file_cache_dir/$cachename"
 }
 
 # start preparing result http header
@@ -1230,7 +1261,7 @@ switch -- $type {
             set query $env(QUERY_STRING)
         }
     }
-    default {error "I don't know how to make type: $type"}
+    default {toperror "I don't know how to make type: $type"}
 }
 
 if {[string equal $type map] && [string length $x]} {
