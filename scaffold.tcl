@@ -1,7 +1,7 @@
-#!/usr/local/bin/tclsh8.4
+#!/usr/bin/tclsh8.3
 
 # cgi variables
-set env(DOCUMENT_ROOT) /home/httpd/html
+set env(DOCUMENT_ROOT) /var/www/html
 set env(SERVER_NAME) localhost
 set env(SERVER_ADDR) 127.0.0.1
 set env(REMOTE_ADDR) 127.0.0.1
@@ -15,4 +15,4 @@ set env(HTTP_PRAGMA) no-cache
 #set env(PATH_INFO) /webdot/demo.dot.pdf
 set env(PATH_INFO) /webdot/demo.html
 
-source cgi-bin/webdot
+source webdot

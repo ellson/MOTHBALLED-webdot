@@ -1,11 +1,28 @@
 <html>
 <head>
-<title>demo</title>
+<title>webdot demo</title>
 </head>
 <body bgcolor=white>
-<h1>demo</h1>
-Some text <webdot src=demo1.dot type=png target=new> followed by more text.
-<p>Some more text <webdot src=demo2.dot type=gif> followed by yet more text.
-<p>Some more text <webdot src=demo1.dot type=tcl> followed by yet more text.
+<h1>webdot demo</h1>
+
+<p>To see the graph images on this page, this page must be viewed
+through the webdot cgi-bin program.
+<a href=/cgi-bin/webdot/webdot/index.html>Try this instead.</a>
+<hr>
+
+<p>This figure shows a directed graph formatted into a PNG image with
+client-side mapping:
+<br><webdot src=demo1.dot type=png target=new>
+
+<p>This figure shows an undirected graph formatted into a GIF image with
+client-side mapping:
+<br><webdot src=demo2.dot type=gif target=new>
+
+<p>The next figure is a directed graph formatted for presentation by
+a Tclet.
+<br><webdot src=demo1.dot type=tcl>
+<br>(The tcl plugin is available from
+<a href=http://www.demailly.com/tcl/plugin/download.html>http://www.demailly.com/tcl/plugin/download.html</a>)
+
 </body>
 </html>

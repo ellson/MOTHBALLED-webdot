@@ -64,6 +64,7 @@ dist:
 	mkdir -p $(distdir)/cgi-bin $(distdir)/html/webdot
 	cp AUTHORS CHANGES COPYING INSTALL README $(distdir)
 	cp Makefile webdot.spec $(distdir)
+	cp scaffold.tcl $(distdir)
 	cp cgi-bin/webdot $(distdir)/cgi-bin/
 	cp html/webdot/*.html $(distdir)/html/webdot/
 	cp html/webdot/*.dot $(distdir)/html/webdot/

@@ -849,8 +849,8 @@ WebDot in any of the following formats:<pre>"
         if {!([incr column]%3)} {puts ""}
     }
     puts "</pre>
-General information, tutorials, and sources for WebDot can be found at:
-<a href=http://www.graphviz.org/webdot/>http://www.graphviz.org/webdot/</a>
+Sources for WebDot can be found at:
+<a href=http://www.graphviz.org/pub/graphviz/>http://www.graphviz.org/pub/graphviz/</a>
 <p>
 WebDot is by: <a href=mailto:ellson@graphviz.org>John Ellson (ellson@graphviz.org)</a>
 </body></html>"
