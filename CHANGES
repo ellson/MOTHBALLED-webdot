@@ -1,4 +1,7 @@
-Februay 12, 2002 - Release 1.7.17
+April 2, 2002 - Release 1.8.1
+	- support ps2 format and use in pdf generation
+	- add 2 new demo graphs (to match graphviz demos)
+February 12, 2002 - Release 1.7.17
         - replace missing graphs
 January 2, 2002 - Release 1.7.16
 	- some improvements to demo graphs
