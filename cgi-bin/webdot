@@ -11,7 +11,7 @@
 # At the top of this file should be some installation dependent code like:
 #
 #	#!/usr/bin/tclsh8.3
-#	set LIBTCLDOT /usr/lib/graphviz/libtcldot.so
+#	set LIBTCLDOT /usr/lib/graphviz/libtcldot.so.0.0.0
 #	set CACHE_ROOT /var/cache/webdot
 #	set GS /usr/bin/gs
 #	set PS2EPSI /usr/bin/ps2epsi

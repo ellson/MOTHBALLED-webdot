@@ -30,7 +30,7 @@ graphviz-tcl rpm.
 
 %define cachedir   /var/cache/webdot
 %define tclshbin   %(rpm -ql tcl | grep '/tclsh$')
-%define tcldotlib  %(rpm -ql graphviz-tcl | grep '/libtcldot\\\.so$')
+%define tcldotlib  %(rpm -ql graphviz-tcl | grep '/libtcldot\\\.so.0.0.0$')
 %define gsbin      %(which gs)
 %define ps2epsibin %(which ps2epsi)
 
