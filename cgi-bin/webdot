@@ -563,7 +563,7 @@ proc webdot::read_graph {} {
     }
     fconfigure $f -encoding utf-8
     if {[catch {dotread $f} g]} {
-        error "Invalid graph source: $g\nThere may be more details in the WebDot server's error_log,\nor check the graph file by running through dot (or neato or twopi) locally."
+        error "Invalid graph source: $g\nThere may be more details in the WebDot server's error_log,\nor check the graph file by running through dot (or neato or twopi or fdp) locally."
     }
     close $f
     return $g
@@ -1033,26 +1033,14 @@ proc webdot::send_help {url type engine} {
 
     webdot::make_client_map $url $type $engine 0 0 new
 
-    switch -- [string toupper $engine] {
-        DOT {
-	    set thisengine DOT
-	    set otherengine1 NEATO
-	    set otherengine2 TWOPI
-	}
-	NEATO {
-	    set thisengine NEATO
-	    set otherengine1 DOT
-	    set otherengine2 TWOPI
-	}
-	TWOPI {
-	    set thisengine TWOPI
-	    set otherengine1 DOT
-	    set otherengine2 NEATO
-	}
-    }
+    set all_engines {DOT NEATO TWOPI FDP}
 
+    set this_engine [string toupper $engine]
+    set ix [lsearch $all_engines $this_engine]
+    set rest_engines [lreplace $all_engines $ix $ix]
+    
     puts "<p>This <a href=$url>graph</a> can be rendered by
-WebDot using the $thisengine layout engine, in any of the following
+WebDot using the $this_engine layout engine, in any of the following
 formats:<pre>"
 
     set column 0
@@ -1067,11 +1055,11 @@ formats:<pre>"
         if {!([incr column]%3)} {puts ""}
     }
     puts "</pre>
-<p>It can also be formatted by the 
-<a href=$SELF/$url.[string tolower $otherengine1].$type.help>$otherengine1</a>
-or the
-<a href=$SELF/$url.[string tolower $otherengine2].$type.help>$otherengine2</a>
-layout engines.
+<p>It can also be formatted by the:"
+    foreach {eng} $rest_engines {
+        puts "<a href=$SELF/$url.[string tolower $eng].$type.help>$eng</a>,"
+    }
+    puts "layout engines.
 <p> Sources for WebDot can be found at:
 <a href=http://www.graphviz.org/pub/graphviz/>http://www.graphviz.org/pub/graphviz/</a>
 <p>
@@ -1153,11 +1141,13 @@ if {[info exists env(PATH_INFO)]} {
 #	filename.dot.dot.png		convert to png using dot
 #	filename.dot.neato.png		convert to png using neato
 #	filename.dot.twopi.png		convert to png using twopi
+#	filename.dot.fdp.png		convert to png using fdp
 #
 #	filename.dot.png.help		(short for filename.dot.dot.png.help)
 #	filename.dot.dot.png.help	put dot result in a help page
 #	filename.dot.neato.png.help	put neato result in a help page
 #	filename.dot.twopi.png.help	put twopi result in a help page
+#	filename.dot.fdp.png.help	put fdp result in a help page
 #
 # "set help help" if .help is found at the end, otherwise "set help {}"
 #
@@ -1243,6 +1233,8 @@ switch -- $type {
 #    http://a.b.c.d/cgi-bin/webdot/http://w.x.y.z/path/x.dot.neato.png.help
 #or:
 #    http://a.b.c.d/cgi-bin/webdot/http://w.x.y.z/path/x.dot.twopi.png.help
+#or:
+#    http://a.b.c.d/cgi-bin/webdot/http://w.x.y.z/path/x.dot.fdp.png.help
 # originated from the "Graph by WebDot" signatures.
 if {[string length $help]} {
     webdot::send_help $url $type $engine
