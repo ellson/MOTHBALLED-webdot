@@ -34,8 +34,8 @@ PS2EPSI=/usr/bin/ps2epsi
 #      this can result in uncontrolled load on your system
 LOCALHOSTONLY=1
 
-# version number for webdot-*.*.tar.gz
-VERSION=1.7.1
+# version number for webdot-*.tar.gz
+VERSION=1.7-1
 
 ###############################################################
 
