@@ -820,6 +820,7 @@ proc make_product {url type engine no_cache} {
             close $f_out
             $g delete
         }
+	src {}
         default {
             error "Don't know how to make target type: $type"
         }
@@ -851,7 +852,11 @@ WebDot using the $thisengine layout engine, in any of the following formats:<pre
 
     set column 0
     foreach t {dot epsi fig gif hpgl jpeg mif pcl pdf pic png ps src svg tcl vrml vtx} {
-        puts -nonewline " <a href=$SELF/$url.$engine.$t>[format %5s $t] [format %-25s ($MIME($t))]</a>"
+	if {[string equal $t src]} {
+            puts -nonewline " <a href=$SELF/$url.$t>[format %5s $t] [format %-25s ($MIME($t))]</a>"
+	} {
+            puts -nonewline " <a href=$SELF/$url.$engine.$t>[format %5s $t] [format %-25s ($MIME($t))]</a>"
+	}
         if {!([incr column]%3)} {puts ""}
     }
     puts "</pre>
@@ -1028,8 +1033,13 @@ if {[info exists env(HTTP_IF_MODIFIED_SINCE)]} {
 # convert the graph
 make_product $url $type $engine $no_cache
 # now the product is in the cache and we can ship it
-if {[catch {open $engine.$type r} f]} {
-    error "Unable to open cache file for read: $file_cache_dir/$engine.$type"
+if {[string equal $type src]} {
+    set cachename src
+} {
+    set cachename $engine.$type
+}
+if {[catch {open $cachename r} f]} {
+    error "Unable to open cache file for read: $file_cache_dir/$cachename"
 }
 
 # start preparing result http header
