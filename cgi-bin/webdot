@@ -594,9 +594,20 @@ proc webdot::make_client_map {url type engine no_cache count target} {
     
                     # save bb for size
                 } elseif {[scan $l {rectangle (%d,%d) (%d,%d) %s %[^\n]} x1 y1 x2 y2 ref_url label] == 6} {
+                    # fix up coordinate order to that expected by browsers.
+                    if {$x2<$x1} {
+                        set t $x1
+                        set x1 $x2
+                        set x2 $t
+                    }
+                    if {$y2<$y1} {
+                        set t $y1
+                        set y1 $y2
+                        set y2 $t
+                    }
                     puts "<area href=\"$ref_url\"
 	shape=\"rect\"
-	coords=\"$x1,$y2,$x2,$y1\"
+        coords=\"$x1,$y1,$x2,$y2\"
 	target=\"$target\">"
                 } elseif {[scan $l {default %s %[^\n]} ref_url label] == 2} {
                      set default "<area href=\"$ref_url\"
