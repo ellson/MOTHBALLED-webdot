@@ -359,14 +359,6 @@ proc webdot::read_graph {src} {
         }
     }
 
-    # FIXME - this ugliness is to make textsize assume PNG output
-    #   shouldn't be needed when cairo renderers are available
-    set g [dotnew digraph]
-    set f [open /dev/null w]
-    $g write $f PNG
-    close $f
-    $g delete
-                                                                                
     # read in source file from cache
     if {[catch {open $src r} f]} {
         error "Unable to open cache file for read: $src"
