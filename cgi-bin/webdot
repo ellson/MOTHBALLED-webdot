@@ -901,7 +901,7 @@ proc webdot::make_product {url type engine no_cache} {
         }
         pdf {
             webdot::make_product $url ps2 $engine $no_cache
-            exec $GS -q -dNOPAUSE -dBATCH -sDEVICE=pdfwrite -sOutputFile=$cachename $engine.ps2
+            exec $GS -q -dNOPAUSE -dBATCH -sPAPERSIZE=a0 -sDEVICE=pdfwrite -sOutputFile=$cachename $engine.ps2
         }
         epsi {
             webdot::make_product $url ps $engine $no_cache
