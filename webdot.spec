@@ -35,16 +35,7 @@ graphviz rpm.
 mkdir -p $RPM_BUILD_ROOT/%{cgibindir}
 mkdir -p $RPM_BUILD_ROOT/%{htmldir}
 mkdir -p $RPM_BUILD_ROOT/%{cachedir}
-cat > $RPM_BUILD_ROOT/%{cgibindir}/webdot << '__EOF__'
-#!%{tclsh83bin}
-set LIBTCLDOT %{libtcldot}
-set CACHE_ROOT %{cachedir}
-set GS %{gsbin}
-set PS2EPSI %{ps2epsibin}
-set LOCALHOSTONLY 1
-__EOF__
-cat $RPM_SOURCE_DIR/cgi-bin/webdot >> $RPM_BUILD_ROOT/%{cgibindir}/webdot
-chmod 755 $RPM_BUILD_ROOT/%{cgibindir}/webdot
+cp $RPM_SOURCE_DIR/cgi-bin/webdot $RPM_BUILD_ROOT/%{cgibindir}/
 cp -r $RPM_SOURCE_DIR/html/webdot $RPM_BUILD_ROOT/%{htmldir}/
 chown %{apacheuser}:%{apachegroup} $RPM_BUILD_ROOT/%{cachedir}
 chmod 700 $RPM_BUILD_ROOT/%{cachedir}
@@ -64,9 +55,11 @@ set GS %{gsbin}
 set PS2EPSI %{ps2epsibin}
 set LOCALHOSTONLY 1
 __EOF__
-tail +7 %{cgibindir}/webdot >> %{cgibindir}/webdot.new
+cat %{cgibindir}/webdot >> %{cgibindir}/webdot.new
 mv -f %{cgibindir}/webdot.new %{cgibindir}/webdot
 chmod +x %{cgibindir}/webdot
+chown %{apacheuser}:%{apachegroup} %{cachedir}
+chmod 700 %{cachedir}
 
 %clean
 rm -rf $RPM_BUILD_ROOT
