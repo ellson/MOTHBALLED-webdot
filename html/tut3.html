@@ -1,0 +1,37 @@
+<html>
+<head>
+<title>WebDot - Tutorial 3</title>
+</head>
+<body bgcolor=white>
+<table width=100%><tr>
+<th align=left><a href=tut2.html>[previous]</a></th>
+<th>WebDot - Tutorial 3</th>
+<th align=right><a href=/cgi-bin/webdot/webdot/tut4.html>[next]</a></th>
+</tr></table>
+<table width=100%><tr><td>
+Dot supports a "\N" short form so that the URLs of the nodes can be
+based on the node name.  Edges can also have URLs, but because
+of the limited abilities of image maps, a label must exist and the
+URL is attached to it.
+<pre>
+    digraph G {
+        graph [URL="default.html"]
+	node [URL="\N.html"]
+        a -> b -> c
+        a -> c [URL="a->c.html", label="a->c"]
+    }
+</pre>
+<p>
+The box around the clickable image can be suppressed with "border=0"
+<pre>
+	&lt;a href=/cgi-bin/webdot/webdot/tut3.dot.dot.map&gt;
+	&lt;img src=/cgi-bin/webdot/webdot/tut3.dot.dot.png border=0 ismap&gt;
+	&lt;/a&gt;
+</pre>
+</td><td>
+<a href=/cgi-bin/webdot/webdot/tut3.dot.dot.map>
+<img src=/cgi-bin/webdot/webdot/tut3.dot.dot.png border=0 ismap>
+</a>
+</td></tr></table>
+</body>
+</html>

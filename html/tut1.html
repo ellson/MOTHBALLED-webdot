@@ -1,0 +1,40 @@
+<html>
+<head>
+<title>WebDot - Tutorial 1</title>
+</head>
+<body bgcolor=white>
+<table width=100%><tr>
+<th align=left></th>
+<th>WebDot - Tutorial 1</th>
+<th align=right><a href=tut2.html>[next]</a></th>
+</tr></table>
+<table><tr><td>
+Given a description of a graph in the dot language, e.g.:
+<pre>
+    graph G {
+        a -- b -- c -- d
+        b -- e -- d
+    }
+</pre>
+<p>
+in a file that can be served by your web server, e.g.
+<a href=/cgi-bin/webdot/webdot/tut1.dot.src>/var/www/html/webdot/tut1.dot</a>
+<p>
+Then this image reference in an html web page:
+<pre>
+    &lt;img src=/cgi-bin/webdot<b>/webdot/tut1.dot</b>.neato<b>.png</b>&gt;
+</pre>
+<p>
+will produce the image at the right.
+The image reference consists of four parts:
+<pre>
+    /cgi-bin/webdot       The WebDot CGI server.
+    <b>/webdot/tut1.dot</b>      The graph source file.
+    .neato                The layout engine (either ".dot" or ".neato")
+    <b>.png</b>                  The output format.
+</pre>
+</td><td>
+<img src=/cgi-bin/webdot/webdot/tut1.dot.neato.png>
+</td></tr></table>
+</body>
+</html>
