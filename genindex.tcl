@@ -1,8 +1,8 @@
 #!/usr/bin/tclsh8.3
 
 set f [open html/webdot/demo.html w]
-set w http://localhost/cgi-bin/webdot
-set p http://localhost/webdot/graphs/directed
+set w /cgi-bin/webdot
+set p /webdot/graphs/directed
 cd html/webdot/graphs/directed
 
 puts $f "<html>
@@ -28,18 +28,18 @@ set i 0
 foreach dd [lsort [glob *.dot]] {
 	set d [file rootname $dd]
 	if {$i%4} {puts $f "<td></td>"}
-	puts $f "<td><a href=$w/$p/$dd.src>$d</a></td>
-<td><a href=$w/$p/$dd.$e.png.help>png</a></td>
-<td><a href=$w/$p/$dd.$e.tcl.help>tcl</a></td>
-<td><a href=$w/$p/$dd.$e.pdf>pdf</a></td>
+	puts $f "<td><a href=$w$p/$dd.src>$d</a></td>
+<td><a href=$w$p/$dd.$e.png.help>png</a></td>
+<td><a href=$w$p/$dd.$e.tcl.help>tcl</a></td>
+<td><a href=$w$p/$dd.$e.pdf>pdf</a></td>
 <td></td>
-<td><a href=$w/$p/$dd.$oe.png.help>png</a></td>
-<td><a href=$w/$p/$dd.$oe.tcl.help>tcl</a></td>
-<td><a href=$w/$p/$dd.$oe.pdf>pdf</a></td>"
+<td><a href=$w$p/$dd.$oe.png.help>png</a></td>
+<td><a href=$w$p/$dd.$oe.tcl.help>tcl</a></td>
+<td><a href=$w$p/$dd.$oe.pdf>pdf</a></td>"
 	if {!([incr i]%4)} {puts $f "</tr><tr>"}
 }
 
-set p http://localhost/webdot/graphs/undirected
+set p /webdot/graphs/undirected
 cd ../undirected
 puts $f "</tr><tr></tr><tr>
 <th>Undirected</th>
@@ -56,16 +56,16 @@ set i 0
 foreach dd [lsort [glob *.dot]] {
 	set d [file rootname $dd]
 	if {$i%4} {puts $f "<td></td>"}
-	puts $f "<td><a href=$w/$p/$dd.src>$d</a></td>
-<td><a href=$w/$p/$dd.$e.png.help>png</a></td>
-<td><a href=$w/$p/$dd.$e.tcl.help>tcl</a></td>
-<!-- <td><a href=$w/$p/$dd.$e.ps>ps</a></td> -->
-<td><a href=$w/$p/$dd.$e.pdf>pdf</a></td>
+	puts $f "<td><a href=$w$p/$dd.src>$d</a></td>
+<td><a href=$w$p/$dd.$e.png.help>png</a></td>
+<td><a href=$w$p/$dd.$e.tcl.help>tcl</a></td>
+<!-- <td><a href=$w$p/$dd.$e.ps>ps</a></td> -->
+<td><a href=$w$p/$dd.$e.pdf>pdf</a></td>
 <td></td>
-<td><a href=$w/$p/$dd.$oe.png.help>png</a></td>
-<td><a href=$w/$p/$dd.$oe.tcl.help>tcl</a></td>
-<!-- <td><a href=$w/$p/$dd.$oe.ps>ps</a></td> -->
-<td><a href=$w/$p/$dd.$oe.pdf>pdf</a></td>"
+<td><a href=$w$p/$dd.$oe.png.help>png</a></td>
+<td><a href=$w$p/$dd.$oe.tcl.help>tcl</a></td>
+<!-- <td><a href=$w$p/$dd.$oe.ps>ps</a></td> -->
+<td><a href=$w$p/$dd.$oe.pdf>pdf</a></td>"
 	if {!([incr i]%4)} {puts $f "</tr><tr>"}
 }
 
