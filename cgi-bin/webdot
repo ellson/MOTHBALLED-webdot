@@ -1085,13 +1085,16 @@ if {[info exists env(PATH_INFO)]} {
     # we allow encoding in PATH_INFO so that an encoded
     #  QUERY_STRING can be passed through to the graph server
     set path_info [webdot::unencode $env(PATH_INFO)]
-    if {[scan $path_info {/%[^:]://%[^/]%s} protocol serverport path] != 3} {
+    # second scan is an ugly hack for apache-2 servers that won't allow
+    #  "//" in PATH_INFO strings.  They translate "//" to "/".
+    if {[scan $path_info {/%[^:]://%[^/]%s} protocol serverport path] == 3
+      || [scan $path_info {/%[^:]:/%[^/]%s} protocol serverport path] == 3} {
+        if {![string equal $protocol http]} {
+            toperror "Invalid URL. Only http protocol is allowed to upstream graph server."
+        }
+    } {
         set serverport $env(SERVER_NAME)$server_port
         set path $path_info
-    } {
-        if {![string equal $protocol http]} {
-            toperror "Invalid URL. Only http allowed."
-        }
     }
     if {[scan $path {%[^\?]?%s} path through_query] != 2} {
 	set havequery 0
