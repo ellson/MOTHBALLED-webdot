@@ -31,7 +31,7 @@ PS2EPSI=/usr/bin/ps2epsi
 LOCALHOSTONLY=1
 
 # version number for webdot-*.tar.gz
-VERSION=1.7.16
+VERSION=1.7.17
 
 ###############################################################
 
@@ -71,5 +71,6 @@ dist:
 	cp html/webdot/*.dot $(distdir)/html/webdot/
 	cp html/webdot/*.png $(distdir)/html/webdot/
 	cp html/webdot/*.gif $(distdir)/html/webdot/
+	cp -r html/webdot/graphs $(distdir)/html/webdot/
 	tar cf - $(distdir) | gzip > $(distdir).tar.gz
 	rm -rf $(distdir)
