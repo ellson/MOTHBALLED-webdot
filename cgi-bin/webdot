@@ -927,7 +927,7 @@ proc webdot::send_help {url type engine viewport} {
 <body bgcolor=white>
 <h1>WebDot Help Page</h1>"
 
-    webdot::make_client_map $url $type $viewport $engine 0 0 new
+    webdot::make_client_map $url $type $engine $viewport 0 0 new
 
     set all_engines {DOT NEATO TWOPI FDP CIRCO}
 
