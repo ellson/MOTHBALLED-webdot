@@ -420,7 +420,10 @@ proc webdot::get_url {url no_cache} {
                     }
                     "last-modified:" {scan $line {%*s %[^~]} LastModified}
                     "expires:" {scan $line {%*s %[^~]} Expires}
-                    "content-type:" {scan $line {%*s %[^~]} ContentType}
+                    "content-type:" {
+			scan $line {%*s %[^~]} ContentType
+			set ContentType [lindex [split $ContentType ;] 0]
+		    }
                     {} {
                         incr inbody
                         if {[string equal $ResponseCode 200]} {
