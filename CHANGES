@@ -1,3 +1,5 @@
+June 11, 2003 - Release 1.9.1
+	- generalize the workaround hack for apache bugs
 February 26, 2003 - Release 1.9.0
         - add "target" support to client-maps
 August 4, 2002 - Release 1.8.9  (to realign with graphviz)

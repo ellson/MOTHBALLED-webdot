@@ -1,5 +1,5 @@
 Name:           webdot
-Version:        1.9.0
+Version:        1.9.1
 Release:        RH8
 Group:          Applications/Graphics
 License:        BSD-style
