@@ -1,4 +1,0 @@
-graph G {
-	a -- b -- c -- d
-	b -- e -- d
-}
