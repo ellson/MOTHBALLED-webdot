@@ -738,10 +738,10 @@ proc webdot::get_image_size {g} {
         set landscape 0
     }
     if {[catch {$g queryattr size} sz]} {
-    	scan [$g queryattr bb] "{%d %d %d %d}" ulx uly lrx lry
+    	scan [$g queryattr bb] "{%d %d %d %d}" lrx lry ulx uly
     	#  size of image is size of graph + (2 * margin)
-    	set sizex [expr int(($lrx - $ulx + (2 * 10)) * 96./72)]
-    	set sizey [expr int(($lry - $uly + (2 * 2)) * 96./72)]
+    	set sizex [expr int(($ulx - $lrx + (2 * 10)) * 96./72)]
+    	set sizey [expr int(($uly - $lry + (2 * 10)) * 96./72)]
     } {
 	# this sucks!
 	if {$landscape} {
@@ -840,6 +840,9 @@ proc webdot::make_product {url type engine no_cache} {
                     }
                 }
     
+                # render graph
+                $g rendergd $gd
+
                 # Sign this piece of art (signature is hyperlinked to help)
                 # first work out size of the signature in this font
                 foreach {x0 y0 x1 y1 x2 y2 x3 y3} [gd text {} 0 \
@@ -849,8 +852,6 @@ proc webdot::make_product {url type engine no_cache} {
                     times 8.0 0.0 [expr $sizex - $x2 - 2] \
                     [expr $sizey - $y0 - 2] $SIGNATURE
     
-                # render graph
-                $g rendergd $gd
                 gd write[string toupper $type] $gd $f_out
                 gd destroy $gd
                 close $f_out
@@ -865,9 +866,12 @@ proc webdot::make_product {url type engine no_cache} {
                 $g write $f_out ismap
             	$g delete
             } err]} {
+		# try to output an error message 
 		if {! [string length [info command gd]]} {
+		    # a bitmap is expected, but if that wom't work then a stderr message 
 		    error $err
 		}
+		# write the error message to a bitmap
                 set gd [gd create 500 100]
                 set white [gd color new $gd 255 255 255]
                 set red [gd color new $gd 255 0 0]
