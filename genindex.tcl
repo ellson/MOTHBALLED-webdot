@@ -1,6 +1,7 @@
 #!/usr/bin/tclsh8.3
 
 set f [open html/webdot/demo.html w]
+set h /webdot/
 set w /cgi-bin/webdot
 set p /webdot/graphs/directed
 cd html/webdot/graphs/directed
@@ -10,7 +11,7 @@ puts $f "<html>
 <title>WebDot Demo Graphs</title>
 </head>
 <body bgcolor=#ffffff>
-<h1><a href=$w>WebDot</a> Demo Graphs</h1>
+<h1><a href=$h>WebDot</a> Demo Graphs</h1>
 <table border=1><tr>
 <th>Directed</th>
 <th colspan=3>DOT</th><th></th><th colspan=3>NEATO</th>
@@ -79,7 +80,7 @@ puts $f "</tr>
 <img src=getacro.png width=89 height=30 align=center
 border=0 alt=\"get acrobat reader\"></a></td>
 <td>and for viewing <b>tcl</b> files you will need the tcl plugin:</td>
-<td><a href=http://www.scriptics.com/plugin/>
+<td><a href=http://www.demailly.com/tcl/plugin/download.html>
 <img src=tclp.png width=42 height=64 align=center
 border=0 alt=\"get tcl plugin\"></a></td>
 </tr>
@@ -87,12 +88,12 @@ border=0 alt=\"get tcl plugin\"></a></td>
 
 <p>
 The graph renderings are produced on-demand by the 
-<a href=$w>WebDot Graph Server</a>.
+<a href=$h>WebDot Graph Server</a>.
 Please send problem reports first to the person that installed
 this server locally.  WebDot was written by:
 <a href=mailto:ellson@lucent.com>John Ellson</a>.
 <p>
-Thanks for trying <a href=$w>WebDot</a>.
+Thanks for trying <a href=$h>WebDot</a>.
 </body>
 </html>"
 

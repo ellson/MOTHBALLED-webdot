@@ -466,7 +466,7 @@ proc fix_graph_urls {g serverport dirname} {
                 $n setattr URL [make_absolute_url $serverport $dirname $n_url $name]
             }
         }
-        foreach e [$n listout] {
+        foreach e [$n listoutedges] {
             set name [$e showname]
             if {![catch {$e queryattr URL} e_url]} {
                 set e_url [lindex $e_url 0]
@@ -483,7 +483,7 @@ proc fix_graph_urls {g serverport dirname} {
 ###########################################################################
 # read_graph
 #
-proc read_graph {{engine {}}} {
+proc read_graph {} {
     global LIBTCLDOT
 
     # we're going to need the Tcldot extension to process the graph
@@ -500,11 +500,6 @@ proc read_graph {{engine {}}} {
         error "Invalid graph source: $g\nThere may be more details in the server's error_log."
     }
     close $f
-    if {[string length $engine]} {
-        if {[catch {$g layout [string toupper $engine]} err]} {
-            error "Graph layout error: $err" 
-        }
-    }
     return $g
 }
         
@@ -544,7 +539,7 @@ proc make_client_map {url type engine no_cache count target} {
             close $f
             puts $default
             puts "</map>"
-            puts "<img src=\"$SELF/$url.$engine.$type\" width=\"$sizex\" height=\"$sizey\" usemap=\"#webdot$count\" border=\"0\" alt=\"Graph\">"
+            puts "<img src=\"$SELF/$url.$engine.$type\" width=\"$sizex\" height=\"$sizey\" usemap=\"#webdot$count\" border=\"0\" alt=\"Graph by WebDot\">"
         }
         tcl {
             puts "<embed width=600 height=400 src=\"$SELF/$url.$engine.tcl\">"
@@ -647,7 +642,10 @@ proc make_product {url type engine no_cache} {
                 error "Unable to open cache file for write: $cachename"
             }
             if {[catch {
-                set g [read_graph $engine]
+                set g [read_graph]
+                if {[catch {$g layout [string toupper $engine]} err]} {
+                    error "Graph layout error: $err" 
+                }
                 scan [$g queryattr bb] "{%dp %dp %dp %dp}" ulx uly lrx lry
                 set sizex [expr (($lrx - $ulx) * 96/72) + 2] 
                 set sizey [expr (($lry - $uly) * 96/72) + 14]
@@ -746,8 +744,11 @@ proc make_product {url type engine no_cache} {
             $g delete
         }
         map {
-            set g [read_graph $engine]
+            set g [read_graph]
             fix_graph_urls $g $serverport $dirname
+            if {[catch {$g layout [string toupper $engine]} err]} {
+                error "Graph layout error: $err" 
+            }
             if {[catch {open $cachename w} f_out]} {
                 error "Unable to open cache file for write: $cachename"
             }
@@ -766,7 +767,10 @@ proc make_product {url type engine no_cache} {
             $g delete
         }
         tcl {
-            set g [read_graph $engine]
+            set g [read_graph]
+            if {[catch {$g layout [string toupper $engine]} err]} {
+                error "Graph layout error: $err" 
+            }
             if {[catch {open $cachename w} f_out]} {
                 error "Unable to open cache file for write: $cachename"
             }
@@ -783,8 +787,14 @@ proc make_product {url type engine no_cache} {
             $g delete
         }
         tclmap {
-            set g [read_graph $engine]
+            set g [read_graph]
             fix_graph_urls $g $serverport $dirname
+            if {[catch {$g layout [string toupper $engine]} err]} {
+                error "Graph layout error: $err" 
+            }
+            if {[catch {open $cachename w} f_out]} {
+                error "Unable to open cache file for write: $cachename"
+            }
             if {![catch {$g queryattr URL} url]} {
                 set urls($g) $url
             }
@@ -797,9 +807,6 @@ proc make_product {url type engine no_cache} {
                         set urls($e) $url
                     }
                 }
-            }
-            if {[catch {open $cachename w} f_out]} {
-                error "Unable to open cache file for write: $cachename"
             }
             if {[array exists urls]} {
                 puts $f_out [array get urls]
@@ -816,7 +823,10 @@ proc make_product {url type engine no_cache} {
             exec $PS2EPSI $engine.ps $cachename
         }
         fig - mif - pcl - pic - ps - svg - vtx - vrml {
-            set g [read_graph $engine]
+            set g [read_graph]
+            if {[catch {$g layout [string toupper $engine]} err]} {
+                error "Graph layout error: $err" 
+            }
             if {[catch {open $cachename w} f_out]} {
                 error "Unable to open cache file for write: $cachename"
             }
@@ -1107,14 +1117,16 @@ if {[string equal $type map] && [string length $x]} {
     if {[string length $defaulturl]} {
         puts "Location: $defaulturl\n"
     } {
-        error "No default URL was specified in the graph."
+	# no default - want this to do nothing
+        puts "Status: 204 No URL for this location\n"
     }
 } elseif {[string equal $type tclmap] && [string length $query]} {
     array set urls [read $f]
     if {[info exists urls($query)]} {
         puts "Location: $urls($query)\n"
     } {
-        error "no URL for $query"
+	# no default - want this to do nothing
+        puts "Status: 204 No URL for this location\n"
     }
 } elseif {[string equal $type src]} {
     puts "Content-Length: [file size src]\n"
