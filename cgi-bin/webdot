@@ -626,12 +626,12 @@ proc get_image_size {g} {
     	set sizex [expr int(($lrx - $ulx + (2 * 10)) * 96./72)]
     	set sizey [expr int(($lry - $uly + (2 * 2)) * 96./72)]
     } {
-        if {[scan $sz "%g,%g" sizex sizey] == 2} {
-    		set sizex [expr int($sizex * 96)]
-    		set sizey [expr int($sizey * 96)]
-	} {
-		error "size \"$sz\" didn't scan"
-	}
+	# this sucks!
+	foreach {sizex sizey} [split $sz ,] {break}
+	set sizex [string trim $sizex {{} }]
+	set sizey [string trim $sizey {{} }]
+    	set sizex [expr int($sizex * 96)]
+    	set sizey [expr int($sizey * 96)]
     }
     #  add a bit more for the signature
     incr sizex 2
