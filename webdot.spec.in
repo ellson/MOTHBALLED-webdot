@@ -1,5 +1,7 @@
+# @configure_input@
+                                                                                
 Name:           webdot
-Version:        1.10.3
+Version:        @PACKAGE_VERSION@
 Release:        1
 Group:          Applications/Graphics
 License:        BSD-style
@@ -17,7 +19,8 @@ when provided with an href to a .dot file.  Uses Tcldot from the
 graphviz-tcl rpm.
 
 %prep
-%setup -n %{name}-%{version}
+# %setup -n %{name}-%{version}
+%setup -q
 
 %define cgibindir  %(rpm -ql httpd | grep -v doc | grep '/cgi-bin$')
 %define htmldir    %(rpm -ql httpd | grep -v doc | grep '/html$')
@@ -35,9 +38,9 @@ graphviz-tcl rpm.
 mkdir -p $RPM_BUILD_ROOT/%{cgibindir}
 mkdir -p $RPM_BUILD_ROOT/%{htmldir}
 mkdir -p $RPM_BUILD_ROOT/%{cachedir}
-cp $RPM_SOURCE_DIR/cgi-bin/webdot $RPM_BUILD_ROOT/%{cgibindir}/
-cp $RPM_SOURCE_DIR/cgi-bin/webdot.tclet $RPM_BUILD_ROOT/%{cgibindir}/
-cp -r $RPM_SOURCE_DIR/html/webdot $RPM_BUILD_ROOT/%{htmldir}/
+cp cgi-bin/webdot $RPM_BUILD_ROOT/%{cgibindir}/
+cp cgi-bin/webdot.tclet $RPM_BUILD_ROOT/%{cgibindir}/
+cp -r html/webdot $RPM_BUILD_ROOT/%{htmldir}/
 chown %{apacheuser}:%{apachegroup} $RPM_BUILD_ROOT/%{cachedir}
 chmod 700 $RPM_BUILD_ROOT/%{cachedir}
 %{?suse_check}
