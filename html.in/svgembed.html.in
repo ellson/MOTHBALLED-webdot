@@ -1,10 +1,10 @@
 <table><tr><td>
 <object
     data="$CGIBASE$BASE/$SELF.dot.dot.svgz"
-    type="image/svg-xml"
+    type="image/svg+xml"
     width="250" height="250">
 <embed src="$CGIBASE$BASE/$SELF.dot.dot.svgz"
-    type="image/svg-xml"
+    type="image/svg+xml"
     coding="gzip"
     palette="foreground">
 Embedded SVG Graph
@@ -19,10 +19,10 @@ can be generated with:
 <table border=1><tr><td><pre>
 &lt;object
     data="$CGIBASE$BASE/$SELF.dot.dot.svgz"
-    type="image/svg-xml"
+    type="image/svg+xml"
     width="250" height="250"&gt;
 &lt;embed src="$CGIBASE$BASE/$SELF.dot.dot.svgz"
-    type="image/svg-xml"
+    type="image/svg+xml"
     coding="gzip"
     palette="foreground"&gt;
 Embedded SVG Graph
