@@ -1,6 +1,6 @@
 Name:           webdot
-Version:        1.7.4
-Release:        2_RH7
+Version:        1.7.5
+Release:        1_RH7
 Group:          Applications/Graphics
 Copyright:      BSD-style
 URL:            http://www.graphviz.org/
@@ -26,8 +26,8 @@ graphviz rpm.
 %define apachegroup %(grep -i '^group ' %{httpdconf} | awk '{print $2}')
 
 %define cachedir   /var/cache/webdot
-%define tclsh83bin  %(rpm -ql tcl | grep '/tclsh8.3$')
-%define libtcldot  %(rpm -ql graphviz | grep 'libtcldot.so$')
+%define tclshbin  %(rpm -ql tcl | grep '/tclsh$')
+%define tcldotbin  %(rpm -ql graphviz | grep 'libtcldot.so$')
 %define gsbin      %(which gs)
 %define ps2epsibin %(which ps2epsi)
 
@@ -48,8 +48,8 @@ chmod 700 $RPM_BUILD_ROOT/%{cachedir}
 
 %post
 cat > %{cgibindir}/webdot.new << '__EOF__'
-#!%{tclsh83bin}
-set LIBTCLDOT %{libtcldot}
+#!%{tclshbin}
+set LIBTCLDOT %{tcldotbin}
 set CACHE_ROOT %{cachedir}
 set GS %{gsbin}
 set PS2EPSI %{ps2epsibin}
