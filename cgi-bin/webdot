@@ -658,8 +658,12 @@ proc make_product {url type engine no_cache} {
                     error "Graph layout error: $err" 
                 }
                 scan [$g queryattr bb] "{%dp %dp %dp %dp}" ulx uly lrx lry
-                set sizex [expr (($lrx - $ulx) * 96/72) + 2] 
-                set sizey [expr (($lry - $uly) * 96/72) + 14]
+		#  size of image is size of graph + margins:
+		#      sizex = (lrx - ulx) + (2 * ulx)
+		#            = lrx + ulx
+		#  add a bit more for the signature
+		set sizex [expr (($lrx + $ulx) * 96/72) + 2 -1]
+		set sizey [expr (($lry + $uly) * 96/72) + 14 -1]
                 if {$sizex < 94} {set sizex 94}
                 set gd [gd create $sizex $sizey]
     
@@ -764,8 +768,12 @@ proc make_product {url type engine no_cache} {
                 error "Unable to open cache file for write: $cachename"
             }
             scan [$g queryattr bb] "{%dp %dp %dp %dp}" ulx uly lrx lry
-            set sizex [expr (($lrx - $ulx) * 96/72) + 2 -1]
-            set sizey [expr (($lry - $uly) * 96/72) + 14 -1]
+	    #  size of image is size of graph + margins:
+	    #      sizex = (lrx - ulx) + (2 * ulx)
+	    #            = lrx + ulx
+	    #  add a bit more for the signature
+            set sizex [expr (($lrx + $ulx) * 96/72) + 2 -1]
+            set sizey [expr (($lry + $uly) * 96/72) + 14 -1]
             if {$sizex < 94} {set sizex 94}
             puts $f_out "bb ($sizex,$sizey)"
             foreach {x0 y0 x1 y1 x2 y2 x3 y3} [gd text {} 0 \
