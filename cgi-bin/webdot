@@ -560,6 +560,20 @@ proc webdot::make_client_map {url type engine no_cache count target} {
             puts "</map>"
             puts "<img src=\"$SELF/$url.$engine.$type\" width=\"$sizex\" height=\"$sizey\" usemap=\"#webdot$count\" border=\"0\" alt=\"Graph by WebDot\">"
         }
+	svg {
+            # get source file into cache (may already be there)
+            foreach {file_cache_dir LastModified Expires ContentType} \
+                        [webdot::get_url $url $no_cache] {break}
+            # some types (e.g. vrml) result in mutiple files, so cd to target directory
+            cd $file_cache_dir
+            webdot::make_product $url $type $engine $no_cache
+            # generate svg
+            if {[catch {open $engine.svg r} f]} {
+                error "Unable to open cache file for read: $file_cache_dir/$engine.svg"
+            }
+            fcopy $f stdout
+	    close $f
+	}
         tcl {
             puts "<embed width=600 height=400 src=\"$SELF/$url.$engine.tcl\">"
         }

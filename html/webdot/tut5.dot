@@ -1,5 +1,4 @@
-digraph G {
-	node [URL="\N.html"]
-	edge [URL="\N.html"]
-	{a b c} -> d
+graph G {
+	node [URL="/webdot/\N.html"]
+	a -- b -- c; b -- d;
 }

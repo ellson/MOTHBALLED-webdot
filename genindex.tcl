@@ -4,7 +4,7 @@ set f [open html/webdot/demo.html w]
 set h /webdot/
 set w /cgi-bin/webdot
 
-set layout_engines {dot neato}
+set layout_engines {dot neato twopi}
 set nl [llength $layout_engines]
 
 set formats {{png help} {gif help} {tcl help} ps pdf svg}
@@ -31,7 +31,9 @@ foreach dir {Directed Undirected} {
   cd $oldpwd/html/webdot/graphs/[string tolower $dir]
 
   for {set i 1} {$i <= $ncol} {incr i} {
-    puts $f "<th>$dir</th><th colspan=$nf>DOT</th><th></th><th colspan=$nf>NEATO</th>"
+    puts $f "<th>$dir</th><th colspan=$nf>DOT</th>"
+    puts $f "<th></th><th colspan=$nf>NEATO</th>"
+    puts $f "<th></th><th colspan=$nf>TWOPI</th>"
     if {$i != $ncol} {
       puts $f "<th></th>"
     } {
