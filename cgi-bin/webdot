@@ -1091,11 +1091,11 @@ switch -- [llength $parts] {
 # and form SELF url to used in the href for help attached to the signature
 if {$LOCALHOSTONLY} {
 	set SELF $env(SCRIPT_NAME)
-	set url http://127.0.0.1$path
 } {
 	set SELF http://$env(SERVER_NAME)$server_port$env(SCRIPT_NAME)
-	set url http://$serverport$path
 }
+# url is used in maps, so needs to keep public address of server
+set url http://$serverport$path
 
 # create a directory name for the cache
 set dirname [file dirname $path]
