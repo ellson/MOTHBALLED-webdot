@@ -14,11 +14,11 @@ puts $f "<html>
 <h1><a href=$h>WebDot</a> Demo Graphs</h1>
 <table border=1><tr>
 <th>Directed</th>
-<th colspan=3>DOT</th><th></th><th colspan=3>NEATO</th>
+<th colspan=3>DOT</th><th></th><th colspan=4>NEATO</th>
 <th colspan=2></th>
-<th colspan=3>DOT</th><th></th><th colspan=3>NEATO</th>
+<th colspan=3>DOT</th><th></th><th colspan=4>NEATO</th>
 <th colspan=2></th>
-<th colspan=3>DOT</th><th></th><th colspan=3>NEATO</th>
+<th colspan=3>DOT</th><th></th><th colspan=4>NEATO</th>
 </tr><tr>"
 
 set e dot
@@ -46,11 +46,11 @@ set p /webdot/graphs/undirected
 cd ../undirected
 puts $f "</tr><tr></tr><tr>
 <th>Undirected</th>
-<th colspan=3>DOT</th><th></th><th colspan=3>NEATO</th>
+<th colspan=3>DOT</th><th></th><th colspan=4>NEATO</th>
 <th colspan=2></th>
-<th colspan=3>DOT</th><th></th><th colspan=3>NEATO</th>
+<th colspan=3>DOT</th><th></th><th colspan=4>NEATO</th>
 <th colspan=2></th>
-<th colspan=3>DOT</th><th></th><th colspan=3>NEATO</th>
+<th colspan=3>DOT</th><th></th><th colspan=4>NEATO</th>
 </tr><tr>"
 
 set i 0
