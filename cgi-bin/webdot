@@ -534,10 +534,8 @@ proc make_client_map {url type engine no_cache count target} {
     
                     # save bb for size
                 } elseif {[scan $l {rectangle (%d,%d) (%d,%d) %s %[^\n]} x1 y1 x2 y2 ref_url label] == 6} {
-    #               puts "<area href=\"$ref_url\" shape=\"rect\" coords=\"$x1,$y2,$x2,$y1\" alt=\"$label\" target=\"$target\">"
                     puts "<area href=\"$ref_url\" shape=\"rect\" coords=\"$x1,$y2,$x2,$y1\" target=\"$target\">"
                 } elseif {[scan $l {default %s %[^\n]} ref_url label] == 2} {
-#                    set default "<area href=\"$ref_url\" shape=\"default\" alt=\"$label\" target=\"$target\">"
                      set default "<area href=\"$ref_url\" shape=\"default\" target=\"$target\">"
                 }
             }
@@ -617,6 +615,32 @@ proc filter_html {serverport dirname no_cache} {
 }
 
 ###########################################################################
+# get_image_size
+# 
+# encapsulate this rather ugly calculation  (used in two places)
+#
+proc get_image_size {g} {
+    if {[catch {$g queryattr size} sz]} {
+    	scan [$g queryattr bb] "{%d %d %d %d}" ulx uly lrx lry
+    	#  size of image is size of graph + (2 * margin)
+    	set sizex [expr int(($lrx - $ulx + (2 * 10)) * 96./72)]
+    	set sizey [expr int(($lry - $uly + (2 * 2)) * 96./72)]
+    } {
+        if {[scan $sz "%g,%g" sizex sizey] == 2} {
+    		set sizex [expr int($sizex * 96)]
+    		set sizey [expr int($sizey * 96)]
+	} {
+		error "size \"$sz\" didn't scan"
+	}
+    }
+    #  add a bit more for the signature
+    incr sizex 2
+    incr sizey 14
+    if {$sizex < 94} {set sizex 94}
+    list $sizex $sizey
+}
+
+###########################################################################
 # make_product
 #
 # convert "src" into "$type" in current directory
@@ -652,19 +676,12 @@ proc make_product {url type engine no_cache} {
                 set g [read_graph]
 		# set default background to transparent for web use
 		if {[catch {$g queryattr bgcolor}]} {
-		    $g setattr bgcolor transparent
+		    $g setattr bgcolor white
 		}
                 if {[catch {$g layout [string toupper $engine]} err]} {
                     error "Graph layout error: $err" 
                 }
-                scan [$g queryattr bb] "{%dp %dp %dp %dp}" ulx uly lrx lry
-		#  size of image is size of graph + margins:
-		#      sizex = (lrx - ulx) + (2 * ulx)
-		#            = lrx + ulx
-		#  add a bit more for the signature
-		set sizex [expr (($lrx + $ulx) * 96/72) + 2 -1]
-		set sizey [expr (($lry + $uly) * 96/72) + 7 -1]
-                if {$sizex < 94} {set sizex 94}
+		foreach {sizex sizey} [get_image_size $g] {break}
                 set gd [gd create $sizex $sizey]
     
                 # Antialising against transparent background doesn't work well
@@ -767,14 +784,7 @@ proc make_product {url type engine no_cache} {
             if {[catch {open $cachename w} f_out]} {
                 error "Unable to open cache file for write: $cachename"
             }
-            scan [$g queryattr bb] "{%dp %dp %dp %dp}" ulx uly lrx lry
-	    #  size of image is size of graph + margins:
-	    #      sizex = (lrx - ulx) + (2 * ulx)
-	    #            = lrx + ulx
-	    #  add a bit more for the signature
-            set sizex [expr (($lrx + $ulx) * 96/72) + 2 -1]
-            set sizey [expr (($lry + $uly) * 96/72) + 7 -1]
-            if {$sizex < 94} {set sizex 94}
+            foreach {sizex sizey} [get_image_size $g] {break}
             puts $f_out "bb ($sizex,$sizey)"
             foreach {x0 y0 x1 y1 x2 y2 x3 y3} [gd text {} 0 \
                 times 8.0 0.0 0 0 $SIGNATURE] {break}

@@ -13,6 +13,8 @@ set env(HTTP_PRAGMA) no-cache
 #set env(PATH_INFO) /webdot/demo.dot.png
 #set env(PATH_INFO) /webdot/demo.dot.png.help
 #set env(PATH_INFO) /webdot/demo.dot.pdf
-set env(PATH_INFO) /webdot/demo.html
+#set env(PATH_INFO) /webdot/demo.html
+#set env(PATH_INFO)  /webdot/graphs/undirected/ER.dot.neato.png.help
+set env(PATH_INFO) /webdot/graphs/directed/KW91.dot.dot.png
 
-source webdot
+source /var/www/cgi-bin/webdot
