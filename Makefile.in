@@ -71,7 +71,7 @@ distdir=webdot-$(VERSION)
 dist: genfiles
 	rm -rf $(distdir)*
 	mkdir -p $(distdir)/cgi-bin $(distdir)/config $(distdir)/html.in
-	mkdir -p $(distdir)/html/webdot/directed $(distdir)/html/webdot/undirected
+	mkdir -p $(distdir)/html/webdot/graphs/directed $(distdir)/html/webdot/graphs/undirected
 	cp AUTHORS CHANGES COPYING INSTALL README $(distdir)/
 	cp configure.in configure Makefile.in Makefile webdot.spec.in webdot.spec $(distdir)/
 	cp genindex.tcl linktut.tcl scaffold.tcl $(distdir)/
@@ -84,8 +84,8 @@ dist: genfiles
 	cp html/webdot/*.gif $(distdir)/html/webdot/
 	cp html.in/*.html.in $(distdir)/html.in/
 	cp html.in/*.dot.in $(distdir)/html.in/
-	cp html/webdot/graphs/directed/*dot $(distdir)/html/webdot/directed/
-	cp html/webdot/graphs/undirected/*dot $(distdir)/html/webdot/undirected/
+	cp html/webdot/graphs/directed/*dot $(distdir)/html/webdot/graphs/directed/
+	cp html/webdot/graphs/undirected/*dot $(distdir)/html/webdot/graphs/undirected/
 	tar cf - $(distdir) | gzip > $(distdir).tar.gz
 	rm -rf $(distdir)
 
