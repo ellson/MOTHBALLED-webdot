@@ -1,5 +1,5 @@
 <p>
-<webdot src=$BASE/$SELF.dot engine=neato type=svg>
+<webdot src="$BASE/$SELF.dot" engine="neato" type="svg">
 <p>
 Similarly to the support for client-side maps, WebDot can filter an
 html page and replace all occurrences of &lt;webdot...&gt; tags
@@ -8,8 +8,8 @@ with a client-side SVG image.
 For example, $SELF.dot contains:
 $DOT
 and the source of this page contains:
-<table border=1><tr><td><pre>
-&lt;webdot src=$BASE/$SELF.dot engine=neato type=svg&gt;
+<table border="1"><tr><td><pre>
+&lt;webdot src="$BASE/$SELF.dot" engine="neato" type="svg"&gt;
 </pre></td></tr></table>
 which serving through $CGIBASE replaces the &lt;webdot...&gt; tag. 
 To see the result please view the source of this page.

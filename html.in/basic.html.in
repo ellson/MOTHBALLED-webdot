@@ -1,14 +1,14 @@
 <p>
-<img src=$CGIBASE$BASE/$SELF.dot.neato.png>
+<img src="$CGIBASE$BASE/$SELF.dot.neato.png">
 <p>
 Given a description of a graph in the dot language, for example this graph:
 $DOT
 in a file that can be served by your web server, in this case:
-<a href=$BASE/$SELF.dot>$BASE/$SELF.dot</a>
+<a href="$BASE/$SELF.dot">$BASE/$SELF.dot</a>
 <p>
 Then this img tag in an html web page:
 <table border=1><tr><td><pre>
-&lt;img src=$CGIBASE<b>$BASE/$SELF.dot</b>.neato<b>.png</b>&gt;
+&lt;img src="$CGIBASE<b>$BASE/$SELF.dot</b>.neato<b>.png</b>"&gt;
 </pre></td></tr></table>
 <p>
 will produce the graph layout at the top of this page.

@@ -1,19 +1,30 @@
-<html><head>
-<title>WebDot Tutorial: Embedded SVG graph</title>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <link rel="shortcut icon" href="/webdot/icon.png">
-</head><body bgcolor=white>
-<a href=/webdot/hedges.html>[previous]</a>
-<a href=/cgi-bin/webdot/webdot/clientmap.html>[next]</a>
-<font size=+2><b>WebDot Tutorial: Embedded SVG graph</b></font>
-<p>
-<embed src=/cgi-bin/webdot/webdot/svgembed.dot.dot.svgz
+<title>WebDot Tutorial: Embedded SVG graph</title>
+</head>
+<body bgcolor="white">
+<a href="/webdot/hedges.html">[previous]</a>
+<a href="/cgi-bin/webdot/webdot/clientmap.html">[next]</a>
+<font size="+2"><b>WebDot Tutorial: Embedded SVG graph</b></font>
+<table><tr><td>
+<object
+    data="/cgi-bin/webdot/webdot/svgembed.dot.dot.svgz"
+    type="image/svg-xml"
+    width="250" height="250">
+<embed src="/cgi-bin/webdot/webdot/svgembed.dot.dot.svgz"
     type="image/svg-xml"
     coding="gzip"
-    palette="foreground"
->
-<p>
-WebDot also supports SVG or SVGZ as output formats.  For example this graph:
-<table border=1><tr><td><pre>
+    palette="foreground">
+Embedded SVG Graph
+</embed>
+</object>
+</td></tr></table>
+WebDot can render graphs in SVG or SVGZ formats for use in
+&lt;object&gt; or &lt;embed&gt; tags.  For example this graph:
+<table border="1"><tr><td><pre>
 digraph G {
 	node [URL="\N.html"]
 	edge [URL="\N.html"]
@@ -22,14 +33,24 @@ digraph G {
 }
 </pre></td></tr></table>
 <p>
-can be generated for web browsers that support SVGZ viewing with:
+can be generated with:
 <table border=1><tr><td><pre>
-&lt;embed src=/cgi-bin/webdot/webdot/svgembed.dot.dot.svgz 
-      type="image/svg-xml"
-      coding="gzip"
-      palette="foreground"
-&gt;
+&lt;object
+    data="/cgi-bin/webdot/webdot/svgembed.dot.dot.svgz"
+    type="image/svg-xml"
+    width="250" height="250"&gt;
+&lt;embed src="/cgi-bin/webdot/webdot/svgembed.dot.dot.svgz"
+    type="image/svg-xml"
+    coding="gzip"
+    palette="foreground"&gt;
+Embedded SVG Graph
+&lt;/embed&gt;
+&lt;/object&gt;
 </pre></td></tr></table>
 <p>
+Note the html trick of nesting &lt;embed&gt; inside &lt;object&gt;
+to get embedded graphs to work in non-HTML-4.01 browsers.
+<p>
 Note that edges are easily clickable in this format.
-</body></html>
+</body>
+</html>

@@ -23,16 +23,21 @@ set OTHER {
 	webdot_libs.dot
 }
 
-set header {<html><head>
+set header {<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="shortcut icon" href="$HTMLBASE/icon.png">
 <title>WebDot Tutorial: $TITLE</title>
-<link rel="shortcut icon" href="$BASE/icon.png">
-</head><body bgcolor=white>
-<a href=$PREVBASE/$PREVIOUS>[previous]</a>
-<a href=$NEXTBASE/$NEXT>[next]</a>
-<font size=+2><b>WebDot Tutorial: $TITLE</b></font>
+</head>
+<body bgcolor="white">
+<a href="$PREVBASE/$PREVIOUS">[previous]</a>
+<a href="$NEXTBASE/$NEXT">[next]</a>
+<font size="+2"><b>WebDot Tutorial: $TITLE</b></font>
 }
 
-set footer {</body></html>}
+set footer {</body>
+</html>}
 
 set PREVIOUS index.html
 set PREVTITLE "WebDot Home"
@@ -73,7 +78,7 @@ for {set i 0} {$i < [llength $DOCS]} {} {
 		close $f
 		regsub -all {<} $DOT {\&lt;} DOT
 		regsub -all {>} $DOT {\&gt;} DOT
-		set DOT "<table border=1><tr><td><pre>\n$DOT</pre></td></tr></table>"
+		set DOT "<table border=\"1\"><tr><td><pre>\n$DOT</pre></td></tr></table>"
 	}
 	set fin $INDIR/$SELF.html.in
 	set fout $OUTDIR/$SELF.html

@@ -1,19 +1,23 @@
-<html><head>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="shortcut icon" href="/webdot/icon.png">
 <title>WebDot Tutorial: Client-side maps</title>
-<link rel="shortcut icon" href="/cgi-bin/webdot/webdot/icon.png">
-</head><body bgcolor=white>
-<a href=/webdot/svgembed.html>[previous]</a>
-<a href=/cgi-bin/webdot/webdot/svginline.html>[next]</a>
-<font size=+2><b>WebDot Tutorial: Client-side maps</b></font>
+</head>
+<body bgcolor="white">
+<a href="/webdot/svgembed.html">[previous]</a>
+<a href="/cgi-bin/webdot/webdot/svginline.html">[next]</a>
+<font size="+2"><b>WebDot Tutorial: Client-side maps</b></font>
 <p>
-<webdot src=/cgi-bin/webdot/webdot/clientmap.dot engine=neato type=png target=new>
+<webdot src="/cgi-bin/webdot/webdot/clientmap.dot" engine="neato" type="png" target="new">
 <p>
 In order to support client-side maps, WebDot can filter an
 html page and replace all occurrences of &lt;webdot...&gt; tags
 with a client-side map and an image reference.  
 
 For example, clientmap.dot contains:
-<table border=1><tr><td><pre>
+<table border="1"><tr><td><pre>
 graph G {
 	graph [URL="default.html"]
 	node [URL="\N.html"]
@@ -22,21 +26,40 @@ graph G {
 </pre></td></tr></table>
 and the source of this page contains (for the graph on the right):
 <table border=1><tr><td><pre>
-&lt;webdot src=/cgi-bin/webdot/webdot/clientmap.dot engine=neato type=png target=new&gt;
+&lt;webdot src="/cgi-bin/webdot/webdot/clientmap.dot" engine="neato" type="png" target="new"&gt;
 </pre></td></tr></table>
 <p>
 after serving this page through /cgi-bin/webdot, this &lt;webdot...&gt;
 tag is replaced by:
 <table border=1><tr><td><pre>
 &lt;map name="webdot0"&gt;
-&lt;area href="/cgi-bin/webdot/http://127.0.0.1/cgi-bin/webdot/webdot/clientmap.dot.neato.png.help" shape="rect" coords="160,223,248,235" target="new"&gt;
-&lt;area href="/cgi-bin/webdot/webdot/a.html" shape="rect" coords="1,126,73,174" target="new"&gt;
-&lt;area href="/cgi-bin/webdot/webdot/b.html" shape="rect" coords="101,101,173,149" target="new"&gt;
-&lt;area href="/cgi-bin/webdot/webdot/c.html" shape="rect" coords="173,173,245,221" target="new"&gt;
-&lt;area href="/cgi-bin/webdot/webdot/d.html" shape="rect" coords="128,2,200,50" target="new"&gt;
-&lt;area href="/cgi-bin/webdot/webdot/default.html" shape="default" target="new"&gt;
+&lt;area href="/cgi-bin/webdot/http://127.0.0.1/cgi-bin/webdot/webdot/clientmap.dot.neato.png.help"
+	shape="rect"
+	coords="160,223,248,235"
+	target="new"&gt;
+&lt;area href="/cgi-bin/webdot/webdot/a.html"
+	shape="rect"
+	coords="1,126,73,174"
+	target="new"&gt;
+&lt;area href="/cgi-bin/webdot/webdot/b.html"
+	shape="rect" coords="101,101,173,149"
+	target="new"&gt;
+&lt;area href="/cgi-bin/webdot/webdot/c.html"
+	shape="rect"
+	coords="173,173,245,221"
+	target="new"&gt;
+&lt;area href="/cgi-bin/webdot/webdot/d.html"
+	shape="rect"
+	coords="128,2,200,50"
+	target="new"&gt;
+&lt;area href="/cgi-bin/webdot/webdot/default.html"
+	shape="default"
+	target="new"&gt;
 &lt;/map&gt;
-&lt;img src="/cgi-bin/webdot/http://127.0.0.1/cgi-bin/webdot/webdot/clientmap.dot.neato.png" width="248" height="235" usemap="#webdot0" border="0" alt="Graph by WebDot"&gt;
+&lt;img src="/cgi-bin/webdot/http://127.0.0.1/cgi-bin/webdot/webdot/clientmap.dot.neato.png"
+	width="248" height="235" border="0"
+	usemap="#webdot0"
+	alt="Graph by WebDot"&gt;
 </pre></td></tr></table>
 <p>
 The advantages of this mode of WebDot are the much simpler authoring and
@@ -51,4 +74,5 @@ through the WebDot cgi program so it is important to use "rooted" hrefs
 in documents and graphs served this way.
 <p>
 Embedded SVG is probably a better choice assuming SVG clients are available.
-</body></html>
+</body>
+</html>

@@ -1,6 +1,6 @@
 <p>
-<a href=$CGIBASE$BASE/$SELF.dot.dot.map>
-<img src=$CGIBASE$BASE/$SELF.dot.dot.png ismap>
+<a href="$CGIBASE$BASE/$SELF.dot.dot.map">
+<img src="$CGIBASE$BASE/$SELF.dot.dot.png" ismap>
 </a>
 <p>
 A graph can contain URLs so that the nodes and background are clickable, e.g.:
@@ -11,9 +11,9 @@ server-side or client-side maps.  First we describe server-side maps.
 <p>
 The mapping information is generated dynamically from the same graph source
 file as the image, using this construct:
-<table border=1><tr><td><pre>
-&lt;a href=$CGIBASE$BASE/$SELF.dot.dot.map&gt;
-&lt;img src=$CGIBASE$BASE/$SELF.dot.dot.png ismap&gt;
+<table border="1"><tr><td><pre>
+&lt;a href="$CGIBASE$BASE/$SELF.dot.dot.map"&gt;
+&lt;img src="$CGIBASE$BASE/$SELF.dot.dot.png" ismap&gt;
 &lt;/a&gt;
 </pre></td></tr></table>
 <p>

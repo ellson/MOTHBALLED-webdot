@@ -1,5 +1,5 @@
 graph G {
-	node [URL="svginline/\N.html"]
+	node [URL="/webdot/\N.html"]
 	a -- b -- c; b -- d;
 }
 

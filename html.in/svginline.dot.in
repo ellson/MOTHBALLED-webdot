@@ -1,4 +1,4 @@
 graph G {
-	node [URL="$SELF/\N.html"]
+	node [URL="$HTMLBASE/\N.html"]
 	a -- b -- c; b -- d;
 }
