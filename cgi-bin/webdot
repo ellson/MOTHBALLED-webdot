@@ -19,6 +19,10 @@
 #
 # This code is normally created during "make install"
 #
+# If fonts are not found automatically, you may also want to 
+# add a line like:
+#	set env(GDFONTPATH) /mnt/dos/c/windows/fonts/
+#
 ###########################################################################
 
 ###########################################################################
