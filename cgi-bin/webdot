@@ -58,7 +58,7 @@ array set MIME {
 # signature that is hyperlinked to help
 set SIGNATURE "Graph by WebDot"
 
-# timeout for network operations (get_url)
+# timeout for network operations (webdot::get_url)
 set TIMEOUT 5000
 
 # latest mtime of LIBTCLDOT and this script
@@ -288,8 +288,21 @@ proc error {m} {
     return -code error $m
 }
 
+namespace eval webdot {
+	namespace export \
+		get_url \
+		make_absolute_url \
+		fix_graph_urls \
+		read_graph \
+		make_client_map \
+		filter_html \
+		get_image_size \
+		make_product \
+		send_help
+}
+
 ###########################################################################
-# get_url
+# webdot::get_url
 #
 # get file from a url, using previously cached copy if still good
 #
@@ -299,7 +312,7 @@ proc error {m} {
 #        Expires             time string
 #        ContentType         mime string
 #
-proc get_url {url no_cache} {
+proc webdot::get_url {url no_cache} {
     global CACHE_ROOT TIMEOUT LOCALHOSTONLY env
 
     # parse the url into component parts
@@ -420,13 +433,13 @@ proc get_url {url no_cache} {
 }
 
 ###########################################################################
-# make_absolute_url
+# webdot::make_absolute_url
 #
-# support routine for fix_graph_urls
+# support routine for webdot::fix_graph_urls
 #
 # returns: absolute_url
 #
-proc make_absolute_url {serverport dirname ref name} {
+proc webdot::make_absolute_url {serverport dirname ref name} {
     regsub -all {\\N} $ref $name ref
     if {[scan $ref {http://%s} .] != 1} {
         if {[string first / $ref] == 0} {
@@ -439,7 +452,7 @@ proc make_absolute_url {serverport dirname ref name} {
 }
 
 ###########################################################################
-# fix_graph_urls
+# webdot::fix_graph_urls
 #
 # URL attributes of graph objects can be relative, and URLs of nodes
 # can contain the escape sequence "\N" which will be replaced by the
@@ -447,21 +460,21 @@ proc make_absolute_url {serverport dirname ref name} {
 #
 # returns count of URLs found in graph (not BGURL)
 #
-proc fix_graph_urls {g serverport dirname} {
+proc webdot::fix_graph_urls {g serverport dirname} {
     set urls_found 0
     # expand relative URLs if we need them in the output format
     set name [$g showname]
     if {![catch {$g queryattr BGURL} bg_url]} {
         set bg_url [lindex $bg_url 0]
         if {[string length $bg_url]} {
-            $g setattr BGURL [make_absolute_url $serverport $dirname $bg_url $name]
+            $g setattributes BGURL [webdot::make_absolute_url $serverport $dirname $bg_url $name]
         }
     }
     if {![catch {$g queryattr URL} g_url]} {
         set g_url [lindex $g_url 0]
         if {[string length $g_url]} {
             incr urls_found
-            $g setattr URL [make_absolute_url $serverport $dirname $g_url $name]
+            $g setattributes URL [webdot::make_absolute_url $serverport $dirname $g_url $name]
         }
     }
     foreach n [$g listnodes] {
@@ -470,7 +483,7 @@ proc fix_graph_urls {g serverport dirname} {
             set n_url [lindex $n_url 0]
             if {[string length $n_url]} {
                 incr urls_found
-                $n setattr URL [make_absolute_url $serverport $dirname $n_url $name]
+                $n setattributes URL [webdot::make_absolute_url $serverport $dirname $n_url $name]
             }
         }
         foreach e [$n listoutedges] {
@@ -479,7 +492,7 @@ proc fix_graph_urls {g serverport dirname} {
                 set e_url [lindex $e_url 0]
                 if {[string length $e_url]} {
                     incr urls_found
-                    $e setattr URL [make_absolute_url $serverport $dirname $e_url $name]
+                    $e setattributes URL [webdot::make_absolute_url $serverport $dirname $e_url $name]
                 }
             }
         }
@@ -488,9 +501,9 @@ proc fix_graph_urls {g serverport dirname} {
 }
 
 ###########################################################################
-# read_graph
+# webdot::read_graph
 #
-proc read_graph {} {
+proc webdot::read_graph {} {
     global LIBTCLDOT
 
     # we're going to need the Tcldot extension to process the graph
@@ -511,9 +524,9 @@ proc read_graph {} {
 }
         
 ###########################################################################
-# make_client_map
+# webdot::make_client_map
 #
-proc make_client_map {url type engine no_cache count target} {
+proc webdot::make_client_map {url type engine no_cache count target} {
    global SELF
 
     # generate graph in requested format
@@ -521,10 +534,10 @@ proc make_client_map {url type engine no_cache count target} {
         png - gif - jpeg {
             # get source file into cache (may already be there)
             foreach {file_cache_dir LastModified Expires ContentType} \
-                        [get_url $url $no_cache] {break}
+                        [webdot::get_url $url $no_cache] {break}
             # some types (e.g. vrml) result in mutiple files, so cd to target directory
             cd $file_cache_dir
-            make_product $url $type $engine $no_cache
+            webdot::make_product $url $type $engine $no_cache
             # generate map
             if {[catch {open $engine.map r} f]} {
                 error "Unable to open cache file for read: $file_cache_dir/$engine.map"
@@ -552,11 +565,11 @@ proc make_client_map {url type engine no_cache count target} {
     }
 }
 ###########################################################################
-# filter_html 
+# webdot::filter_html 
 #
 #   processes <webdot> tags embedded in an html page
 #
-proc filter_html {serverport dirname no_cache} {
+proc webdot::filter_html {serverport dirname no_cache} {
     global SELF STARTED_CONTENT_TYPE
 
     set f [open src r]
@@ -594,12 +607,12 @@ proc filter_html {serverport dirname no_cache} {
                 }
             }
 
-            set url [make_absolute_url $serverport $dirname $src {}]
+            set url [webdot::make_absolute_url $serverport $dirname $src {}]
     
             #case ignore type value
             set type [string tolower $type]
     
-            make_client_map $url $type $engine $no_cache $count $target
+            webdot::make_client_map $url $type $engine $no_cache $count $target
 
             # mark start of text after current "<webdot...>" tag
             set start [incr e_end]
@@ -617,11 +630,11 @@ proc filter_html {serverport dirname no_cache} {
 }
 
 ###########################################################################
-# get_image_size
+# webdot::get_image_size
 # 
 # encapsulate this rather ugly calculation  (used in two places)
 #
-proc get_image_size {g} {
+proc webdot::get_image_size {g} {
     if {![catch {$g queryattr orientation} or]
       && [string first land [string tolower $or]] == 0} {
         set landscape 1
@@ -653,11 +666,11 @@ proc get_image_size {g} {
 }
 
 ###########################################################################
-# make_product
+# webdot::make_product
 #
 # convert "src" into "$type" in current directory
 #
-proc make_product {url type engine no_cache} {
+proc webdot::make_product {url type engine no_cache} {
     global env SIGNATURE GS PS2EPSI SELF TCLET SELFMTIME
 
     if {[scan $url {http://%[^/]%s} serverport path] != 2} {
@@ -685,15 +698,15 @@ proc make_product {url type engine no_cache} {
                 error "Unable to open cache file for write: $cachename"
             }
             if {[catch {
-                set g [read_graph]
+                set g [webdot::read_graph]
 		# set default background to transparent for web use
 		if {[catch {$g queryattr bgcolor}]} {
-		    $g setattr bgcolor white
+		    $g setattributes bgcolor white
 		}
                 if {[catch {$g layout [string toupper $engine]} err]} {
                     error "Graph layout error: $err" 
                 }
-		foreach {sizex sizey} [get_image_size $g] {break}
+		foreach {sizex sizey} [webdot::get_image_size $g] {break}
                 set gd [gd create $sizex $sizey]
     
                 # Antialising against transparent background doesn't work well
@@ -707,9 +720,9 @@ proc make_product {url type engine no_cache} {
                 if {! [catch {$g queryattr BGURL} bgurl]} {
                     set bgurl [lindex $bgurl 0]
                     if {[string length $bgurl]} {
-                        set bgurl [make_absolute_url $serverport $dirname $bgurl [$g showname]]
+                        set bgurl [webdot::make_absolute_url $serverport $dirname $bgurl [$g showname]]
                         foreach {bg_file_cache_dir . . ContentType} \
-                            [get_url $bgurl $no_cache] {break}
+                            [webdot::get_url $bgurl $no_cache] {break}
                         if {[catch {open $bg_file_cache_dir/src r} bgf]} {
                             error "Unable to open background image file: $bg_file_cache_dir/src"
                         }
@@ -778,8 +791,8 @@ proc make_product {url type engine no_cache} {
         }
         dot {
             # for client side we use canonical dot format and don't bother with server side layout.
-            set g [read_graph]
-            fix_graph_urls $g $serverport $dirname
+            set g [webdot::read_graph]
+            webdot::fix_graph_urls $g $serverport $dirname
             if {[catch {open $cachename w} f_out]} {
                 error "Unable to open cache file for write: $cachename"
             }
@@ -788,15 +801,15 @@ proc make_product {url type engine no_cache} {
             $g delete
         }
         map {
-            set g [read_graph]
-            fix_graph_urls $g $serverport $dirname
+            set g [webdot::read_graph]
+            webdot::fix_graph_urls $g $serverport $dirname
             if {[catch {$g layout [string toupper $engine]} err]} {
                 error "Graph layout error: $err" 
             }
             if {[catch {open $cachename w} f_out]} {
                 error "Unable to open cache file for write: $cachename"
             }
-            foreach {sizex sizey} [get_image_size $g] {break}
+            foreach {sizex sizey} [webdot::get_image_size $g] {break}
             puts $f_out "bb ($sizex,$sizey)"
             foreach {x0 y0 x1 y1 x2 y2 x3 y3} [gd text {} 0 \
                 times 8.0 0.0 0 0 $SIGNATURE] {break}
@@ -808,7 +821,7 @@ proc make_product {url type engine no_cache} {
             $g delete
         }
         tcl {
-            set g [read_graph]
+            set g [webdot::read_graph]
             if {[catch {$g layout [string toupper $engine]} err]} {
                 error "Graph layout error: $err" 
             }
@@ -828,8 +841,8 @@ proc make_product {url type engine no_cache} {
             $g delete
         }
         tclmap {
-            set g [read_graph]
-            fix_graph_urls $g $serverport $dirname
+            set g [webdot::read_graph]
+            webdot::fix_graph_urls $g $serverport $dirname
             if {[catch {$g layout [string toupper $engine]} err]} {
                 error "Graph layout error: $err" 
             }
@@ -856,15 +869,15 @@ proc make_product {url type engine no_cache} {
             $g delete
         }
         pdf {
-            make_product $url ps $engine $no_cache
+            webdot::make_product $url ps $engine $no_cache
             exec $GS -q -dNOPAUSE -dBATCH -sDEVICE=pdfwrite -sOutputFile=$cachename $engine.ps
         }
         epsi {
-            make_product $url ps $engine $no_cache
+            webdot::make_product $url ps $engine $no_cache
             exec $PS2EPSI $engine.ps $cachename
         }
         fig - mif - pcl - pic - ps - svg - vtx - vrml {
-            set g [read_graph]
+            set g [webdot::read_graph]
             if {[catch {$g layout [string toupper $engine]} err]} {
                 error "Graph layout error: $err" 
             }
@@ -883,16 +896,16 @@ proc make_product {url type engine no_cache} {
 }
 
 ###########################################################################
-# send_help
+# webdot::send_help
 #
-proc send_help {url type engine} {
+proc webdot::send_help {url type engine} {
     global SELF MIME
 
     puts "Content-Type: text/html\n
 <html><head><title>WebDot Help Page</title></head>
 <body bgcolor=white><h1>WebDot Help Page</h1>"
 
-    make_client_map $url $type $engine 0 0 new
+    webdot::make_client_map $url $type $engine 0 0 new
 
     if {[string equal [string toupper $engine] DOT]} {
 	set thisengine DOT
@@ -925,6 +938,11 @@ WebDot using the $thisengine layout engine, in any of the following formats:<pre
 WebDot is by: <a href=mailto:ellson@graphviz.org>John Ellson (ellson@graphviz.org)</a>
 </body></html>"
 }
+
+#############################################################
+# If we are sourced from "Dtcl_Script ChildInitScript" then
+# quit now.  The remaining function is provided by webdot.ttml/
+if {[string length [info commands dtcl_info]]} {return}
 
 ###########################################################################
 # main                                                                    #
@@ -1056,7 +1074,7 @@ switch -- $type {
 #    http://a.b.c.d/cgi-bin/webdot/http://w.x.y.z/path/x.dot.neato.png.help
 # originated from the "Graph by WebDot" signatures.
 if {[string length $help]} {
-    send_help $url $type $engine
+    webdot::send_help $url $type $engine
     exit
 }
 
@@ -1065,20 +1083,20 @@ if {[string length $help]} {
 
 # get source file into cache (may already be there)
 foreach {file_cache_dir LastModified Expires ContentType} \
-    [get_url $url $no_cache] {break}
+    [webdot::get_url $url $no_cache] {break}
 
 # some types (e.g. vrml) result in mutiple files, so cd to target directory
 cd $file_cache_dir
 
 # deal with html pages containing <webdot...> tags
 if {[string equal $srctype html]} {
-    filter_html $serverport $dirname $no_cache
+    webdot::filter_html $serverport $dirname $no_cache
     exit
 }
 
 # Support for client-side caching
 #
-# We could do this in get_url, but we must make sure src is in cache
+# We could do this in webdot::get_url, but we must make sure src is in cache
 # even if not-modified-since because the html processing will
 # need it.  The output html may be modified by embedded webdot images even
 # if the source html hasn't been changed.  To fix that would require
@@ -1099,7 +1117,7 @@ if {[info exists env(HTTP_IF_MODIFIED_SINCE)]} {
 }
 
 # convert the graph
-make_product $url $type $engine $no_cache
+webdot::make_product $url $type $engine $no_cache
 # now the product is in the cache and we can ship it
 if {[string equal $type src]} {
     set cachename src
