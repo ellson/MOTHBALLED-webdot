@@ -14,11 +14,11 @@ puts $f "<html>
 <h1><a href=$h>WebDot</a> Demo Graphs</h1>
 <table border=1><tr>
 <th>Directed</th>
-<th colspan=4>DOT</th><th></th><th colspan=4>NEATO</th>
+<th colspan=6>DOT</th><th></th><th colspan=6>NEATO</th>
 <th colspan=2></th>
-<th colspan=4>DOT</th><th></th><th colspan=4>NEATO</th>
+<th colspan=6>DOT</th><th></th><th colspan=6>NEATO</th>
 <th colspan=2></th>
-<th colspan=4>DOT</th><th></th><th colspan=4>NEATO</th>
+<th colspan=6>DOT</th><th></th><th colspan=6>NEATO</th>
 </tr><tr>"
 
 set e dot
@@ -26,50 +26,54 @@ set oe neato
 set i 0
 foreach dd [lsort [glob *.dot]] {
 	set d [file rootname $dd]
-	if {$i%3} {puts $f "<td></td>"}
+	if {$i%2} {puts $f "<td></td>"}
 	puts $f "<td><a href=$w$p/$dd.src>$d</a></td>
 <td><a href=$w$p/$dd.$e.png.help>png</a></td>
+<td><a href=$w$p/$dd.$e.gif.help>gif</a></td>
 <td><a href=$w$p/$dd.$e.tcl.help>tcl</a></td>
 <td><a href=$w$p/$dd.$e.svg>svg</a></td>
-<!-- <td><a href=$w$p/$dd.$e.ps>ps</a></td> -->
+<td><a href=$w$p/$dd.$e.ps>ps</a></td>
 <td><a href=$w$p/$dd.$e.pdf>pdf</a></td>
 <td></td>
 <td><a href=$w$p/$dd.$oe.png.help>png</a></td>
+<td><a href=$w$p/$dd.$oe.gif.help>gif</a></td>
 <td><a href=$w$p/$dd.$oe.tcl.help>tcl</a></td>
 <td><a href=$w$p/$dd.$oe.svg>svg</a></td>
-<!-- <td><a href=$w$p/$dd.$oe.ps>ps</a></td> -->
+<td><a href=$w$p/$dd.$oe.ps>ps</a></td>
 <td><a href=$w$p/$dd.$oe.pdf>pdf</a></td>"
-	if {!([incr i]%3)} {puts $f "</tr><tr>"}
+	if {!([incr i]%2)} {puts $f "</tr><tr>"}
 }
 
 set p /webdot/graphs/undirected
 cd ../undirected
 puts $f "</tr><tr></tr><tr>
 <th>Undirected</th>
-<th colspan=4>DOT</th><th></th><th colspan=4>NEATO</th>
+<th colspan=6>DOT</th><th></th><th colspan=6>NEATO</th>
 <th colspan=2></th>
-<th colspan=4>DOT</th><th></th><th colspan=4>NEATO</th>
+<th colspan=6>DOT</th><th></th><th colspan=6>NEATO</th>
 <th colspan=2></th>
-<th colspan=4>DOT</th><th></th><th colspan=4>NEATO</th>
+<th colspan=6>DOT</th><th></th><th colspan=6>NEATO</th>
 </tr><tr>"
 
 set i 0
 foreach dd [lsort [glob *.dot]] {
 	set d [file rootname $dd]
-	if {$i%3} {puts $f "<td></td>"}
+	if {$i%2} {puts $f "<td></td>"}
 	puts $f "<td><a href=$w$p/$dd.src>$d</a></td>
 <td><a href=$w$p/$dd.$e.png.help>png</a></td>
+<td><a href=$w$p/$dd.$e.gif.help>gif</a></td>
 <td><a href=$w$p/$dd.$e.tcl.help>tcl</a></td>
 <td><a href=$w$p/$dd.$e.svg>svg</a></td>
-<!-- <td><a href=$w$p/$dd.$e.ps>ps</a></td> -->
+<td><a href=$w$p/$dd.$e.ps>ps</a></td>
 <td><a href=$w$p/$dd.$e.pdf>pdf</a></td>
 <td></td>
 <td><a href=$w$p/$dd.$oe.png.help>png</a></td>
+<td><a href=$w$p/$dd.$oe.gif.help>gif</a></td>
 <td><a href=$w$p/$dd.$oe.tcl.help>tcl</a></td>
 <td><a href=$w$p/$dd.$oe.svg>svg</a></td>
-<!-- <td><a href=$w$p/$dd.$oe.ps>ps</a></td> -->
+<td><a href=$w$p/$dd.$oe.ps>ps</a></td>
 <td><a href=$w$p/$dd.$oe.pdf>pdf</a></td>"
-	if {!([incr i]%3)} {puts $f "</tr><tr>"}
+	if {!([incr i]%2)} {puts $f "</tr><tr>"}
 }
 
 puts $f "</tr>
