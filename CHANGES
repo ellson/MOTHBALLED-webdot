@@ -1,3 +1,6 @@
+August 4, 2002 - Release 1.8.9  (to realign with graphviz)
+	- use cmap to generate client-maps directly
+	- support for and demo of tooltips
 June 7, 2002 - Release 1.8.5
         - allow encoded QUERY_STRINGS to be passed through to the graph server
 	  Specifically, "%3f" is required to represent the "?"
