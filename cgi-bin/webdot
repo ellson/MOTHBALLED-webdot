@@ -1112,9 +1112,12 @@ if {[string equal $dpath /]} {
 set parts [lrange $parts 2 end]
 
 # extract target type, engine, viewport
-foreach {engine type viewport} $parts {break}
-if {[string equal $engine {}]} {set engine dot}
-if {[string equal $type {}]} {set type dot}
+switch -- [llength $parts] {
+        0 {set engine dot; set type dot; set viewport {}}
+        1 {set engine dot; set type $parts; set viewport {}}
+	2 {foreach {engine type} $parts {break}; set viewport {}}
+	default {foreach {engine type viewport} $parts {break}}
+}
 
 # nasty hacks to workaround bugs in Apache/2.0.36 and later
 set env(SCRIPT_NAME) /cgi-bin/[file tail $argv0]

@@ -15,6 +15,7 @@ set DOCS {
 	clientmap "Client-side maps" 1
 	svginline "Inline SVG graphs" 1
 	tclembed "Graphs in Tclets" 1
+	graphquest "GraphQuest - pan &amp; zoom &amp; client-side maps" 0
 }
 
 set OTHER {

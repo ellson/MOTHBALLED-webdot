@@ -105,6 +105,8 @@ clean:
 		html/webdot/svginline.html \
 		html/webdot/tclembed.dot \
 		html/webdot/tclembed.html \
+		html/webdot/graphquest.dot \
+		html/webdot/graphquest.html \
 		html/webdot/index.html \
 		html/webdot/webdot_op.dot \
 		html/webdot/webdot_libs.dot \
