@@ -1,4 +1,4 @@
-#!/usr/bin/tclsh8.3
+#!/usr/bin/tclsh
 
 set f [open html/webdot/demo.html w]
 set h /webdot/

@@ -1,17 +1,33 @@
 digraph G {
-	a -> b [arrowhead=none]
-	a -> c [arrowhead=normal]
-	a -> d [arrowhead=inv]
-	a -> e [arrowhead=dot]
-	a -> f [arrowhead=odot]
-	a -> g [arrowhead=invdot]
-	a -> h [arrowhead=invodot]
+  // to avoid confusion, remember this: it's spelt tail/head, but it's read start/end
 
-	b -> z [arrowtail=none]
-	c -> z [arrowtail=normal]
-	d -> z [arrowtail=inv]
-	e -> z [arrowtail=dot]
-	f -> z [arrowtail=odot]
-	g -> z [arrowtail=invdot]
-	h -> z [arrowtail=invodot]
+  ranksep=1.5            // leave some space for the head/taillabels
+	edge [arrowsize=2]     // emphasize theatrically
+  edge [dir=none]        // show only explicitly given head/tails
+  edge [labeldistance=3] // put head/tail labels farther from the node
+
+  // currently (dot "gviz 1.7.3b") samearrowhead/samearrowtail doesn't work :-(
+  a1 -> a  [samehead=ahead samearrowhead=1 headlabel=samehead]
+  a2 -> a  [samehead=ahead samearrowhead=1 arrowhead=inv]
+  a2 -> a3 [sametail=a2tail]
+  a4 -> a3 [sametail=a4tail samearrowtail=1] // only the "middle" edge in group should have arrow
+  a4 -> a5 [sametail=a4tail arrowtail=inv samearrowtail=1 taillabel=sametail]
+  a4 -> a6 [sametail=a4tail samearrowtail=1] // only the "middle" edge in group should have arrow
+
+	a -> b [arrowhead=none    headlabel=none   ]
+	a -> c [arrowhead=normal  headlabel=normal ]
+	a -> d [arrowhead=inv     headlabel=inv    ]
+	a -> e [arrowhead=dot     headlabel=dot    ]
+	a -> f [arrowhead=odot    headlabel=odot   ]
+	a -> g [arrowhead=invdot  headlabel=invdot ]
+	a -> h [arrowhead=invodot headlabel=invodot]
+
+	b -> z [arrowtail=none   	taillabel=none   ]
+	c -> z [arrowtail=normal 	taillabel=normal ]
+	d -> z [arrowtail=inv    	taillabel=inv    ]
+	e -> z [arrowtail=dot    	taillabel=dot    ]
+	f -> z [arrowtail=odot   	taillabel=odot   ]
+	g -> z [arrowtail=invdot 	taillabel=invdot ]
+	h -> z [arrowtail=invodot	taillabel=invodot]
+
 }
