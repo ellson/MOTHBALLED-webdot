@@ -48,7 +48,7 @@ array set MIME {
     png    "image/png"
     ps     "application/postscript"
     src    "text/plain"
-    svg    "image/svg"
+    svg    "image/svg+xml"
     tcl    "application/x-tcl"
     tclmap "text/plain"
     txt    "text/plain"
@@ -333,8 +333,13 @@ proc webdot::get_url {url no_cache} {
 
     # set default values
     foreach {ResponseCode Expires LastModified ContentType} {{} {} {} {}} {break}
+    if {[scan $path {%[^?]?%s} path query] == 2} {
+        regsub -all -- {[^a-zA-Z0-9]} $query {_} safe_query
+    } {
+	set safe_query {}
+    }
     regsub -all {~} $path {%7E} path
-    set file_cache_dir $CACHE_ROOT/$serverport$path
+    set file_cache_dir $CACHE_ROOT/$serverport$path$safe_query
     if {[file isdirectory $file_cache_dir]} {
         if {! [catch {open $file_cache_dir/info r} f]} {
             foreach {LastModified Expires ContentType} [read $f] {break}
@@ -527,7 +532,7 @@ proc webdot::read_graph {} {
 ###########################################################################
 # webdot::make_client_map
 #
-proc webdot::make_client_map {url type engine no_cache count target} {
+proc webdot::make_client_map {url file_cache_dir type engine no_cache count target} {
    global SELF
 
     # generate graph in requested format
@@ -538,7 +543,7 @@ proc webdot::make_client_map {url type engine no_cache count target} {
                         [webdot::get_url $url $no_cache] {break}
             # some types (e.g. vrml) result in mutiple files, so cd to target directory
             cd $file_cache_dir
-            webdot::make_product $url $type $engine $no_cache
+            webdot::make_product $url $file_cache_dir $type $engine $no_cache
             # generate map
             if {[catch {open $engine.map r} f]} {
                 error "Unable to open cache file for read: $file_cache_dir/$engine.map"
@@ -613,7 +618,7 @@ proc webdot::filter_html {serverport dirname no_cache} {
             #case ignore type value
             set type [string tolower $type]
     
-            webdot::make_client_map $url $type $engine $no_cache $count $target
+            webdot::make_client_map $url $file_cache_dir $type $engine $no_cache $count $target
 
             # mark start of text after current "<webdot...>" tag
             set start [incr e_end]
@@ -671,13 +676,22 @@ proc webdot::get_image_size {g} {
 #
 # convert "src" into "$type" in current directory
 #
-proc webdot::make_product {url type engine no_cache} {
+proc webdot::make_product {url file_cache_dir type engine no_cache} {
     global env SIGNATURE GS PS2EPSI SELF TCLET SELFMTIME
 
     if {[scan $url {http://%[^/]%s} serverport path] != 2} {
         error "Invalid url: $url"
     }
+    if {[scan $path {%[^?]?%s} npath query] == 2} {
+        regsub -all -- {[^a-zA-Z0-9]} $query {_} safe_query
+        set dirname [file dirname $npath$safe_query]
+    } {
+        set dirname [file dirname $path]
+    }
+<<<<<<< webdot
+=======
     set dirname [file dirname $path]
+>>>>>>> 1.35
     set cachename $engine.$type
 
     # see if we can use product from cache
@@ -870,11 +884,11 @@ proc webdot::make_product {url type engine no_cache} {
             $g delete
         }
         pdf {
-            webdot::make_product $url ps $engine $no_cache
+            webdot::make_product $url $file_cache_dir ps $engine $no_cache
             exec $GS -q -dNOPAUSE -dBATCH -sDEVICE=pdfwrite -sOutputFile=$cachename $engine.ps
         }
         epsi {
-            webdot::make_product $url ps $engine $no_cache
+            webdot::make_product $url $file_cache_dir ps $engine $no_cache
             exec $PS2EPSI $engine.ps $cachename
         }
         fig - mif - pcl - pic - ps - svg - vtx - vrml {
@@ -899,14 +913,14 @@ proc webdot::make_product {url type engine no_cache} {
 ###########################################################################
 # webdot::send_help
 #
-proc webdot::send_help {url type engine} {
+proc webdot::send_help {url file_cache_dir type engine} {
     global SELF MIME
 
     puts "Content-Type: text/html\n
 <html><head><title>WebDot Help Page</title></head>
 <body bgcolor=white><h1>WebDot Help Page</h1>"
 
-    webdot::make_client_map $url $type $engine 0 0 new
+    webdot::make_client_map $url $file_cache_dir $type $engine 0 0 new
 
     if {[string equal [string toupper $engine] DOT]} {
 	set thisengine DOT
@@ -1077,7 +1091,7 @@ switch -- $type {
 #    http://a.b.c.d/cgi-bin/webdot/http://w.x.y.z/path/x.dot.twopi.png.help
 # originated from the "Graph by WebDot" signatures.
 if {[string length $help]} {
-    webdot::send_help $url $type $engine
+    webdot::send_help $url $file_cache_dir $type $engine
     exit
 }
 
@@ -1128,7 +1142,7 @@ if {[info exists env(HTTP_IF_MODIFIED_SINCE)]} {
 }
 
 # convert the graph
-webdot::make_product $url $type $engine $no_cache
+webdot::make_product $url $file_cache_dir $type $engine $no_cache
 # now the product is in the cache and we can ship it
 if {[string equal $type src]} {
     set cachename src
