@@ -18,8 +18,8 @@ and the source of this page contains (for the graph above):
 &lt;iframe
   name="gq"
   src="$CGIBASE$BASE/$SELF.dot.neato.gq.300,300"
-  width="360"
-  height="340"
+  width="380"
+  height="360"
   frameborder="0"
 &gt;&lt;/iframe&gt;
 </pre></td></tr></table>
@@ -33,11 +33,11 @@ One disadvantage is that there is no guarantee that a graph will fit the frame
 at the initial zoom setting, possibly requiring the user to zoom to see
 the whole graph.
 <p>
-Note that the size of the image does not depend on the contents of the graph,
+The size of the image does not depend on the contents of the graph,
 but is fixed by the viewport dimensions specified in the URL,
 300x300 in this example.
 This eases page design.
-The width and height of the &lt;iframe&gt; needs to be a 60 wider and 40 higher
+The width and height of the &lt;iframe&gt; needs to be 80 wider and 60 higher
 than the graph image to allow for the pan&amp;zoom controls.
 <p>
 The &lt;iframe&gt; must be named "gq" for the pan&amp;zoom updates to be
