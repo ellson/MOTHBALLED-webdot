@@ -754,10 +754,11 @@ proc webdot::get_image_size {g} {
     	set sizex [expr int($sizex * 96)]
     	set sizey [expr int($sizey * 96)]
     }
-    #  add a bit more for the signature
-    incr sizex 2
-    incr sizey 14
-    if {$sizex < 94} {set sizex 94}
+#    #  add a bit more for the signature
+#    incr sizex 2
+#    incr sizey 14
+    # enforce a minimum width
+    if {$sizex < 50} {set sizex 50}
     list $sizex $sizey
 }
 
