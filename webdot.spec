@@ -19,9 +19,9 @@ graphviz rpm.
 %prep
 %setup -n %{name}-%{version}
 
-%define cgibindir  %(rpm -ql apache | grep '/cgi-bin$')
-%define htmldir    %(rpm -ql apache | grep '/html$')
-%define httpdconf  %(rpm -ql apache | grep '/httpd\\\.conf$')
+%define cgibindir  %(rpm -ql apache | grep -v doc | grep '/cgi-bin$')
+%define htmldir    %(rpm -ql apache | grep -v doc | grep '/html$')
+%define httpdconf  %(rpm -ql apache | grep -v doc | grep '/httpd\\\.conf$')
 %define apacheuser %(grep -i '^user ' %{httpdconf} | awk '{print $2}')
 %define apachegroup %(grep -i '^group ' %{httpdconf} | awk '{print $2}')
 
