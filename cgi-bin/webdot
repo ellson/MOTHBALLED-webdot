@@ -557,6 +557,15 @@ proc webdot::read_graph {} {
             error $err
         }
     }
+
+    # FIXME - this ugliness is to make textsize assume PNG output
+    #   shouldn't be needed when cairo renderers are available
+    set g [dotnew digraph]
+    set f [open /dev/null w]
+    $g write $f PNG
+    close $f
+    $g delete
+                                                                                
     # read in source file from cache
     if {[catch {open src r} f]} {
         error "Unable to open cache file for read: src"
@@ -732,11 +741,10 @@ proc webdot::get_image_size {g} {
 	} {
 		foreach {sizex sizey} [split [lindex $sz 0] ,] {break}
 	}
-    	set sizex [expr int($sizex * 96)]
-    	set sizey [expr int($sizey * 96)]
+    	#  size of image is size of graph + (2 * margin)
+	set sizex [expr int(($sizex +(5+5)/72.) * 96)]
+    	set sizey [expr int(($sizey +(5+5)/72.) * 96)]
     }
-    # FIXME - add a fudge factor because apparently bb is innaccurate
-    incr sizey 10
     if {[info exists SIGNATURE]} {
         #  add a bit more for the signature
         incr sizex 5
