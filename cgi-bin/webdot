@@ -1001,10 +1001,12 @@ if {[info exists env(PATH_INFO)]} {
 #	filename.dot.png		(short for filename.dot.dot.png)
 #	filename.dot.dot.png		convert to png using dot
 #	filename.dot.neato.png		convert to png using neato
+#	filename.dot.twopi.png		convert to png using twopi
 #
 #	filename.dot.png.help		(short for filename.dot.dot.png.help)
 #	filename.dot.dot.png.help	put dot result in a help page
 #	filename.dot.neato.png.help	put neato result in a help page
+#	filename.dot.twopi.png.help	put twopi result in a help page
 #
 # "set help help" if .help is found at the end, otherwise "set help {}"
 #
@@ -1071,7 +1073,11 @@ switch -- $type {
 # deal with help requests of the form:
 #    http://a.b.c.d/cgi-bin/webdot/http://w.x.y.z/path/x.dot.png.help
 #or:
+#    http://a.b.c.d/cgi-bin/webdot/http://w.x.y.z/path/x.dot.dot.png.help
+#or:
 #    http://a.b.c.d/cgi-bin/webdot/http://w.x.y.z/path/x.dot.neato.png.help
+#or:
+#    http://a.b.c.d/cgi-bin/webdot/http://w.x.y.z/path/x.dot.twopi.png.help
 # originated from the "Graph by WebDot" signatures.
 if {[string length $help]} {
     webdot::send_help $url $type $engine
