@@ -41,6 +41,7 @@ array set MIME {
     hpgl   "application/x-hpgl"
     html   "text/html"
     imap    "text/plain"
+    ismap    "text/plain"
     jpeg   "image/jpeg"
     map    "text/plain"
     mif    "application/x-mif"
@@ -607,7 +608,7 @@ proc webdot::make_client_map {url type engine no_cache count target} {
                         set y1 $y2
                         set y2 $t
                     }
-		    #  FIXME - should use cmap output
+		    #  FIXME - should use cmap output but cmap has no bb
 		    # escape >
 		    regsub -all -- {>} $ref_url {\&gt;} ref_url
                     puts "<area href=\"$ref_url\"
@@ -1042,7 +1043,7 @@ WebDot using the $thisengine layout engine, in any of the following
 formats:<pre>"
 
     set column 0
-    foreach t {dot epsi fig gif gv hpgl jpeg mif pcl pdf pic png ps ps2 svg svgz tcl vrml vtx map imap ismap cmap src} {
+    foreach t {dot epsi fig gif gv hpgl jpeg mif pcl pdf pic png ps ps2 svg svgz tcl vrml vtx map ismap imap cmap src} {
 	set mime "($MIME($t))"
 	if {[string equal $t src]} {
 	    set anchor "<a href=$SELF/$url.$t>$t $mime</a>"
@@ -1177,6 +1178,15 @@ switch -- [llength $parts] {
 	0 {set engine dot; set type dot}
 	1 {set engine dot; set type $parts}
 	default {foreach {engine type} $parts {break}}
+}
+
+# nasty hack to workaround bugis in Apache/2.0.36
+if {[info exists env(SERVER_SOFTWARE)]
+    && [string equal $env(SERVER_SOFTWARE) "Apache/2.0.36 (Red Hat Linux)"]} {
+	set env(SCRIPT_NAME) /cgi-bin/$argv0
+	if {[info exists env(PATH_INFO)]} {
+		regsub -- {http:/} $env(PATH_INFO) {http://} env(PATH_INFO)
+	}
 }
 
 # form url for upstream get 
