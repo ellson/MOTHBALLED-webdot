@@ -677,12 +677,7 @@ proc webdot::make_product {url type engine no_cache} {
     if {[scan $url {http://%[^/]%s} serverport path] != 2} {
         error "Invalid url: $url"
     }
-    if {[scan $path {%[^?]?%s} npath query] == 2} {
-        regsub -all -- {[^a-zA-Z0-9]} $query {_} safe_query
-        set dirname [file dirname $npath$safe_query]
-    } {
-        set dirname [file dirname $path]
-    }
+    set dirname [file dirname $path]
     set cachename $engine.$type
 
     # see if we can use product from cache
@@ -1043,28 +1038,18 @@ switch -- [llength $parts] {
 	default {foreach {engine type} $parts {break}}
 }
 
-# pass through any QUERY_STRING
-if {[info exists env(QUERY_STRING)] && [string length $env(QUERY_STRING)]} {
-   set query ?$env(QUERY_STRING)
-} {
-   set query {}
-}
-
 # form url for upstream get 
 # and form SELF url to used in the href for help attached to the signature
 if {$LOCALHOSTONLY} {
 	set SELF $env(SCRIPT_NAME)
-	set url http://127.0.0.1$path$query
+	set url http://127.0.0.1$path
 } {
 	set SELF http://$env(SERVER_NAME)$server_port$env(SCRIPT_NAME)
-	set url http://$serverport$path$query
+	set url http://$serverport$path
 }
 
-# create a safe version of the query that can be used in a directory name
-regsub -all -- {[^a-zA-Z0-9]} $query {_} safe_query
-
 # create a directory name for the cache
-set dirname [file dirname $path$safe_query]
+set dirname [file dirname $path]
 
 # clean up type
 switch -- $type {
