@@ -32,13 +32,15 @@
 
 # define the set of mime.types that we can convert graphs to
 array set MIME {
+    cmap    "text/plain"
     dot    "text/x-graphviz"
-    gv     "application/x-graphviz"
     epsi   "application/postscript"
     fig    "application/x-fig"
     gif    "image/gif"
+    gv     "application/x-graphviz"
     hpgl   "application/x-hpgl"
     html   "text/html"
+    imap    "text/plain"
     jpeg   "image/jpeg"
     map    "text/plain"
     mif    "application/x-mif"
@@ -605,6 +607,9 @@ proc webdot::make_client_map {url type engine no_cache count target} {
                         set y1 $y2
                         set y2 $t
                     }
+		    #  FIXME - should use cmap output
+		    # escape >
+		    regsub -all -- {>} $ref_url {\&gt;} ref_url
                     puts "<area href=\"$ref_url\"
 	shape=\"rect\"
         coords=\"$x1,$y1,$x2,$y2\"
@@ -904,12 +909,12 @@ proc webdot::make_product {url type engine no_cache} {
             }
             foreach {sizex sizey} [webdot::get_image_size $g] {break}
             puts $f_out "bb ($sizex,$sizey)"
+            # work out size of the signature in this font
             foreach {x0 y0 x1 y1 x2 y2 x3 y3} [gd text {} 0 \
                 times 8.0 0.0 0 0 $SIGNATURE] {break}
             puts $f_out "rectangle ([expr $sizex - $x2 - 4],$sizey) ($sizex,[expr $sizey - ($x0 - $y2) - 4]) $SELF/$url.$cachename.help $SIGNATURE"
             flush $f_out
             $g write $f_out ismap
-            # work out size of the signature in this font
             close $f_out
             $g delete
         }
@@ -973,7 +978,7 @@ proc webdot::make_product {url type engine no_cache} {
             }
             exec $PS2EPSI $engine.ps $cachename
         }
-        hpgl - fig - mif - pcl - pic - ps - ps2 - svg - svgz - vtx - vrml {
+        hpgl - fig - imap - cmap - mif - pcl - pic - ps - ps2 - svg - svgz - vtx - vrml {
             set g [webdot::read_graph]
             if {[catch {$g layout [string toupper $engine]} err]} {
                 error "Graph layout error: $err" 
@@ -1032,7 +1037,7 @@ WebDot using the $thisengine layout engine, in any of the following
 formats:<pre>"
 
     set column 0
-    foreach t {dot epsi fig gif gv hpgl jpeg mif pcl pdf pic png ps ps2 src svg svgz tcl vrml vtx} {
+    foreach t {dot epsi fig gif gv hpgl jpeg mif pcl pdf pic png ps ps2 svg svgz tcl vrml vtx map imap ismap cmap src} {
 	set mime "($MIME($t))"
 	if {[string equal $t src]} {
 	    set anchor "<a href=$SELF/$url.$t>$t $mime</a>"
@@ -1294,7 +1299,7 @@ if {[string length $LastModified]} {
 
 # send output header
 switch -- $type {
-    gv - dot - png - gif - jpeg - mif - ps - ps2 - epsi - pdf - hpgl - pic - pcl - vrml - vtx - fig - svg - svgz - src {
+    gv - dot - png - gif - jpeg - mif - ps - ps2 - epsi - pdf - hpgl - pic - pcl - vrml - vtx - fig - svg - svgz - src - imap - cmap {
         puts [join $header \n]
     }
     tcl {
@@ -1328,7 +1333,8 @@ if {[string equal $type map] && [string length $x]} {
     set defaulturl {}
     foreach l [split [read $f] \n] {
         if {[scan $l {rectangle (%d,%d) (%d,%d) %s %s} x1 y1 x2 y2 xy_url xy_label]} {
-            if {$x >= $x1 && $x <= $x2 && $y <= $y1 && $y >= $y2} {
+            if {(($x >= $x1 && $x <= $x2) || ($x <= $x1 && $x >= $x2))
+		 && (($y >= $y1 && $y <= $y2) || ($y <= $y1 && $y >= $y2))} {
                 puts "Location: $xy_url\n"
                 set defaulturl {}
                 break
