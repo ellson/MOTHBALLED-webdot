@@ -27,7 +27,7 @@ graphviz rpm.
 
 %define cachedir   /var/cache/webdot
 %define tclshbin   %(rpm -ql tcl | grep '/tclsh$')
-%define libtcldot  %(rpm -ql graphviz | grep 'libtcldot\\\.so$')
+%define tcldotlib  %(rpm -ql graphviz | grep '/libtcldot\\\.so$')
 %define gsbin      %(which gs)
 %define ps2epsibin %(which ps2epsi)
 
@@ -49,7 +49,7 @@ chmod 700 $RPM_BUILD_ROOT/%{cachedir}
 %post
 cat > %{cgibindir}/webdot.new << '__EOF__'
 #!%{tclshbin}
-set LIBTCLDOT %{libtcldot}
+set LIBTCLDOT %{tcldotlib}
 set CACHE_ROOT %{cachedir}
 set GS %{gsbin}
 set PS2EPSI %{ps2epsibin}
