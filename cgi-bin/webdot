@@ -27,7 +27,6 @@ set env(DOTFONTPATH) /usr/share/ttf
 set CACHE_ROOT /var/cache/webdot
 set GS /usr/bin/gs
 set PS2EPSI /usr/bin/ps2epsi
-set MYDATA $env(DOCUMENT_ROOT)/webdot
 
 # feature switches
 #
