@@ -16,7 +16,7 @@ after serving this page through $CGIBASE, this &lt;webdot...&gt;
 tag is replaced by:
 <table border=1><tr><td><pre>
 &lt;map name="webdot0"&gt;
-&lt;area href="/cgi-bin/webdot/http://localhost/cgi-bin/webdot/webdot/clientmap.dot.neato.png.help" alt="Graph by WebDot" coords="147,240,235,228"&gt;
+&lt;area shape="rect" href="/cgi-bin/webdot/http://localhost/cgi-bin/webdot/webdot/clientmap.dot.neato.png.help" title="Graph by WebDot" alt="Graph by WebDot" coords="147,240,235,228"&gt;
 &lt;area shape="rect" href="http://localhost/webdot/a.html" title="a" alt="" coords="8,132,37,161"&gt;
 &lt;area shape="rect" href="http://localhost/webdot/b.html" title="b" alt="" coords="108,105,137,135"&gt;
 &lt;area shape="rect" href="http://localhost/webdot/c.html" title="c" alt="" coords="180,179,209,208"&gt;
