@@ -1,5 +1,5 @@
 Name:           webdot
-Version:        1.10.1
+Version:        1.10.2
 Release:        1
 Group:          Applications/Graphics
 License:        BSD-style

@@ -1,3 +1,5 @@
+February 13, 2004 - Release 1.10.2
+	- fix problem with margins
 August 21, 2003 - Release 1.10
 	- support operation without SIGNATURE feature
 	- realign version number with graphviz

@@ -724,8 +724,8 @@ proc webdot::get_image_size {g} {
     if {[catch {$g queryattr size} sz]} {
         foreach {lrx lry ulx uly} [lindex [$g queryattr bb] 0] {break}
     	#  size of image is size of graph + (2 * margin)
-    	set sizex [expr int(($ulx - $lrx + (2 * 10)) * 96./72)]
-    	set sizey [expr int(($uly - $lry + (2 * 10)) * 96./72)]
+    	set sizex [expr {($ulx - $lrx + 5 + 5) * 96/72}]
+    	set sizey [expr {($uly - $lry + 5 + 5) * 96/72}]
     } {
 	if {$landscape} {
 		foreach {sizey sizex} [split [lindex $sz 0] ,] {break}
