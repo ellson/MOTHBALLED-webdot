@@ -873,11 +873,13 @@ WebDot using the $thisengine layout engine, in any of the following formats:<pre
 
     set column 0
     foreach t {dot epsi fig gif hpgl jpeg mif pcl pdf pic png ps src svg tcl vrml vtx} {
+	set mime "($MIME($t))"
 	if {[string equal $t src]} {
-            puts -nonewline " <a href=$SELF/$url.$t>[format %5s $t] [format %-25s ($MIME($t))]</a>"
+	    set anchor "<a href=$SELF/$url.$t>$t $mime</a>"
 	} {
-            puts -nonewline " <a href=$SELF/$url.$engine.$t>[format %5s $t] [format %-25s ($MIME($t))]</a>"
+	    set anchor "<a href=$SELF/$url.$engine.$t>$t $mime</a>"
 	}
+        puts -nonewline [format "%[expr 6-[string length $t]]s%s%[expr 25-[string length $mime]]s" {} $anchor {}]
         if {!([incr column]%3)} {puts ""}
     }
     puts "</pre>
