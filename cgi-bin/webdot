@@ -1045,7 +1045,7 @@ if {[info exists env(HTTP_IF_MODIFIED_SINCE)]} {
     if {[catch {clock scan $Expires -gmt 1} t]} {
        error "failed to parse time in env(HTTP_IF_MODIFIED_SINCE): $env(HTTP_IF_MODIFIED_SINCE)"
     }
-    if {$LastModified <= $t && $LastModified < [file mtime $LIBTCLDOT]} {
+    if {$LastModified <= $t && [file mtime $LIBTCLDOT] < $t} {
         puts "Status: 304 Not Modified\n"
         exit
     }
