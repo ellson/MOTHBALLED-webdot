@@ -5,7 +5,7 @@ Group:          Applications/Graphics
 License:        BSD-style
 URL:            http://www.graphviz.org/
 Summary:        A CGI graph server script that uses tcldot from graphviz-tcl.
-Packager:       John Ellson (ellson@lucent.com)
+Packager:       John Ellson (ellson@graphviz.org)
 Requires:       graphviz-tcl ghostscript tcl httpd
 Source:         http://www.graphviz.org/pub/graphviz/%{name}-%{version}.tar.gz
 BuildArchitectures: noarch

@@ -3,7 +3,6 @@
 # From: "Stephen C. North" <north@research.att.com> 
 # Date: 01/02/01 17:05
 # Subject: webdot cgi bin hack to limit cpu and virtual memory
-# To: ellson@lucent.com
 # 
 # Please note that $(kill -k $?)  is a ksh93-ism.
 # In bash or pdksh I guess you could wire in the

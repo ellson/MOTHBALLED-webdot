@@ -81,7 +81,7 @@ set SELFMTIME [expr $t1>$t2?$t1:$t2]
 # skip to the next ############ separator.)
 #
 set TCLET {
-# Zoomable canvas tclet preamble by: John Ellson (ellson@lucent.com)
+# Zoomable canvas tclet preamble by: John Ellson (ellson@graphviz.org)
 # if running in a tclet...
 # set tclet security policy to allow ::browser::displayURL
 if {[catch {policy home}]} {
