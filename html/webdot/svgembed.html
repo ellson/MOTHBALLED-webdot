@@ -6,12 +6,12 @@
 <a href=/cgi-bin/webdot/webdot/clientmap.html>[next]</a>
 <font size=+2><b>WebDot Tutorial: Embedded SVG graph</b></font>
 <p>
-<embed src=/cgi-bin/webdot/webdot/svgembed.dot.dot.svg 
+<embed src=/cgi-bin/webdot/webdot/svgembed.dot.dot.svgz
     type="image/svg-xml"
     palette="foreground"
 >
 <p>
-WebDot also supports SVG as an output format.  For example this graph:
+WebDot also supports SVG or SVGZ as output formats.  For example this graph:
 <table border=1><tr><td><pre>
 digraph G {
 	node [URL="\N.html"]
@@ -21,9 +21,9 @@ digraph G {
 }
 </pre></td></tr></table>
 <p>
-can be generated for web browsers that support SVG viewing with:
+can be generated for web browsers that support SVGZ viewing with:
 <table border=1><tr><td><pre>
-&lt;embed src=/cgi-bin/webdot/webdot/svgembed.dot.dot.svg 
+&lt;embed src=/cgi-bin/webdot/webdot/svgembed.dot.dot.svgz 
       type="image/svg-xml"
       palette="foreground"
 &gt;

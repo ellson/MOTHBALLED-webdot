@@ -1,15 +1,15 @@
 <p>
-<embed src=$CGIBASE$BASE/$SELF.dot.dot.svg 
+<embed src=$CGIBASE$BASE/$SELF.dot.dot.svgz
     type="image/svg-xml"
     palette="foreground"
 >
 <p>
-WebDot also supports SVG as an output format.  For example this graph:
+WebDot also supports SVG or SVGZ as output formats.  For example this graph:
 $DOT
 <p>
-can be generated for web browsers that support SVG viewing with:
+can be generated for web browsers that support SVGZ viewing with:
 <table border=1><tr><td><pre>
-&lt;embed src=$CGIBASE$BASE/$SELF.dot.dot.svg 
+&lt;embed src=$CGIBASE$BASE/$SELF.dot.dot.svgz 
       type="image/svg-xml"
       palette="foreground"
 &gt;
