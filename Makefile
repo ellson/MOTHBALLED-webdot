@@ -34,12 +34,12 @@ PS2EPSI=/usr/bin/ps2epsi
 #      this can result in uncontrolled load on your system
 LOCALHOSTONLY=1
 
+# version number for webdot-*.*.tar.gz
+VERSION=1.7.1
 
 ###############################################################
 
-
 all:
-	true
 
 install:
 	echo "#!$(TCLSH_EXECUTABLE)" > $(CGI-BIN_DIR)/webdot
@@ -61,3 +61,17 @@ uninstall:
 	rm -f $(CGI-BIN_DIR)/webdot
 	rm -rf $(HTML_DIR)/webdot
 	rm -rf $(CACHE_DIR)/webdot
+
+distdir=webdot-$(VERSION)
+
+dist: 
+	rm -rf $(distdir)*
+	mkdir -p $(distdir)/cgi-bin $(distdir)/html/webdot
+	cp AUTHORS CHANGES COPYING INSTALL Makefile README $(distdir)
+	cp cgi-bin/webdot $(distdir)/cgi-bin/
+	cp html/webdot/*.html $(distdir)/html/webdot/
+	cp html/webdot/*.dot $(distdir)/html/webdot/
+	cp html/webdot/*.png $(distdir)/html/webdot/
+	cp html/webdot/*.gif $(distdir)/html/webdot/
+	tar cf - $(distdir) | gzip > $(distdir).tar.gz
+	rm -rf $(distdir)

@@ -1,0 +1,20 @@
+Oct 30, 00 - Release 1.7.1
+
+	- Support for tags in html pages.  tags are of the form:
+		<webdot src=demo.dot type=png> 
+	and get replaced by a client side map and an <img ...> 
+	
+	- New local host installation.  Option to serve graphs only
+	from the same server. 
+
+	- Security.  No more support for file: urls, or any other
+	local files (except for private cache area).  All upstream
+	files are obtained by http even if in LOCALHOSTONLY mode, so
+	the security is provided by the httpd configuration.
+
+	- Support for clickable edge labels in gif, png, and jpegs.
+
+	- Upgrade to use graphviz-1.7
+
+
+

@@ -2,33 +2,3 @@ WebDot is a server-side graph layout engine
 that allows authors to publish .dot files
 and have them rendered in their .html pages 
 as .png with associated imagemaps.
-
-There are three things you need to do to install WebDot:
-
-1. Install prerequisites:
-
-	tcl8.3 ( http://www.scriptics.org/ )
-	graphviz
-	Apache httpd (or other web server)
-	Ghostscript 
-	TrueType fonts
-	xv (required for testing only)
-
-2. Check the paths in the first few lines of the Makefile
-to reflect your installation of:
-
-	tclsh
-	gs
-	ps2epsi
-	TrueType fonts
-	httpd server name
-	httpd server cgi-bin directory
-
-3. Then type 'make install' to complete the installation.
-
-For testing, 'make test' emulates a CGI environment around
-the installed CGI to produce a PNG which is then viewed
-with xv. This allows testing independant of the httpd.
-
-ellson@lucent.com
-north@att.com
