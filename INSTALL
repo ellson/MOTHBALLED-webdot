@@ -1,0 +1,29 @@
+Prequisites:
+
+	tcl-8.3 (already in redhat-7.0)
+
+	freetype-1.3 (already in redhat-7.0)
+
+	graphviz-1.7 (from http://www.graphviz.org/pub/graphviz/ )
+
+	TrueType fonts installed in /usr/share/ttf
+	    Minimally: /usr/share/ttf/times.ttf
+
+Note:
+	To use the graphviz GIF/PNG/JPEG generator with Unix, you need
+	to install TrueType fonts.  For copyright reasons, we don't
+	bundle any fonts with graphviz, or webdot.  You may have a
+	licensed copy on a nearby PC in C:\Windows\Fonts, or you can
+	download some suitable fonts from, for example:
+        http://www.microsoft.com/typography/fontpack/default.htm
+
+Precheck:
+
+	Check the install locations in the Makefile (the default locations
+	match RedHat 7.0 conventions)
+
+Install:
+	make install
+
+Test:
+	netscape http://localhost/webdot/

@@ -1,44 +1,29 @@
-#!/usr/local/bin/tclsh8.4
-
 ###########################################################################
 # WebDot, the Server                                                      #
 #                                                                         #
-# John Ellson, ellson@lucent.com                                          #
+# John Ellson, ellson@graphviz.org                                        #
 #                                                                         #
-# Copyright (c) Lucent Technologies. 1994...2000.                         #
-#                                                                         #
-# This code is licensed by AT&T Corp.  For the terms and conditions       #
-# of the license, see http://www.research.att.com/sw/tools/graphviz       #
 ###########################################################################
 
-
 ###########################################################################
-# config data definitions that may require adjustment at installation
-###########################################################################
-
-# requires Tcldot packages
-# (package requires are done in make_product only if needed
-#  i.e. if result not already in cache.)
-# path to "graphviz" package directory containing Tcldot and Gdtclft
-# use "load" rather than "package require" to avoid directory searching
-set TCLDOT /usr/local/lib/graphviz/libtcldot.so
-
-set env(DOTFONTPATH) /usr/share/ttf
-set CACHE_ROOT /var/cache/webdot
-set GS /usr/bin/gs
-set PS2EPSI /usr/bin/ps2epsi
-
-# feature switches
+# configuration data
 #
-# LOCALHOSTONLY set to 0 to allow conversion of graphs from other hosts
-#               warning: use only if you want to provide a public graph server
-#                        this can result in uncontrolled load on your system
-#      
-set LOCALHOSTONLY 1
+# At the top of this file should be some installation dependent code like:
+#
+#	#!/usr/bin/tclsh8.3
+#	set LIBTCLDOT /usr/lib/graphviz/libtcldot.so
+#	set CACHE_ROOT /var/cache/webdot
+#	set env(DOTFONTPATH) /usr/share/ttf
+#	set GS /usr/bin/gs
+#	set PS2EPSI /usr/bin/ps2epsi
+#	set LOCALHOSTONLY 1
+#
+# This code is normally created during "make install"
+#
+###########################################################################
 
 ###########################################################################
-# other data definitions - these should not require adjustment at installtion
-###########################################################################
+# various data definitions - these should not require adjustment
 
 # define the set of mime.types that we can convert graphs to
 array set MIME {
@@ -496,11 +481,11 @@ proc fix_graph_urls {g serverport dirname} {
 # read_graph
 #
 proc read_graph {do_layout} {
-    global TCLDOT
+    global LIBTCLDOT
 
     # we're going to need the Tcldot extension to process the graph
     if {! [string length [info command dotread]]} {
-        if {[catch {load $TCLDOT} err]} {
+        if {[catch {load $LIBTCLDOT} err]} {
             error $err
         }
     }
