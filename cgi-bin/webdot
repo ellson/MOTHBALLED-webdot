@@ -307,15 +307,12 @@ proc get_url {url no_cache} {
     if {[scan $serverport {%[^:]:%s} server port] == 1} {set port 80}
 
     # now check for security
-    if {$LOCALHOSTONLY} {
-        if {! ([string equal $env(SERVER_ADDR) $server]
+    if {$LOCALHOSTONLY
+      && ! ([string equal $env(SERVER_ADDR) $server]
           || [string equal $env(SERVER_NAME) $server]
           || [string equal localhost $server]
           || [string equal 127.0.0.1 $server])} {
             error "This webdot installation only delivers graphs from localhost"
-	}
-	# $server may not work if there is no network
-	set server localhost
     }
 
     # set default values
