@@ -21,6 +21,10 @@ graphviz rpm.
 
 %define cgibindir  %(rpm -ql apache | grep '/cgi-bin$')
 %define htmldir    %(rpm -ql apache | grep '/html$')
+%define httpdconf  %(rpm -ql apache | grep '/httpd\\\.conf$')
+%define apacheuser %(grep -i '^user ' %{httpdconf} | awk '{print $2}')
+%define apachegroup %(grep -i '^group ' %{httpdconf} | awk '{print $2}')
+
 %define cachedir   /var/cache/webdot
 %define tclsh8bin  %(rpm -ql tcl | grep tclsh8)
 %define libtcldot  %(rpm -ql graphviz | grep 'libtcldot.so$')
@@ -42,14 +46,14 @@ __EOF__
 cat $RPM_SOURCE_DIR/cgi-bin/webdot >> $RPM_BUILD_ROOT/%{cgibindir}/webdot
 chmod 755 $RPM_BUILD_ROOT/%{cgibindir}/webdot
 cp -r $RPM_SOURCE_DIR/html/webdot $RPM_BUILD_ROOT/%{htmldir}/
-chown apache:apache $RPM_BUILD_ROOT/%{cachedir}
+chown %{apacheuser}:%{apachegroup} $RPM_BUILD_ROOT/%{cachedir}
 chmod 700 $RPM_BUILD_ROOT/%{cachedir}
 %{?suse_check}
 
 %files
 %attr(755,root,root) %{cgibindir}/webdot
 %attr(-,root,root) %{htmldir}/webdot/
-%attr(700,apache,apache) %{cachedir}/
+%attr(700,%{apacheuser},%{apachegroup}) %{cachedir}/
 
 %post
 cat > %{cgibindir}/webdot.new << '__EOF__'
