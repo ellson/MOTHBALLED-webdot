@@ -1,4 +1,0 @@
-graph G {
-	node [URL="/webdot/\N.html"]
-	a -- b -- c; b -- d;
-}

@@ -1,6 +1,0 @@
-digraph G {
-	graph [URL="default.html"]
-	node [URL="\N.html"]
-	a -> b -> c
-	a -> c [URL="a->c.html", label="a->c"]
-}
