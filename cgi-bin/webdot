@@ -840,7 +840,7 @@ proc webdot::make_product {url type engine no_cache} {
                     error "Unable to open cache file for write: $engine.cmap"
                 }
                 puts $f_out "<!-- bb ($sizex,$sizey) -->"
-                puts $f_out "<area href=\"$SELF/$url.$cachename.help\" alt=\"$SIGNATURE\" coords=\"[expr $sizex - $x2 - 4],$sizey,$sizex,[expr $sizey - ($x0 - $y2) - 4]\">"
+                puts $f_out "<area shape=\"rect\" href=\"$SELF/$url.$cachename.help\" alt=\"$SIGNATURE\" coords=\"[expr $sizex - $x2 - 4],$sizey,$sizex,[expr $sizey - ($x0 - $y2) - 4]\">"
                 flush $f_out
                 $g write $f_out cmap
             	$g delete
@@ -915,7 +915,7 @@ proc webdot::make_product {url type engine no_cache} {
             # work out size of the signature in this font
             foreach {x0 y0 x1 y1 x2 y2 x3 y3} [gd text {} 0 \
                 times 8.0 0.0 0 0 $SIGNATURE] {break}
-            puts $f_out "<area href=\"$SELF/$url.$cachename.help\" alt=\"$SIGNATURE\" coords=\"[expr $sizex - $x2 - 4],$sizey,$sizex,[expr $sizey - ($x0 - $y2) - 4]\">"
+            puts $f_out "<area shape=\"rect\" href=\"$SELF/$url.$cachename.help\" alt=\"$SIGNATURE\" coords=\"[expr $sizex - $x2 - 4],$sizey,$sizex,[expr $sizey - ($x0 - $y2) - 4]\">"
             flush $f_out
             $g write $f_out cmap
             close $f_out
