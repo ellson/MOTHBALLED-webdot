@@ -1,3 +1,7 @@
+April 17, 2002 - Release 1.8.4
+        - strip preamble (DOCTYPE etc) from SVG when using inline.
+        - strip extra infor after ";" from Content-type: headers.
+        - don't put text in <embed>...</embed> 'cos Amaya prints it.
 April 7, 2002 - Release 1.8.3
 	- improve error handling
 April 4, 2002 - Release 1.8.2

@@ -590,7 +590,7 @@ proc webdot::make_client_map {url type engine no_cache count target} {
 	usemap=\"#webdot$count\"
 	alt=\"Graph by WebDot\">"
         }
-	svg - svgz {
+	svg {
             # get source file into cache (may already be there)
 	    if {[catch {webdot::get_url $url $no_cache} res]} {
 		error $res
@@ -604,6 +604,9 @@ proc webdot::make_client_map {url type engine no_cache count target} {
 	    }
             if {[catch {open $engine.$type r} f]} {
                 error "Unable to open cache file for read: $file_cache_dir/$engine.$type"
+            }
+            while {![eof $f]} {
+		if {[string equal [string range [gets $f] end-2 end] {-->}]} {break}
             }
             fcopy $f stdout
 	    close $f
