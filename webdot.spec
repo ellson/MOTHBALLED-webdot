@@ -36,6 +36,7 @@ mkdir -p $RPM_BUILD_ROOT/%{cgibindir}
 mkdir -p $RPM_BUILD_ROOT/%{htmldir}
 mkdir -p $RPM_BUILD_ROOT/%{cachedir}
 cp $RPM_SOURCE_DIR/cgi-bin/webdot $RPM_BUILD_ROOT/%{cgibindir}/
+cp $RPM_SOURCE_DIR/cgi-bin/webdot.tclet $RPM_BUILD_ROOT/%{cgibindir}/
 cp -r $RPM_SOURCE_DIR/html/webdot $RPM_BUILD_ROOT/%{htmldir}/
 chown %{apacheuser}:%{apachegroup} $RPM_BUILD_ROOT/%{cachedir}
 chmod 700 $RPM_BUILD_ROOT/%{cachedir}
@@ -43,6 +44,7 @@ chmod 700 $RPM_BUILD_ROOT/%{cachedir}
 
 %files
 %attr(755,root,root) %{cgibindir}/webdot
+%attr(755,root,root) %{cgibindir}/webdot.tclet
 %attr(-,root,root) %{htmldir}/webdot/
 %attr(700,%{apacheuser},%{apachegroup}) %{cachedir}/
 

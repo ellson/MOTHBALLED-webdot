@@ -46,8 +46,9 @@ install:
 	echo "set PS2EPSI $(PS2EPSI)" >> $(CGI-BIN_DIR)/webdot
 	echo "set LOCALHOSTONLY  $(LOCALHOSTONLY)" >> $(CGI-BIN_DIR)/webdot
 	cat cgi-bin/webdot >> $(CGI-BIN_DIR)/webdot
+	cp cgi-bin/webdot.tclet $(CGI-BIN_DIR)/webdot.tcl
 	chmod +x $(CGI-BIN_DIR)/webdot
-	cp -r html/webdot $(HTML_DIR)
+	cp -r html/webdot $(HTML_DIR)/
 	rm -rf $(CACHE_DIR)/webdot
 	mkdir $(CACHE_DIR)/webdot
 	chmod 700 $(CACHE_DIR)/webdot
@@ -55,6 +56,7 @@ install:
 
 uninstall:
 	rm -f $(CGI-BIN_DIR)/webdot
+	rm -f $(CGI-BIN_DIR)/webdot.tclet
 	rm -rf $(HTML_DIR)/webdot
 	rm -rf $(CACHE_DIR)/webdot
 
@@ -67,6 +69,7 @@ dist:
 	cp Makefile webdot.spec $(distdir)
 	cp scaffold.tcl $(distdir)
 	cp cgi-bin/webdot $(distdir)/cgi-bin/
+	cp cgi-bin/webdot.tclet $(distdir)/cgi-bin/
 	cp html/webdot/*.html $(distdir)/html/webdot/
 	cp html/webdot/*.dot $(distdir)/html/webdot/
 	cp html/webdot/*.png $(distdir)/html/webdot/
