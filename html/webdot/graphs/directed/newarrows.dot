@@ -1,0 +1,17 @@
+digraph G {
+	a -> b [arrowhead=none]
+	a -> c [arrowhead=normal]
+	a -> d [arrowhead=inv]
+	a -> e [arrowhead=dot]
+	a -> f [arrowhead=odot]
+	a -> g [arrowhead=invdot]
+	a -> h [arrowhead=invodot]
+
+	b -> z [arrowtail=none]
+	c -> z [arrowtail=normal]
+	d -> z [arrowtail=inv]
+	e -> z [arrowtail=dot]
+	f -> z [arrowtail=odot]
+	g -> z [arrowtail=invdot]
+	h -> z [arrowtail=invodot]
+}
