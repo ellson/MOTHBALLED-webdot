@@ -1,0 +1,7 @@
+digraph G {
+	node [style=filled]
+	a [color=pink shape=diamond]
+	b [color=palegreen shape=box]
+	c [color=lightblue shape=invtriangle]
+	a -> {b c}
+}
