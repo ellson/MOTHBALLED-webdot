@@ -707,6 +707,9 @@ proc make_product {url type no_cache} {
                 $g write $f_out ismap
             	$g delete
             } err]} {
+		if {! [string length [info command gd]]} {
+		    error $err
+		}
                 set gd [gd create 500 100]
                 set white [gd color new $gd 255 255 255]
                 set red [gd color new $gd 255 0 0]
