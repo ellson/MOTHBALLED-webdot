@@ -617,7 +617,7 @@ proc filter_html {serverport dirname no_cache} {
 # convert "src" into "$type" in current directory
 #
 proc make_product {url type engine no_cache} {
-    global env SIGNATURE GS PS2EPSI SELF TCLET
+    global env SIGNATURE GS PS2EPSI SELF TCLET LIBTCLDOT
 
     if {[scan $url {http://%[^/]%s} serverport path] != 2} {
         error "Invalid url: $url"
@@ -628,6 +628,7 @@ proc make_product {url type engine no_cache} {
     # see if we can use product from cache
     if {[file exists $cachename]
       && [file mtime $cachename] >= [file mtime src]
+      && [file mtime $cachename] > [file mtime $LIBTCLDOT]
       && [file size $cachename] != 0
       && ! $no_cache} {
         return
@@ -963,12 +964,12 @@ if {[llength $parts] < 2} {
 	error "unable to process $path"
 }
 #
-# "set html html" if .html is found at the end,
-#  otherwise "set html {}" and check that first extension is .dot
+# check srctype
 #
 foreach {srcname srctype} $parts {break}
 switch -- $srctype {
 	dot - html {}
+	htm {set srctype html}
 	default {error "unknown source type"}
 }
 set path [file dirname $path]/$srcname.$srctype
@@ -1038,11 +1039,13 @@ if {[string equal $srctype html]} {
 # only if no changes to the resulting html would not-modified
 # be sent to the client. Basically this is all very messy for little benefit.
 #
+# Make sure an update is forced if Tcldot has changed
+#
 if {[info exists env(HTTP_IF_MODIFIED_SINCE)]} {
     if {[catch {clock scan $Expires -gmt 1} t]} {
        error "failed to parse time in env(HTTP_IF_MODIFIED_SINCE): $env(HTTP_IF_MODIFIED_SINCE)"
     }
-    if {$LastModified <= $t} {
+    if {$LastModified <= $t && $LastModified < [file mtime $LIBTCLDOT]} {
         puts "Status: 304 Not Modified\n"
         exit
     }
