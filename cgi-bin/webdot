@@ -560,6 +560,7 @@ proc webdot::read_graph {} {
     if {[catch {open src r} f]} {
         error "Unable to open cache file for read: src"
     }
+    fconfigure $f -encoding utf-8
     if {[catch {dotread $f} g]} {
         error "Invalid graph source: $g\nThere may be more details in the WebDot server's error_log,\nor check the graph file by running through dot (or neato or twopi) locally."
     }
