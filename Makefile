@@ -38,6 +38,7 @@ VERSION=1.7.4
 all:
 
 install:
+	mkdir -p $(CGI-BIN_DIR)
 	echo "#!$(TCLSH_EXECUTABLE)" > $(CGI-BIN_DIR)/webdot
 	echo "set LIBTCLDOT $(LIBTCLDOT)" >> $(CGI-BIN_DIR)/webdot
 	echo "set CACHE_ROOT $(CACHE_DIR)/webdot" >> $(CGI-BIN_DIR)/webdot
@@ -49,8 +50,8 @@ install:
 	cp -r html/webdot $(HTML_DIR)
 	rm -rf $(CACHE_DIR)/webdot
 	mkdir $(CACHE_DIR)/webdot
-	chown $(HTTPD-USER-GROUP) $(CACHE_DIR)/webdot
 	chmod 700 $(CACHE_DIR)/webdot
+	chown $(HTTPD-USER-GROUP) $(CACHE_DIR)/webdot
 
 uninstall:
 	rm -f $(CGI-BIN_DIR)/webdot

@@ -1,6 +1,6 @@
 Name:           webdot
 Version:        1.7.4
-Release:        2_RH7.x
+Release:        2_RH7
 Group:          Applications/Graphics
 Copyright:      BSD-style
 URL:            http://www.graphviz.org/

@@ -23,6 +23,8 @@
 # add a line like:
 #	set env(GDFONTPATH) /mnt/dos/c/windows/fonts/
 #
+# For a public webdot server, set LOCALHOST 0
+#
 ###########################################################################
 
 ###########################################################################
@@ -66,7 +68,7 @@ set SELFMTIME [expr $t1>$t2?$t1:$t2]
 
 ###########################################################################
 #
-# tclet preamble code that runs in the browser (no wish reqired on server)
+# tclet preamble code that runs in the browser (no wish required on server)
 #
 # (This is a long section that is only applicable to clients
 #  running the tclplugin.   If reading the server code please
@@ -309,7 +311,7 @@ proc get_url {url no_cache} {
     # now check for security
     if {$LOCALHOSTONLY
       && ! ([string equal $env(SERVER_ADDR) $server]
-          || [string equal $env(SERVER_NAME) $server]
+	  || [string equal $env(SERVER_NAME) $server]
           || [string equal localhost $server]
           || [string equal 127.0.0.1 $server])} {
             error "This webdot installation only delivers graphs from localhost"
@@ -932,9 +934,14 @@ WebDot is by: <a href=mailto:ellson@graphviz.org>John Ellson (ellson@graphviz.or
 set STARTED_CONTENT_TYPE {}
 
 # check cgi environment
-foreach v {REMOTE_ADDR SERVER_NAME SERVER_ADDR
-           SERVER_PORT SCRIPT_NAME REQUEST_METHOD} {
+foreach v {REMOTE_ADDR SERVER_NAME SERVER_PORT SCRIPT_NAME REQUEST_METHOD} {
         if {![info exists env($v)]} {error "Missing: $v"}
+}
+# some httpd don't provide SERVER_ADDR
+if {![info exists env(SERVER_ADDR)]} {
+	# stub in a safe address.  client won't be able to use IP
+	# in URLs to dot files.
+	set env(SERVER_ADDR) {127.0.0.1}
 }
 if {!([string equal $env(REQUEST_METHOD) GET]
     || [string equal $env(REQUEST_METHOD) HEAD])} {
@@ -942,13 +949,6 @@ if {!([string equal $env(REQUEST_METHOD) GET]
 }
 set server_port ":$env(SERVER_PORT)"
 if {[string equal $server_port :80]} {set server_port {}}
-
-# SELF is used in the href for help attached to the signature
-if {$LOCALHOSTONLY} {
-	set SELF $env(SCRIPT_NAME)
-} {
-	set SELF http://$env(SERVER_ADDR)$server_port$env(SCRIPT_NAME)
-}
 
 # see if we should use cache copy if it is available
 set no_cache 0
@@ -997,12 +997,12 @@ if {[string equal [lindex $parts end] help]} {
 } {
 	set help {}
 }
+
 #
-# check number of extension parts is still reasonable
+# if not enough parts, default to index.html
 #
-if {[llength $parts] < 2} {
-	error "unable to process $path"
-}
+if {[llength $parts] < 2} {set parts {index html}}
+
 #
 # check srctype
 #
@@ -1023,8 +1023,15 @@ switch -- [llength $parts] {
 	default {foreach {engine type} $parts {break}}
 }
 
-# form url for upstream get
-set url http://$serverport$path
+# form url for upstream get 
+# and form SELF url to used in the href for help attached to the signature
+if {$LOCALHOSTONLY} {
+	set SELF $env(SCRIPT_NAME)
+	set url http://127.0.0.1$path
+} {
+	set SELF http://$env(SERVER_NAME)$server_port$env(SCRIPT_NAME)
+	set url http://$serverport$path
+}
 set dirname [file dirname $path]
 
 # clean up type
