@@ -906,7 +906,7 @@ proc webdot::make_product {url type engine no_cache} {
             webdot::make_product $url ps $engine $no_cache
             exec $PS2EPSI $engine.ps $cachename
         }
-        fig - mif - pcl - pic - ps - svg - svgz - vtx - vrml {
+        hpgl - fig - mif - pcl - pic - ps - svg - svgz - vtx - vrml {
             set g [webdot::read_graph]
             if {[catch {$g layout [string toupper $engine]} err]} {
                 error "Graph layout error: $err" 
