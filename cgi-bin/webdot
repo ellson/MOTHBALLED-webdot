@@ -32,7 +32,8 @@
 
 # define the set of mime.types that we can convert graphs to
 array set MIME {
-    dot    "application/x-dot"
+    dot    "text/x-graphviz"
+    gv     "application/x-graphviz"
     epsi   "application/postscript"
     fig    "application/x-fig"
     gif    "image/gif"
@@ -676,7 +677,12 @@ proc webdot::make_product {url type engine no_cache} {
     if {[scan $url {http://%[^/]%s} serverport path] != 2} {
         error "Invalid url: $url"
     }
-    set dirname [file dirname $path]
+    if {[scan $path {%[^?]?%s} npath query] == 2} {
+        regsub -all -- {[^a-zA-Z0-9]} $query {_} safe_query
+        set dirname [file dirname $npath$safe_query]
+    } {
+        set dirname [file dirname $path]
+    }
     set cachename $engine.$type
 
     # see if we can use product from cache
@@ -919,7 +925,7 @@ proc webdot::send_help {url type engine} {
 WebDot using the $thisengine layout engine, in any of the following formats:<pre>"
 
     set column 0
-    foreach t {dot epsi fig gif hpgl jpeg mif pcl pdf pic png ps src svg tcl vrml vtx} {
+    foreach t {gv epsi fig gif hpgl jpeg mif pcl pdf pic png ps src svg tcl vrml vtx} {
 	set mime "($MIME($t))"
 	if {[string equal $t src]} {
 	    set anchor "<a href=$SELF/$url.$t>$t $mime</a>"
@@ -1037,16 +1043,28 @@ switch -- [llength $parts] {
 	default {foreach {engine type} $parts {break}}
 }
 
+# pass through any QUERY_STRING
+if {[info exists env(QUERY_STRING)] && [string length $env(QUERY_STRING)]} {
+   set query ?$env(QUERY_STRING)
+} {
+   set query {}
+}
+
 # form url for upstream get 
 # and form SELF url to used in the href for help attached to the signature
 if {$LOCALHOSTONLY} {
 	set SELF $env(SCRIPT_NAME)
-	set url http://127.0.0.1$path
+	set url http://127.0.0.1$path$query
 } {
 	set SELF http://$env(SERVER_NAME)$server_port$env(SCRIPT_NAME)
-	set url http://$serverport$path
+	set url http://$serverport$path$query
 }
-set dirname [file dirname $path]
+
+# create a safe version of the query that can be used in a directory name
+regsub -all -- {[^a-zA-Z0-9]} $query {_} safe_query
+
+# create a directory name for the cache
+set dirname [file dirname $path$safe_query]
 
 # clean up type
 switch -- $type {
@@ -1089,12 +1107,16 @@ foreach {file_cache_dir LastModified Expires ContentType} \
 cd $file_cache_dir
 
 # deal with html pages containing <webdot...> tags
-if {[string equal $ContentType $MIME(html)] || [string equal $srctype html]} {
+if {[string equal $ContentType $MIME(html)]
+       || [string equal $srctype html]} {
     webdot::filter_html $serverport $dirname $no_cache
     exit
 }
 
-if {! ([string equal $ContentType $MIME(dot)] || [string equal $srctype dot])} {
+if {! ([string equal $ContentType $MIME(dot)]
+       || [string equal $ContentType $MIME(gv)]
+       || [string equal $srctype gv]
+       || [string equal $srctype dot])} {
     error "unrecognized mimetype for graph: $ContentType and unrecognized file extension: $srctype"
 }
 
@@ -1143,7 +1165,7 @@ if {[string length $LastModified]} {
 
 # send output header
 switch -- $type {
-    dot - png - gif - jpeg - mif - ps - epsi - pdf - hpgl - pic - pcl - vrml - vtx - fig - svg - src {
+    gv - dot - png - gif - jpeg - mif - ps - epsi - pdf - hpgl - pic - pcl - vrml - vtx - fig - svg - src {
         puts [join $header \n]
     }
     tcl {
