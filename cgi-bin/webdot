@@ -1187,7 +1187,7 @@ switch -- [llength $parts] {
 #    && [string equal $env(SERVER_SOFTWARE) "Apache/2.0.36 (Red Hat Linux)"]} {
 	set env(SCRIPT_NAME) /cgi-bin/[file tail $argv0]
 	if {[info exists env(PATH_INFO)]} {
-		regsub -- {http:/[^/]} $env(PATH_INFO) {http://} env(PATH_INFO)
+		regsub -- {http:/([^/])} $env(PATH_INFO) {http://\1} env(PATH_INFO)
 	}
 #}
 
