@@ -66,6 +66,7 @@ array set MIME {
     tcl    "application/x-tcl"
     tclmap "text/plain"
     txt    "text/plain"
+    viewport   "text/html"
     vrml   "x-world/x-vrml"
     vtx    "application/x-vtx"
 }
@@ -1133,14 +1134,21 @@ if {[catch {webdot::make_product $url $type $engine $viewport $no_cache} err]} {
     toperror $err
 }
 # now the product is in the cache and we can ship it
-if {[string equal $type src]} {
-    set cachename src
-} {
-    set cachename $engine.$type
+switch -- $type {
+    src {
+	set cachename src
+    }
+    viewport {
+	set cachename $engine.$viewport.cmapx
+    }
+    default {
+        set cachename $engine.$type
+    }
 }
 if {[catch {open $cachename r} f]} {
     toperror "Unable to open cache file for read: $file_cache_dir/$cachename"
 }
+set contentLength [file size $cachename]
 
 # start preparing result http header
 lappend header "Content-Type: $MIME($type)"
@@ -1158,7 +1166,7 @@ if {[string length $LastModified]} {
 
 # send output header
 switch -- $type {
-    gv - dot - png - gif - jpeg - mif - ps - ps2 - epsi - pdf - hpgl - pic - pcl - vrml - vtx - fig - svg - svgz - src - imap - cmap {
+    gv - dot - png - gif - jpeg - mif - ps - ps2 - epsi - pdf - hpgl - pic - pcl - vrml - vtx - fig - svg - svgz - src - imap - cmap - viewport {
         puts [join $header \n]
     }
     tcl {
@@ -1183,9 +1191,6 @@ switch -- $type {
         } {
             set query $env(QUERY_STRING)
         }
-    }
-    viewport {
-	puts [join $header \n]
     }
     default {toperror "I don't know how to make type: $type"}
 }
@@ -1219,16 +1224,9 @@ if {[string equal $type map] && [string length $x]} {
 	# no default - want this to do nothing
         puts "Status: 204 No URL for this location\n"
     }
-} elseif {[string equal $type src]} {
-    puts "Content-Length: [file size src]\n"
-    if {![string equal $env(REQUEST_METHOD) HEAD]} {
-        flush stdout
-        fcopy $f stdout
-        flush stdout
-        puts {}
-    }
 } else {
-    puts "Content-Length: [file size $engine.$type]\n"
+    puts "Content-Length: $contentLength"
+    puts {}
     if {![string equal $env(REQUEST_METHOD) HEAD]} {
         flush stdout
         fconfigure $f -translation binary
