@@ -1139,7 +1139,12 @@ if {[llength $parts] < 2} {set parts {index html}}
 # use first two parts as filename for cache
 #   also, srctype may be used later if mimetype not understood
 foreach {srcname srctype} $parts {break}
-set path [file dirname $path]/$srcname.$srctype
+set dpath [file dirname $path]
+if {[string equal $dpath /]} {
+        set path /$srcname.$srctype
+} {
+        set path $dpath/$srcname.$srctype
+}
 set parts [lrange $parts 2 end]
 #
 # extract target type, and possibly a layout engine override
