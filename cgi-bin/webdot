@@ -49,6 +49,7 @@ array set MIME {
     ps     "application/postscript"
     src    "text/plain"
     svg    "image/svg+xml"
+    svgz   "image/svg+xml"
     tcl    "application/x-tcl"
     tclmap "text/plain"
     txt    "text/plain"
@@ -560,16 +561,16 @@ proc webdot::make_client_map {url type engine no_cache count target} {
             puts "</map>"
             puts "<img src=\"$SELF/$url.$engine.$type\" width=\"$sizex\" height=\"$sizey\" usemap=\"#webdot$count\" border=\"0\" alt=\"Graph by WebDot\">"
         }
-	svg {
+	svg - svgz {
             # get source file into cache (may already be there)
             foreach {file_cache_dir LastModified Expires ContentType} \
                         [webdot::get_url $url $no_cache] {break}
             # some types (e.g. vrml) result in mutiple files, so cd to target directory
             cd $file_cache_dir
-            webdot::make_product $url $type $engine $no_cache
             # generate svg
-            if {[catch {open $engine.svg r} f]} {
-                error "Unable to open cache file for read: $file_cache_dir/$engine.svg"
+            webdot::make_product $url $type $engine $no_cache
+            if {[catch {open $engine.$type r} f]} {
+                error "Unable to open cache file for read: $file_cache_dir/$engine.$type"
             }
             fcopy $f stdout
 	    close $f
@@ -891,7 +892,7 @@ proc webdot::make_product {url type engine no_cache} {
             webdot::make_product $url ps $engine $no_cache
             exec $PS2EPSI $engine.ps $cachename
         }
-        fig - mif - pcl - pic - ps - svg - vtx - vrml {
+        fig - mif - pcl - pic - ps - svg - svgz - vtx - vrml {
             set g [webdot::read_graph]
             if {[catch {$g layout [string toupper $engine]} err]} {
                 error "Graph layout error: $err" 
@@ -950,7 +951,7 @@ WebDot using the $thisengine layout engine, in any of the following
 formats:<pre>"
 
     set column 0
-    foreach t {dot epsi fig gif gv hpgl jpeg mif pcl pdf pic png ps src svg tcl vrml vtx} {
+    foreach t {dot epsi fig gif gv hpgl jpeg mif pcl pdf pic png ps src svg svgz tcl vrml vtx} {
 	set mime "($MIME($t))"
 	if {[string equal $t src]} {
 	    set anchor "<a href=$SELF/$url.$t>$t $mime</a>"
@@ -1174,6 +1175,11 @@ if {[catch {open $cachename r} f]} {
 
 # start preparing result http header
 lappend header "Content-Type: $MIME($type)"
+switch -- $type {
+	svgz {
+		lappend header "Content-Encoding: gzip"
+	}
+}
 if {[string length $Expires]} {
     lappend header "Expires: $Expires"
 }
@@ -1183,7 +1189,7 @@ if {[string length $LastModified]} {
 
 # send output header
 switch -- $type {
-    gv - dot - png - gif - jpeg - mif - ps - epsi - pdf - hpgl - pic - pcl - vrml - vtx - fig - svg - src {
+    gv - dot - png - gif - jpeg - mif - ps - epsi - pdf - hpgl - pic - pcl - vrml - vtx - fig - svg - svgz - src {
         puts [join $header \n]
     }
     tcl {

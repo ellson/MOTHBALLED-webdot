@@ -1,3 +1,7 @@
+December 11, 01 - Release 1.7.14
+	- add ps to demo formats
+	- add svgz format support
+	- use svgz instead of svg in demo
 December 2, 01 - Release 1.7.12
 	- [ I haven't been maintaining this Changes file properly, sorry. ]
 	- SVG support added

@@ -13,7 +13,7 @@ set layout_engines {dot neato twopi}
 set nl [llength $layout_engines]
 
 #set formats {{png help} {gif help} {tcl help} ps pdf svg}
-set formats {{png help} pdf svg}
+set formats {{png help} ps pdf svgz}
 set nf [llength $formats]
 
 set directions {Directed Undirected}
