@@ -1,12 +1,12 @@
 Name:           webdot
 Version:        1.8.9
-Release:        0_RH7
+Release:        1_RH_Limbo
 Group:          Applications/Graphics
 License:        BSD-style
 URL:            http://www.graphviz.org/
 Summary:        A CGI graph server script that uses tcldot from graphviz-tcl.
 Packager:       John Ellson (ellson@lucent.com)
-Requires:       graphviz-tcl ghostscript tcl
+Requires:       graphviz-tcl ghostscript tcl httpd
 Source:         http://www.graphviz.org/pub/graphviz/%{name}-%{version}.tar.gz
 BuildArchitectures: noarch
 BuildRoot:	%{_tmppath}/%{name}-root
@@ -19,9 +19,9 @@ graphviz-tcl rpm.
 %prep
 %setup -n %{name}-%{version}
 
-%define cgibindir  %(rpm -ql apache | grep -v doc | grep '/cgi-bin$')
-%define htmldir    %(rpm -ql apache | grep -v doc | grep '/html$')
-%define httpdconf  %(rpm -ql apache | grep -v doc | grep '/httpd\\\.conf$')
+%define cgibindir  %(rpm -ql httpd | grep -v doc | grep '/cgi-bin$')
+%define htmldir    %(rpm -ql httpd | grep -v doc | grep '/html$')
+%define httpdconf  %(rpm -ql httpd | grep -v doc | grep '/httpd\\\.conf$')
 %define apacheuser %(grep -i '^user ' %{httpdconf} | awk '{print $2}')
 %define apachegroup %(grep -i '^group ' %{httpdconf} | awk '{print $2}')
 
