@@ -23,7 +23,7 @@
 # add a line like:
 #	set env(GDFONTPATH) /mnt/dos/c/windows/fonts/
 #
-# For a public webdot server, set LOCALHOST 0
+# For a public webdot server, set LOCALHOSTONLY 0
 #
 ###########################################################################
 
