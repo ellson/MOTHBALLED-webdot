@@ -886,11 +886,13 @@ proc webdot::make_product {url type engine viewport no_cache} {
             puts $f_out "    </tr></table></td>
   </tr><tr>
     <td><a href=\"$SELF/$url.$engine.gq.$X,$Y,$Z,$west,$y\"><img src=\"$SELF/blue.png\" border=\"0\" width=\"5\" height=\"$Y\" /></a></td>
-    <td>"
+    <td>
+    <map name=\"gq\">"
             flush $f_out
-            $g write $f_out cmapx
+            $g write $f_out cmap
             flush $f_out
-            puts $f_out "      <img src=\"$SELF/$url.$engine.png.$viewport\" width=\"$X\" height=\"$Y\" border=\"0\" usemap=\"G\" alt=\"Graph by WebDot\" />
+            puts $f_out "      </map>
+      <img src=\"$SELF/$url.$engine.png.$viewport\" width=\"$X\" height=\"$Y\" border=\"0\" usemap=\"#gq\" alt=\"Graph by WebDot\" />
     </td>
     <td><a href=\"$SELF/$url.$engine.gq.$X,$Y,$Z,$east,$y\"><img src=\"$SELF/blue.png\" border=\"0\" width=\"5\" height=\"$Y\" /></a></td>
   </tr><tr>
