@@ -41,8 +41,6 @@ mkdir -p $RPM_BUILD_ROOT/%{cachedir}
 cp cgi-bin/webdot $RPM_BUILD_ROOT/%{cgibindir}/
 cp cgi-bin/webdot.tclet $RPM_BUILD_ROOT/%{cgibindir}/
 cp -r html/webdot $RPM_BUILD_ROOT/%{htmldir}/
-chown %{apacheuser}:%{apachegroup} $RPM_BUILD_ROOT/%{cachedir}
-chmod 700 $RPM_BUILD_ROOT/%{cachedir}
 %{?suse_check}
 
 %files
