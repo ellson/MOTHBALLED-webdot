@@ -41,7 +41,8 @@ if {[file exists [pwd]/webdot.config]} {
 
 # define the set of mime.types that we can convert graphs to
 array set MIME {
-    cmap    "text/plain"
+    cmap   "text/plain"
+    cmapx  "text/plain"
     dot    "text/x-graphviz"
     epsi   "application/postscript"
     fig    "application/x-fig"
@@ -49,8 +50,8 @@ array set MIME {
     gv     "application/x-graphviz"
     hpgl   "application/x-hpgl"
     html   "text/html"
-    imap    "text/plain"
-    ismap    "text/plain"
+    imap   "text/plain"
+    ismap  "text/plain"
     jpeg   "image/jpeg"
     map    "text/plain"
     mif    "application/x-mif"
@@ -66,7 +67,6 @@ array set MIME {
     tcl    "application/x-tcl"
     tclmap "text/plain"
     txt    "text/plain"
-    viewport   "text/html"
     vrml   "x-world/x-vrml"
     vtx    "application/x-vtx"
 }
@@ -456,8 +456,6 @@ Graph in Tclet
 #   processes <webdot> tags embedded in an html page
 #
 proc webdot::filter_html {serverport dirname no_cache} {
-    global SELF STARTED_CONTENT_TYPE
-
     set f [open src r]
     set h [read $f]
     close $f
@@ -649,8 +647,8 @@ proc webdot::make_product {url type engine viewport no_cache} {
                 }
 
                 gd write[string toupper $type] $gd $f_out
-                gd destroy $gd
                 close $f_out
+                gd destroy $gd
 
                 # generate map
                 if {[catch {open $engine.cmap w} f_out]} {
@@ -679,8 +677,8 @@ proc webdot::make_product {url type engine viewport no_cache} {
                     gd text $gd $red times 10.0 0.0 5 [incr y 20] $l
                 }
                 gd write[string toupper $type] $gd $f_out
-                gd destroy $gd
                 close $f_out
+                gd destroy $gd
 
                 # generate empty map with bb info of error message
                 if {[catch {open $engine.cmap w} f_out]} {
@@ -826,28 +824,80 @@ proc webdot::make_product {url type engine viewport no_cache} {
             $g delete
         }
 	src {}
-	viewport {
+	html {
 	    # make a layout graph
 	    if {[catch {webdot::make_product $url dot $engine {} $no_cache} err]} {
 		error $err
 	    }
 	    # use cached layout
             set g [webdot::read_graph $engine.dot]
-	    foreach {X Y Z x y} [split $viewport _] {break}
+	    foreach {X Y Z x y} [split $viewport ,] {break}
+            if {[string equal $Z {}]} {
+		set Z 125
+#		foreach {llx lly urx ury} [lindex [$g queryattributes bb] 0] {break}
+#		set x [expr {$urx / 2}]
+#		set y [expr {$ury / 2}]
+		set x [expr {($X * 100)/($Z * 2)}]
+		set y [expr {($Y * 100)/($Z * 2)}]
+	    }
 	    $g setattribute viewport "$X,$Y,[expr {$Z/100.}],$x,$y"
 	    # create viewport image
-	    set cachename $engine.$viewport.png
+	    set cachename $engine.png.$viewport
             if {[catch {open $cachename w} f_out]} {
                 error "Unable to open cache file for write: $cachename"
             }
             $g write $f_out png
             close $f_out
-	    # create viewport map
-	    set cachename $engine.$viewport.cmapx
+
+	    # create viewport html and map
+	    set cachename $engine.html.$viewport
             if {[catch {open $cachename w} f_out]} {
                 error "Unable to open cache file for write: $cachename"
             }
+
+	    # precompute pans
+	    set pansize 75
+	    set north [expr {$y-$Y*$pansize/$Z}]
+	    set south [expr {$y+$Y*$pansize/$Z}]
+	    set west [expr {$x+$X*$pansize/$Z}]
+	    set east [expr {$x-$X*$pansize/$Z}]
+
+	    # write graphquest page with pan & zoom controls, map, and img reference
+            puts $f_out "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\" \"http://www.w3.org/TR/html4/loose.dtd\">
+<html><head>
+  <title>Graphquest</title>
+  <base target=\"graphquest\">
+</head><body>
+  <table><tr>
+    <td><a href=\"$SELF/$url.$engine.html.$X,$Y,$Z,$west,$north\"><img src=\"$SELF/blue.png\" border=\"0\" width=\"5\" height=\"5\" /></a></td>
+    <td><a href=\"$SELF/$url.$engine.html.$X,$Y,$Z,$x,$north\"><img src=\"$SELF/blue.png\" border=\"0\" width=\"$X\" height=\"5\" /></a></td>
+    <td><a href=\"$SELF/$url.$engine.html.$X,$Y,$Z,$east,$north\"><img src=\"$SELF/blue.png\" border=\"0\" width=\"5\" height=\"5\" /></a></td>
+    <td rowspan=\"3\"><table><tr>"
+	    foreach z {150 125 100 75 50 25} {
+		if {$z == $Z} {
+		    puts $f_out "    <td><a href=\"$SELF/$url.$engine.html.$X,$Y,$z,$x,$y\"><img src=\"$SELF/green.png\" border=\"0\" width=\"15\" height=\"5\" /></a></td>
+    </tr><tr><td></td></tr><tr>"
+		} {
+		    puts $f_out "    <td><a href=\"$SELF/$url.$engine.html.$X,$Y,$z,$x,$y\"><img src=\"$SELF/blue.png\" border=\"0\" width=\"15\" height=\"5\" /></a></td>
+    </tr><tr><td></td></tr><tr>"
+		}
+            }
+            puts $f_out "    </tr></table></td>
+  </tr><tr>
+    <td><a href=\"$SELF/$url.$engine.html.$X,$Y,$Z,$west,$y\"><img src=\"$SELF/blue.png\" border=\"0\" width=\"5\" height=\"$Y\" /></a></td>
+    <td>"
+            flush $f_out
             $g write $f_out cmapx
+            flush $f_out
+            puts $f_out "      <img src=\"$SELF/$url.$engine.png.$viewport\" width=\"$X\" height=\"$Y\" border=\"0\" usemap=\"G\" alt=\"Graph by WebDot\" />
+    </td>
+    <td><a href=\"$SELF/$url.$engine.html.$X,$Y,$Z,$east,$y\"><img src=\"$SELF/blue.png\" border=\"0\" width=\"5\" height=\"$Y\" /></a></td>
+  </tr><tr>
+    <td><a href=\"$SELF/$url.$engine.html.$X,$Y,$Z,$west,$south\"><img src=\"$SELF/blue.png\" border=\"0\" width=\"5\" height=\"5\" /></a></td>
+    <td><a href=\"$SELF/$url.$engine.html.$X,$Y,$Z,$x,$south\"><img src=\"$SELF/blue.png\" border=\"0\" width=\"$X\" height=\"5\" /></a></td>
+    <td><a href=\"$SELF/$url.$engine.html.$X,$Y,$Z,$east,$south\"><img src=\"$SELF/blue.png\" border=\"0\" width=\"5\" height=\"5\" /></a></td>
+  </tr></table>
+</body></html>"
             close $f_out
             $g delete
 	}
@@ -917,9 +967,6 @@ if {[string length [info commands dtcl_info]]} {return}
 # main                                                                    #
 ###########################################################################
 
-# init some variables
-set STARTED_CONTENT_TYPE {}
-
 # check cgi environment
 foreach v {REMOTE_ADDR SERVER_NAME SERVER_PORT SCRIPT_NAME REQUEST_METHOD} {
         if {![info exists env($v)]} {toperror "Missing: $v"}
@@ -970,29 +1017,73 @@ if {[info exists env(PATH_INFO)]} {
     set path /
 }
 
-# analyze the (possibly multiple) extensions to path
+if {[string equal $path /blue.png] || [string equal $path /green.png]} {
+    set png [string trim $path /]
+    if {! [file exists $CACHE_ROOT/$png]} {
+	if {[catch {load $LIBTCLDOT} err]} {
+            error $err
+	}
+	# create blue.png and green.png for navigation and zoom bars
+	set gd [gd create 10 10]
+	set blue [gd color new $gd 0 0 255]
+	gd fill $gd $blue 5 5
+        if {[catch {open $CACHE_ROOT/blue.png w} f_out]} {
+            error "Unable to open cache file for write: blue.png"
+        }
+	gd writePNG $gd $f_out
+        close $f_out
+
+	set green [gd color new $gd 0 255 0]
+	gd fill $gd $green 5 5
+	if {[catch {open $CACHE_ROOT/green.png w} f_out]} {
+            error "Unable to open cache file for write: blue.png"
+        }
+	gd writePNG $gd $f_out
+        close $f_out
+
+	gd destroy $gd
+    }
+    if {[catch {open $CACHE_ROOT/$png r} f]} {
+        error "Unable to open cache file for read: $png"
+    }
+    puts "Content-Type: $MIME(png)"
+    puts "Content-Length: [file size $CACHE_ROOT/$png]"
+    puts ""
+    flush stdout
+    if {! [string equal $env(REQUEST_METHOD) HEAD]} {
+        fconfigure $f -translation binary
+        fconfigure stdout -translation binary
+        fcopy $f stdout
+        flush stdout
+        puts {}
+    }
+    close $f
+    exit
+}
+	    
+# analyze the filename.extension(s)
 #
 # we want to deal with the following possible patterns of extensions:
 #
-#	filename.html			process <webdot>
+#	filename.html					process <webdot>
 #
-#	filename.dot			(short for filename.dot.dot.dot)
+#	filename.dot					(short for filename.dot.dot.dot)
 #
-#	filename.dot.<type>		(short for filename.dot.dot.<type>)
-#	filename.dot.<eng>.<type>	convert to <type> using <eng>
+#	filename.dot.<type>				(short for filename.dot.dot.<type>)
+#	filename.dot.<eng>.<type>			convert to <type> using <eng>
+#	filename.dot.<eng>.<type>.<viewport>		viewport request
 #
-#	filename.dot.<eng>.<viewport>   viewport request
-#
-#	filename.dot.<type>.help	(short for filename.dot.dot.<type>.help)
-#	filename.dot.<eng>.<type>.help	put <eng> result in a help page
-#
-# "set help help" if .help is found at the end, otherwise "set help {}"
+#	filename.dot.<type>.help			(short for filename.dot.dot.<type>.help)
+#	filename.dot.<eng>.<type>.help			put <eng> result in a help page
+#	filename.dot.<eng>.<type>.<viewport>.help	put <eng> result in a help page
 #
 # <eng> is one of: dot neato twopi ...
 # <type> is one of: png gif jpg ....
-# <viewport> is of the form: X_Y_Z_x_y   
+# <viewport> is of the form: X,Y or X,Y,Z,x,y   
 #     where X, Y, Z, x, y are all integers.
-#
+
+
+# "set help help" if .help is found at the end, otherwise "set help {}"
 set parts [split [file tail $path] .]
 if {[string equal [lindex $parts end] help]} {
 	set help help
@@ -1001,9 +1092,7 @@ if {[string equal [lindex $parts end] help]} {
 	set help {}
 }
 
-#
 # if not enough parts, default to index.html
-#
 if {[llength $parts] < 2} {set parts {index html}}
 
 # use first two parts as filename for cache
@@ -1016,21 +1105,11 @@ if {[string equal $dpath /]} {
         set path $dpath/$srcname.$srctype
 }
 set parts [lrange $parts 2 end]
-#
-# extract target type, and possibly a layout engine override
-#
-switch -- [llength $parts] {
-	0 {set engine dot; set type dot}
-	1 {set engine dot; set type $parts}
-	default {foreach {engine type} $parts {break}}
-}
 
-if {[scan $type "%d_%d_%d_%d_%d" vpX vpY vpZ vpx vpy] == 5} {
-	set viewport $type
-	set type viewport
-} {
-	set viewport {}
-}
+# extract target type, engine, viewport
+foreach {engine type viewport} $parts {break}
+if {[string equal $engine {}]} {set engine dot}
+if {[string equal $type {}]} {set type dot}
 
 # nasty hacks to workaround bugs in Apache/2.0.36 and later
 set env(SCRIPT_NAME) /cgi-bin/[file tail $argv0]
@@ -1138,11 +1217,12 @@ switch -- $type {
     src {
 	set cachename src
     }
-    viewport {
-	set cachename $engine.$viewport.cmapx
-    }
     default {
-        set cachename $engine.$type
+	if {[string equal $viewport {}]} {
+            set cachename $engine.$type
+	} {
+            set cachename $engine.$type.$viewport
+	}
     }
 }
 if {[catch {open $cachename r} f]} {
@@ -1166,7 +1246,7 @@ if {[string length $LastModified]} {
 
 # send output header
 switch -- $type {
-    gv - dot - png - gif - jpeg - mif - ps - ps2 - epsi - pdf - hpgl - pic - pcl - vrml - vtx - fig - svg - svgz - src - imap - cmap - viewport {
+    gv - dot - png - gif - jpeg - mif - ps - ps2 - epsi - pdf - hpgl - pic - pcl - vrml - vtx - fig - svg - svgz - src - imap - cmap - html {
         puts [join $header \n]
     }
     tcl {
