@@ -15,16 +15,18 @@ look at the source of this page when it is
 <hr>
 
 <p>This figure shows a directed graph formatted into a PNG image with
-client-side mapping:
+client-side mapping, first with the dot layout engine, then with neato:
 <br><webdot src=demo1.dot type=png target=new>
+<webdot src=demo1.dot engine=neato type=png target=new>
 
 <p>This figure shows an undirected graph formatted into a GIF image with
-client-side mapping:
+client-side mapping, first with the dot layout engine, then with neato:
 <br><webdot src=demo2.dot type=gif target=new>
+<webdot src=demo2.dot engine=neato type=gif target=new>
 
-<p>The next figure is a directed graph formatted for presentation by
-a Tclet.
-<br><webdot src=demo1.dot type=tcl>
+<p>The next figure is a directed graph with neato layout,
+ formatted for presentation by a Tclet.
+<br><webdot src=demo1.dot engine=neato type=tcl>
 <br>(The tcl plugin is available from
 <a href=http://www.demailly.com/tcl/plugin/download.html>http://www.demailly.com/tcl/plugin/download.html</a>)
 

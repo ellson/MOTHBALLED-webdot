@@ -479,7 +479,7 @@ proc fix_graph_urls {g serverport dirname} {
 ###########################################################################
 # read_graph
 #
-proc read_graph {do_layout} {
+proc read_graph {{engine {}}} {
     global LIBTCLDOT
 
     # we're going to need the Tcldot extension to process the graph
@@ -496,8 +496,8 @@ proc read_graph {do_layout} {
         error "Invalid graph source: $g\nThere may be more details in the server's error_log."
     }
     close $f
-    if {$do_layout} {
-        if {[catch {$g layout} err]} {
+    if {[string length $engine]} {
+        if {[catch {$g layout [string toupper $engine]} err]} {
             error "Graph layout error: $err" 
         }
     }
@@ -507,7 +507,7 @@ proc read_graph {do_layout} {
 ###########################################################################
 # make_client_map
 #
-proc make_client_map {url type no_cache count target} {
+proc make_client_map {url type engine no_cache count target} {
    global SELF
 
     # generate graph in requested format
@@ -518,10 +518,10 @@ proc make_client_map {url type no_cache count target} {
                         [get_url $url $no_cache] {break}
             # some types (e.g. vrml) result in mutiple files, so cd to target directory
             cd $file_cache_dir
-            make_product $url $type $no_cache
+            make_product $url $type $engine $no_cache
             # generate map
-            if {[catch {open map r} f]} {
-                error "Unable to open cache file for read: $file_cache_dir/map"
+            if {[catch {open $engine.map r} f]} {
+                error "Unable to open cache file for read: $file_cache_dir/$engine.map"
             }
             puts "<map name=\"webdot$count\">"
             set default ""
@@ -540,10 +540,10 @@ proc make_client_map {url type no_cache count target} {
             close $f
             puts $default
             puts "</map>"
-            puts "<img src=\"$SELF/$url.$type\" width=\"$sizex\" height=\"$sizey\" usemap=\"#webdot$count\" border=\"0\" alt=\"Graph\">"
+            puts "<img src=\"$SELF/$url.$engine.$type\" width=\"$sizex\" height=\"$sizey\" usemap=\"#webdot$count\" border=\"0\" alt=\"Graph\">"
         }
         tcl {
-            puts "<embed width=600 height=400 src=\"$SELF/$url.tcl\">"
+            puts "<embed width=600 height=400 src=\"$SELF/$url.$engine.tcl\">"
         }
     }
 }
@@ -575,7 +575,7 @@ proc filter_html {serverport dirname no_cache} {
             puts [string range $h $start [incr e_start -1]]
     
             # initialize args to default values
-            foreach {src type alt target} {{} png {[graph]} {}} {break}
+            foreach {src engine type alt target} {{} dot png {[graph]} {}} {break}
     
             # extract args
             foreach {. arg val} \
@@ -586,7 +586,7 @@ proc filter_html {serverport dirname no_cache} {
     
                 # check for legal args only
                 switch -- $arg {
-                            type - src - alt - target {set $arg $val}
+                    type - engine - src - alt - target {set $arg $val}
                 }
             }
 
@@ -595,7 +595,7 @@ proc filter_html {serverport dirname no_cache} {
             #case ignore type value
             set type [string tolower $type]
     
-            make_client_map $url $type $no_cache $count $target
+            make_client_map $url $type $engine $no_cache $count $target
 
             # mark start of text after current "<webdot...>" tag
             set start [incr e_end]
@@ -617,18 +617,19 @@ proc filter_html {serverport dirname no_cache} {
 #
 # convert "src" into "$type" in current directory
 #
-proc make_product {url type no_cache} {
+proc make_product {url type engine no_cache} {
     global env SIGNATURE GS PS2EPSI SELF TCLET
 
     if {[scan $url {http://%[^/]%s} serverport path] != 2} {
         error "Invalid url: $url"
     }
     set dirname [file dirname $path]
+    set cachename $engine.$type
 
     # see if we can use product from cache
-    if {[file exists $type]
-      && [file mtime $type] >= [file mtime src]
-      && [file size $type] != 0
+    if {[file exists $cachename]
+      && [file mtime $cachename] >= [file mtime src]
+      && [file size $cachename] != 0
       && ! $no_cache} {
         return
     }
@@ -638,11 +639,11 @@ proc make_product {url type no_cache} {
         png - jpeg - gif {
             # generates a map at the same time ready for inclusion
             # in an html page
-            if {[catch {open $type w} f_out]} {
-                error "Unable to open cache file for write: $type"
+            if {[catch {open $cachename w} f_out]} {
+                error "Unable to open cache file for write: $cachename"
             }
             if {[catch {
-                set g [read_graph 1]
+                set g [read_graph $engine]
                 scan [$g queryattr bb] "{%dp %dp %dp %dp}" ulx uly lrx lry
                 set sizex [expr (($lrx - $ulx) * 96/72) + 2] 
                 set sizey [expr (($lry - $uly) * 96/72) + 14]
@@ -698,11 +699,11 @@ proc make_product {url type no_cache} {
                 close $f_out
 
                 # generate map
-                if {[catch {open map w} f_out]} {
-                    error "Unable to open cache file for write: map"
+                if {[catch {open $engine.map w} f_out]} {
+                    error "Unable to open cache file for write: $engine.map"
                 }
                 puts $f_out "bb ($sizex,$sizey)"
-                puts $f_out "rectangle ([expr $sizex - $x2 - 4],$sizey) ($sizex,[expr $sizey - ($x0 - $y2) - 4]) $SELF/$url.$type.help $SIGNATURE"
+                puts $f_out "rectangle ([expr $sizex - $x2 - 4],$sizey) ($sizex,[expr $sizey - ($x0 - $y2) - 4]) $SELF/$url.$cachename.help $SIGNATURE"
                 flush $f_out
                 $g write $f_out ismap
             	$g delete
@@ -722,8 +723,8 @@ proc make_product {url type no_cache} {
                 close $f_out
 
                 # generate empty map with bb info of error message
-                if {[catch {open map w} f_out]} {
-                    error "Unable to open cache file for write: map"
+                if {[catch {open $engine.map w} f_out]} {
+                    error "Unable to open cache file for write: $engine.map"
                 }
 		puts $f_out "bb (500,100)"
 	    }
@@ -731,20 +732,20 @@ proc make_product {url type no_cache} {
         }
         dot {
             # for client side we use canonical dot format and don't bother with server side layout.
-            set g [read_graph 0]
+            set g [read_graph]
             fix_graph_urls $g $serverport $dirname
-            if {[catch {open $type w} f_out]} {
-                error "Unable to open cache file for write: $type"
+            if {[catch {open $cachename w} f_out]} {
+                error "Unable to open cache file for write: $cachename"
             }
             $g write $f_out canon
             close $f_out
             $g delete
         }
         map {
-            set g [read_graph 1]
+            set g [read_graph $engine]
             fix_graph_urls $g $serverport $dirname
-            if {[catch {open $type w} f_out]} {
-                error "Unable to open cache file for write: $type"
+            if {[catch {open $cachename w} f_out]} {
+                error "Unable to open cache file for write: $cachename"
             }
             scan [$g queryattr bb] "{%dp %dp %dp %dp}" ulx uly lrx lry
             set sizex [expr (($lrx - $ulx) * 96/72) + 2 -1]
@@ -753,7 +754,7 @@ proc make_product {url type no_cache} {
             puts $f_out "bb ($sizex,$sizey)"
             foreach {x0 y0 x1 y1 x2 y2 x3 y3} [gd text {} 0 \
                 times 8.0 0.0 0 0 $SIGNATURE] {break}
-            puts $f_out "rectangle ([expr $sizex - $x2 - 4],$sizey) ($sizex,[expr $sizey - ($x0 - $y2) - 4]) $SELF/$url.$type.help $SIGNATURE"
+            puts $f_out "rectangle ([expr $sizex - $x2 - 4],$sizey) ($sizex,[expr $sizey - ($x0 - $y2) - 4]) $SELF/$url.$cachename.help $SIGNATURE"
             flush $f_out
             $g write $f_out ismap
             # work out size of the signature in this font
@@ -761,9 +762,9 @@ proc make_product {url type no_cache} {
             $g delete
         }
         tcl {
-            set g [read_graph 1]
-            if {[catch {open $type w} f_out]} {
-                error "Unable to open cache file for write: $type"
+            set g [read_graph $engine]
+            if {[catch {open $cachename w} f_out]} {
+                error "Unable to open cache file for write: $cachename"
             }
             # output the base tclet code
             #
@@ -778,7 +779,7 @@ proc make_product {url type no_cache} {
             $g delete
         }
         tclmap {
-            set g [read_graph 1]
+            set g [read_graph $engine]
             fix_graph_urls $g $serverport $dirname
             if {![catch {$g queryattr URL} url]} {
                 set urls($g) $url
@@ -793,8 +794,8 @@ proc make_product {url type no_cache} {
                     }
                 }
             }
-            if {[catch {open $type w} f_out]} {
-                error "Unable to open cache file for write: $type"
+            if {[catch {open $cachename w} f_out]} {
+                error "Unable to open cache file for write: $cachename"
             }
             if {[array exists urls]} {
                 puts $f_out [array get urls]
@@ -803,17 +804,17 @@ proc make_product {url type no_cache} {
             $g delete
         }
         pdf {
-            make_product $url ps $no_cache
-            exec $GS -q -dNOPAUSE -dBATCH -sDEVICE=pdfwrite -sOutputFile=pdf ps
+            make_product $url ps $engine $no_cache
+            exec $GS -q -dNOPAUSE -dBATCH -sDEVICE=pdfwrite -sOutputFile=$cachename $engine.ps
         }
         epsi {
-            make_product $url ps $no_cache
-            exec $PS2EPSI ps epsi
+            make_product $url ps $engine $no_cache
+            exec $PS2EPSI $engine.ps $cachename
         }
         fig - mif - pcl - pic - ps - svg - vtx - vrml {
-            set g [read_graph 1]
-            if {[catch {open $type w} f_out]} {
-                error "Unable to open cache file for write: $type"
+            set g [read_graph $engine]
+            if {[catch {open $cachename w} f_out]} {
+                error "Unable to open cache file for write: $cachename"
             }
             $g write $f_out $type
             close $f_out
@@ -828,31 +829,35 @@ proc make_product {url type no_cache} {
 ###########################################################################
 # send_help
 #
-proc send_help {url} {
+proc send_help {url type engine} {
     global SELF MIME
 
     puts "Content-Type: text/html\n
 <html><head><title>WebDot Help Page</title></head>
 <body bgcolor=white><h1>WebDot Help Page</h1>"
 
-    #strip extension from url to get url of dot file.
-    set type [file extension $url]
-    set l [string length $type]
-    set url [string range $url 0 end-$l]
-    set type [string range $type 1 end]
+    make_client_map $url $type $engine 0 0 new
 
-    make_client_map $url $type 0 0 new
+    if {[string equal [string toupper $engine] DOT]} {
+	set thisengine DOT
+	set otherengine NEATO
+    } {
+	set thisengine NEATO
+	set otherengine DOT
+    }
 
     puts "<p>This <a href=$url>graph</a> can be rendered by
-WebDot in any of the following formats:<pre>"
+WebDot using the $thisengine layout engine, in any of the following formats:<pre>"
 
     set column 0
     foreach t {dot epsi fig gif hpgl jpeg mif pcl pdf pic png ps src svg tcl vrml vtx} {
-        puts -nonewline " <a href=$SELF/$url.$t>[format %5s $t] [format %-25s ($MIME($t))]</a>"
+        puts -nonewline " <a href=$SELF/$url.$engine.$t>[format %5s $t] [format %-25s ($MIME($t))]</a>"
         if {!([incr column]%3)} {puts ""}
     }
     puts "</pre>
-Sources for WebDot can be found at:
+<p>It can also be formatted by the 
+<a href=$SELF/$url.[string tolower $otherengine].$type.help>$otherengine layout engine</a>.
+<p> Sources for WebDot can be found at:
 <a href=http://www.graphviz.org/pub/graphviz/>http://www.graphviz.org/pub/graphviz/</a>
 <p>
 WebDot is by: <a href=mailto:ellson@graphviz.org>John Ellson (ellson@graphviz.org)</a>
@@ -902,13 +907,58 @@ if {[info exists env(PATH_INFO)]} {
     set serverport $env(SERVER_NAME)$server_port
     set path /
 }
-# separate target type from src path.
-set type [file extension $path]
-if {[set l [string length $type]] > 1} {
-    set path [string range $path 0 end-$l]
-    # remove leading "." from type
-    set type [string range $type 1 end]
+
+# analyze the (possibly multiple) extensions to path
+#
+# we want to deal with the following possible patterns of extensions:
+#
+#	filename.html			process <webdot>
+#
+#	filename.dot			(short for filename.dot.dot.dot)
+#
+#	filename.dot.png		(short for filename.dot.dot.png)
+#	filename.dot.dot.png		convert to png using dot
+#	filename.dot.neato.png		convert to png using neato
+#
+#	filename.dot.png.help		(short for filename.dot.dot.png.help)
+#	filename.dot.dot.png.help	put dot result in a help page
+#	filename.dot.neato.png.help	put neato result in a help page
+#
+# "set help help" if .help is found at the end, otherwise "set help {}"
+#
+set parts [split [file tail $path] .]
+if {[string equal [lindex $parts end] help]} {
+	set help help
+	set parts [lrange $parts 0 end-1]
+} {
+	set help {}
 }
+#
+# check number of extension parts is still reasonable
+#
+if {[llength $parts] < 2} {
+	error "unable to process $path"
+}
+#
+# "set html html" if .html is found at the end,
+#  otherwise "set html {}" and check that first extension is .dot
+#
+foreach {srcname srctype} $parts {break}
+switch -- $srctype {
+	dot - html {}
+	default {error "unknown source type"}
+}
+set path [file dirname $path]/$srcname.$srctype
+set parts [lrange $parts 2 end]
+#
+# extract target type, and possibly a layout engine override
+#
+switch -- [llength $parts] {
+	0 {set engine dot; set type dot}
+	1 {set engine dot; set type $parts}
+	default {foreach {engine type} $parts {break}}
+}
+
 # form url for upstream get
 set url http://$serverport$path
 set dirname [file dirname $path]
@@ -923,20 +973,20 @@ switch -- $type {
         # use canonical type name
         set type jpeg
     }
-    html {
-        # put back type to get src url
-        set url $url.html
-    }
-    help {
-        # deal with help requests of the form:
-        #    http://a.b.c.d/cgi-bin/webdot/http://w.x.y.z/path/x.dot.png.help
-        # originated from the "Graph by WebDot" signatures.
-        send_help $url
-        exit
-    }
     {} {
+	# shouldn't happen, but just in case
         error "Missing type specification"
     }
+}
+
+# deal with help requests of the form:
+#    http://a.b.c.d/cgi-bin/webdot/http://w.x.y.z/path/x.dot.png.help
+#or:
+#    http://a.b.c.d/cgi-bin/webdot/http://w.x.y.z/path/x.dot.neato.png.help
+# originated from the "Graph by WebDot" signatures.
+if {[string length $help]} {
+    send_help $url $type $engine
+    exit
 }
 
 ###########################################################################
@@ -950,7 +1000,7 @@ foreach {file_cache_dir LastModified Expires ContentType} \
 cd $file_cache_dir
 
 # deal with html pages containing <webdot...> tags
-if {[string equal $type html]} {
+if {[string equal $srctype html]} {
     filter_html $serverport $dirname $no_cache
     exit
 }
@@ -976,10 +1026,10 @@ if {[info exists env(HTTP_IF_MODIFIED_SINCE)]} {
 }
 
 # convert the graph
-make_product $url $type $no_cache
+make_product $url $type $engine $no_cache
 # now the product is in the cache and we can ship it
-if {[catch {open $type r} f]} {
-    error "Unable to open cache file for read: $file_cache_dir/$type"
+if {[catch {open $engine.$type r} f]} {
+    error "Unable to open cache file for read: $file_cache_dir/$engine.$type"
 }
 
 # start preparing result http header
@@ -1048,8 +1098,16 @@ if {[string equal $type map] && [string length $x]} {
     } {
         error "no URL for $query"
     }
+} elseif {[string equal $type src]} {
+    puts "Content-Length: [file size src]\n"
+    if {![string equal $env(REQUEST_METHOD) HEAD]} {
+        flush stdout
+        fcopy $f stdout
+        flush stdout
+        puts {}
+    }
 } else {
-    puts "Content-Length: [file size $type]\n"
+    puts "Content-Length: [file size $engine.$type]\n"
     if {![string equal $env(REQUEST_METHOD) HEAD]} {
         flush stdout
         fconfigure $f -translation binary

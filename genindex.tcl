@@ -1,9 +1,10 @@
-foreach {server docroot webdotdir webdotcgi demodir} $argv {break}
-set w $server/$webdotdir/$webdotcgi
-set p $server/$webdotdir/$demodir
+#!/usr/bin/tclsh8.3
 
-set f [open $docroot/$webdotdir/$demodir/index.html w]
-cd $docroot/$webdotdir/$demodir
+set w http://localhost/cgi-bin/webdot
+set p http://localhost/webdot/graphs/directed
+
+set f [open html/webdot/demo.html w]
+cd html/webdot/graphs/directed
 
 puts $f "<html>
 <head>
@@ -29,12 +30,12 @@ puts $f "</tr>
 <p>
 For viewing <b>pdf</b> files you will need the pdf plugin:
 <a href=http://www.adobe.com/prodindex/acrobat/readstep.html>
-<IMG SRC=$server/$webdotdir/images/getacro.png WIDTH=89 HEIGHT=30 ALIGN=CENTER
+<IMG SRC=getacro.png WIDTH=89 HEIGHT=30 ALIGN=CENTER
 BORDER=0 ALT=\"get acrobat reader\"></a>
 <p> 
 For viewing <b>tcl</b> files you will need the tcl plugin:
 <a href=http://www.scriptics.com/plugin/>
-<IMG SRC=$server/$webdotdir/images/tclp.png WIDTH=42 HEIGHT=64 ALIGN=CENTER
+<IMG SRC=tclp.png WIDTH=42 HEIGHT=64 ALIGN=CENTER
 BORDER=0 ALT=\"get tcl plugin\"></a>
 
 <p>

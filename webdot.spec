@@ -1,5 +1,5 @@
 Name:           webdot
-Version:        1.7.2
+Version:        1.7.3
 Release:        1_RH7.0
 Group:          Applications/Graphics
 Copyright:      BSD-style
