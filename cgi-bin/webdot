@@ -1023,15 +1023,9 @@ if {[string equal [lindex $parts end] help]} {
 #
 if {[llength $parts] < 2} {set parts {index html}}
 
-#
-# check srctype
-#
+# use first two parts as filename for cache
+#   also, srctype may be used later if mimetype not understood
 foreach {srcname srctype} $parts {break}
-switch -- $srctype {
-	dot - html {}
-	htm {set srctype html}
-	default {error "unknown source type"}
-}
 set path [file dirname $path]/$srcname.$srctype
 set parts [lrange $parts 2 end]
 #
@@ -1095,9 +1089,13 @@ foreach {file_cache_dir LastModified Expires ContentType} \
 cd $file_cache_dir
 
 # deal with html pages containing <webdot...> tags
-if {[string equal $srctype html]} {
+if {[string equal $ContentType $MIME(html)] || [string equal $srctype html]} {
     webdot::filter_html $serverport $dirname $no_cache
     exit
+}
+
+if {! ([string equal $ContentType $MIME(dot)] || [string equal $srctype dot])} {
+    error "unrecognized mimetype for graph: $ContentType and unrecognized file extension: $srctype"
 }
 
 # Support for client-side caching
