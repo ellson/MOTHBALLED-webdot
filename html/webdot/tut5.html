@@ -1,0 +1,34 @@
+<html>
+<head>
+<title>WebDot - Tutorial 5</title>
+</head>
+<body bgcolor=white>
+<table width=100%><tr>
+<th align=left><a href=/cgi-bin/webdot/webdot/tut4.html>[previous]</a></th>
+<th>WebDot - Tutorial 5</th>
+<th align=right><!-- <a href=tut6.html>[next]</a> --></th>
+</tr></table>
+<p>
+WebDot can convert a graph into a "Tclet" for the
+<a href=http://www.demailly.com/tcl/plugin/download.html>Tcl Plugin</a>.
+For example, tut5.dot contains:
+<pre>
+    digraph G {
+        node [URL="\N.html"]
+        {a b c} -> d
+    }
+</pre>
+and the source of this page contains (for the Tclet which should be displayed below):
+<pre>
+    &lt;webdot src=/webdot/tut5.dot engine=neato type=tcl target=new&gt;
+</pre>
+<p>
+after serving this page through /cgi-bin/webdot, this &lt;webdot...&gt;
+tag is replaced by:
+<pre>
+&lt;embed width=600 height=400 src="/cgi-bin/webdot/http://127.0.0.1/webdot/tut5.dot.neato.tcl"&gt;
+</pre>
+<p>
+<webdot src=/webdot/tut5.dot engine=neato type=tcl target=new>
+</body>
+</html>
