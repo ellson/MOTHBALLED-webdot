@@ -63,10 +63,10 @@ install:
 	chown $(HTTPD-USER-GROUP) $(DESTDIR)$(CACHE_DIR)/webdot
 
 uninstall:
-	rm -f $(CGI-BIN_DIR)/webdot
-	rm -f $(CGI-BIN_DIR)/webdot.tclet
-	rm -rf $(HTML_DIR)/webdot
-	rm -rf $(CACHE_DIR)/webdot
+	rm -f $(DESTDIR)$(CGI-BIN_DIR)/webdot
+	rm -f $(DESTDIR)$(CGI-BIN_DIR)/webdot.tclet
+	rm -rf $(DESTDIR)$(HTML_DIR)/webdot
+	rm -rf $(DESTDIR)$(CACHE_DIR)/webdot
 
 distdir=webdot-$(VERSION)
 
