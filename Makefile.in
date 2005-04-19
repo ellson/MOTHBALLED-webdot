@@ -1,3 +1,5 @@
+DESTDIR=
+
 # Location for the webdot cgi program
 CGI-BIN_DIR=/var/www/cgi-bin
 
@@ -44,21 +46,21 @@ genfiles:
 	tclsh genindex.tcl
 
 install:
-	mkdir -p $(CGI-BIN_DIR)
-	echo "#!$(TCLSH_EXECUTABLE)" > $(CGI-BIN_DIR)/webdot
-	echo "set LIBTCLDOT $(LIBTCLDOT)" >> $(CGI-BIN_DIR)/webdot
-	echo "set CACHE_ROOT $(CACHE_DIR)/webdot" >> $(CGI-BIN_DIR)/webdot
-	echo "set GS $(GS)" >> $(CGI-BIN_DIR)/webdot
-	echo "set PS2EPSI $(PS2EPSI)" >> $(CGI-BIN_DIR)/webdot
-	echo "set LOCALHOSTONLY  $(LOCALHOSTONLY)" >> $(CGI-BIN_DIR)/webdot
-	cat ${BUILD_DIR}/cgi-bin/webdot >> $(CGI-BIN_DIR)/webdot
-	cp ${BUILD_DIR}/cgi-bin/webdot.tclet $(CGI-BIN_DIR)/webdot.tcl
-	chmod +x $(CGI-BIN_DIR)/webdot
-	cp -r ${BUILD_DIR}/html/webdot $(HTML_DIR)/
-	rm -rf $(CACHE_DIR)/webdot
-	mkdir $(CACHE_DIR)/webdot
-	chmod 700 $(CACHE_DIR)/webdot
-	chown $(HTTPD-USER-GROUP) $(CACHE_DIR)/webdot
+	mkdir -p $(DESTDIR)$(CGI-BIN_DIR)
+	echo "#!$(TCLSH_EXECUTABLE)" > $(DESTDIR)$(CGI-BIN_DIR)/webdot
+	echo "set LIBTCLDOT $(LIBTCLDOT)" >> $(DESTDIR)$(CGI-BIN_DIR)/webdot
+	echo "set CACHE_ROOT $(CACHE_DIR)/webdot" >> $(DESTDIR)$(CGI-BIN_DIR)/webdot
+	echo "set GS $(GS)" >> $(DESTDIR)$(CGI-BIN_DIR)/webdot
+	echo "set PS2EPSI $(PS2EPSI)" >> $(DESTDIR)$(CGI-BIN_DIR)/webdot
+	echo "set LOCALHOSTONLY  $(LOCALHOSTONLY)" >> $(DESTDIR)$(CGI-BIN_DIR)/webdot
+	cat ${BUILD_DIR}/cgi-bin/webdot >> $(DESTDIR)$(CGI-BIN_DIR)/webdot
+	cp ${BUILD_DIR}/cgi-bin/webdot.tclet $(DESTDIR)$(CGI-BIN_DIR)/webdot.tcl
+	chmod +x $(DESTDIR)$(CGI-BIN_DIR)/webdot
+	cp -r ${BUILD_DIR}/html/webdot $(DESTDIR)$(HTML_DIR)/
+	rm -rf $(DESTDIR)$(CACHE_DIR)/webdot
+	mkdir $(DESTDIR)$(CACHE_DIR)/webdot
+	chmod 700 $(DESTDIR)$(CACHE_DIR)/webdot
+	chown $(HTTPD-USER-GROUP) $(DESTDIR)$(CACHE_DIR)/webdot
 
 uninstall:
 	rm -f $(CGI-BIN_DIR)/webdot
