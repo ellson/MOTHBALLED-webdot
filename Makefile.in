@@ -19,7 +19,7 @@ TCLSH_EXECUTABLE=/usr/bin/tclsh8.3
 
 # Direct reference to libtcldot.so to avoid directory searching overhead
 # of tcl package mechanism.
-LIBTCLDOT=/usr/lib/graphviz/libtcldot.so
+LIBTCLDOT=/usr/lib/graphviz/libtcldot.so.0.0.0
 
 # Ghostscript is used for pdf output format
 GS=/usr/bin/gs
