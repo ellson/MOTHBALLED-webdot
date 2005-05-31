@@ -2,6 +2,12 @@
 <img src="http://webdot.graphviz.org/cgi-bin/webdot/http://www.graphviz.org/demo.dot.dot.png"
     alt="graph from public webdot server">
 <p>
+<font color="darkred">Notice: Although webdot can still be configured as a public server, we no longer provide such a server ourselves and we don't recommend
+that others do so either.  Webdot contains no mechanisms for limiting the load
+on a public server.  Instead we recommend that you set up a server just for
+your own graphs.
+</font>
+<p>
 If a public WebDot server is available then graphs can be served without
 installing WebDot locally.  For example, if there is a graph at:
 <a href="http://www.graphviz.org/demo.dot">http://www.graphviz.org/demo.dot</a>
