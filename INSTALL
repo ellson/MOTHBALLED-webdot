@@ -1,15 +1,12 @@
 Prequisites:
 
-	tcl-8.3 (already in redhat-7.2)
-	graphviz-1.7.12 (from http://www.graphviz.org/pub/graphviz/ )
-
-Precheck:
-
-	Check the install locations in the Makefile.
-	(the default locations match RedHat 7.0 conventions)
+	tcl (8.3 or later)
+	graphviz (1.7 or later from http://www.graphviz.org/ )
 
 Install:
+	./configure
+	make
 	make install
 
 Test:
-	netscape http://localhost/webdot/
+	firefox http://localhost/webdot/
