@@ -910,7 +910,8 @@ proc webdot::make_product {url type engine viewport no_cache} {
             $g delete
 
             if {! [string equal $vp $viewport]} {
-		exec /usr/bin/ln -s $engine.gq.$vp $engine.gq.$viewport
+		file delete -force $engine.gq.$viewport
+		file link -symbolic $engine.gq.$vp $engine.gq.$viewport
 	    }
 	}
         default {
