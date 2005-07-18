@@ -1152,10 +1152,10 @@ switch -- [llength $parts] {
 }
 
 # nasty hack to workaround bugs in Apache/2.0.36 and later
-#set s $env(SCRIPT_NAME)
-#set SCRIPT_NAME [string range $s 0 [expr {[string first $argv0 $s]-1}]]$argv0
+set wd [file tail $argv0]
+set s $env(SCRIPT_NAME)
+set SCRIPT_NAME [string range $s 0 [expr {[string first $wd $s]-1}]]$wd
 # end hack
-set SCRIPT_NAME $env(SCRIPT_NAME)
 
 #puts $f_debug "SCRIPT_NAME = $SCRIPT_NAME"
 
