@@ -27,6 +27,11 @@
 #
 ###########################################################################
 
+#set f_debug [open /tmp/webdot_debug_[pid] w]
+#foreach e [lsort [array names env]] {
+#    puts $f_debug "$e=$env($e)"
+#}
+
 # signature that is hyperlinked to help
 # comment out the next line if you do't want a signature
 set SIGNATURE "Graph by WebDot"
@@ -910,8 +915,10 @@ proc webdot::make_product {url type engine viewport no_cache} {
             $g delete
 
             if {! [string equal $vp $viewport]} {
-		file delete -force $engine.gq.$viewport
-		file link -symbolic $engine.gq.$vp $engine.gq.$viewport
+		exec /bin/rm -f $engine.gq.$viewport
+		exec /bin/ln -s $engine.gq.$vp $engine.gq.$viewport
+#		file delete -force $engine.gq.$viewport
+#		file link -symbolic $engine.gq.$vp $engine.gq.$viewport
 	    }
 	}
         default {
@@ -1031,6 +1038,11 @@ if {[info exists env(PATH_INFO)]} {
     set path /
 }
 
+#puts $f_debug "serverport=$serverport"
+#puts $f_debug "path_info=$path_info"
+#puts $f_debug "path=$path"
+#puts $f_debug "havequery=$havequery"
+
 if {[string equal $path /blue.png] || [string equal $path /green.png]} {
     set png [string trim $path /]
     if {! [file exists $CACHE_ROOT/$png]} {
@@ -1140,9 +1152,12 @@ switch -- [llength $parts] {
 }
 
 # nasty hack to workaround bugs in Apache/2.0.36 and later
-set s $env(SCRIPT_NAME)
-set SCRIPT_NAME [string range $s 0 [expr {[string first $argv0 $s]-1}]]$argv0
+#set s $env(SCRIPT_NAME)
+#set SCRIPT_NAME [string range $s 0 [expr {[string first $argv0 $s]-1}]]$argv0
 # end hack
+set SCRIPT_NAME $env(SCRIPT_NAME)
+
+#puts $f_debug "SCRIPT_NAME = $SCRIPT_NAME"
 
 # form url for upstream get 
 # and form SELF url to used in the href for help attached to the signature
@@ -1344,3 +1359,5 @@ if {[string equal $type map] && [string length $x]} {
     }
 }
 close $f
+
+#close $f_debug
