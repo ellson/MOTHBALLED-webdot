@@ -46,7 +46,7 @@ genfiles:
 	tclsh genindex.tcl
 
 install:
-	mkdir -p $(DESTDIR)$(CGI-BIN_DIR)
+	mkdir -p $(DESTDIR)$(CGI-BIN_DIR) $(DESTDIR)$(HTML_DIR)
 	echo "#!$(TCLSH_EXECUTABLE)" > $(DESTDIR)$(CGI-BIN_DIR)/webdot
 	echo "set LIBTCLDOT $(LIBTCLDOT)" >> $(DESTDIR)$(CGI-BIN_DIR)/webdot
 	echo "set CACHE_ROOT $(CACHE_DIR)/webdot" >> $(DESTDIR)$(CGI-BIN_DIR)/webdot
@@ -58,7 +58,7 @@ install:
 	chmod +x $(DESTDIR)$(CGI-BIN_DIR)/webdot
 	cp -r ${BUILD_DIR}/html/webdot $(DESTDIR)$(HTML_DIR)/
 	rm -rf $(DESTDIR)$(CACHE_DIR)/webdot
-	mkdir $(DESTDIR)$(CACHE_DIR)/webdot
+	mkdir -p $(DESTDIR)$(CACHE_DIR)/webdot
 	chmod 700 $(DESTDIR)$(CACHE_DIR)/webdot
 	chown $(HTTPD-USER-GROUP) $(DESTDIR)$(CACHE_DIR)/webdot
 
