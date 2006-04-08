@@ -876,6 +876,7 @@ proc webdot::make_product {url type engine viewport no_cache} {
 	    # write graphquest page with pan & zoom controls, map, and img reference
             puts $f_out "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\" \"http://www.w3.org/TR/html4/loose.dtd\">
 <html><head>
+  <meta name=\"robots\" content=\"noindex, nofollow\">
   <title>GraphQuest</title>
   <base target=\"gq\">
 </head><body>
