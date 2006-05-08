@@ -28,5 +28,5 @@ for public graph serving.)</td>
 </tr><tr>
 <td>.neato</td><td>The layout engine<br>(can be either: ".dot", ".neato", or ".twopi")</td>
 </tr><tr>
-<td><b>.png</b></td><td>The output format<br>(other bitmap formats are: ".gif" and ".jpg")</td>
+<td><b>.png</b></td><td>The output format<br>(other bitmap formats are: ".gif")</td>
 </tr></table>
