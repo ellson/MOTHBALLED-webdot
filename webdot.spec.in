@@ -7,7 +7,7 @@ Group:          Applications/Graphics
 License:        BSD-style
 URL:            http://www.graphviz.org/
 Summary:        A CGI graph server script that uses tcldot from graphviz-tcl.
-Requires:       graphviz-tcl >= 2.3 ghostscript tcl >= 8.4 httpd
+Requires:       graphviz-tcl >= 2.9 graphviz-gd ghostscript tcl >= 8.4 httpd
 Source:         http://www.graphviz.org/pub/graphviz/%{name}-%{version}.tar.gz
 BuildArchitectures: noarch
 BuildRoot:	%{_tmppath}/%{name}-root
