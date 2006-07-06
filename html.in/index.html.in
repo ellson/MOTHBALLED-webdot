@@ -29,7 +29,7 @@ The latest version of WebDot is available from:
 <h2>What does it need to run?</h2>
 WebDot requires: <a href="http://www.graphviz.org/">graphviz-tcl</a>
 and a web server (an httpd) such as <a href="http://httpd.apache.org/">Apache</a>.
-WebDot has been developed and tested primarily on RedHat 7.x thuough Fedora systems.
+WebDot has been developed and tested primarily on Fedora systems.
 <p>
 <table>
 <tr>
