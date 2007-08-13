@@ -75,7 +75,7 @@ dist: genfiles
 	mkdir -p $(distdir)/cgi-bin $(distdir)/config $(distdir)/html.in
 	mkdir -p $(distdir)/html/webdot/graphs/directed $(distdir)/html/webdot/graphs/undirected
 	cp AUTHORS CHANGES COPYING INSTALL README $(distdir)/
-	cp configure.in configure Makefile.in Makefile webdot.spec.in webdot.spec $(distdir)/
+	cp configure.ac configure Makefile.in Makefile webdot.spec.in webdot.spec $(distdir)/
 	cp genindex.tcl linktut.tcl scaffold.tcl $(distdir)/
 	cp config/config.guess config/config.sub config/install-sh $(distdir)/config/
 	cp cgi-bin/webdot $(distdir)/cgi-bin/
