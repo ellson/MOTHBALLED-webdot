@@ -14,7 +14,7 @@ after serving this page through $CGIBASE, this &lt;webdot...&gt;
 tag is replaced by:
 <table border="1"><tr><td><pre>
 &lt;embed src="$CGIBASE/http://127.0.0.1$BASE/$SELF.dot.neato.tcl"
-	width="600" height="400"&gt;
+  width="600" height="400"&gt;
 Graph in Tclet
 &lt;/embed&gt;
 </pre></td></tr></table>

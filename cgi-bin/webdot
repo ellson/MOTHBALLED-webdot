@@ -10,8 +10,7 @@
 #
 # At the top of this file should be some installation dependent code like:
 #
-#	#!/usr/bin/tclsh8.3
-#	set LIBTCLDOT /usr/lib/graphviz/libtcldot.so.0.0.0
+#	#!/usr/bin/tclsh
 #	set CACHE_ROOT /var/cache/webdot
 #	set GS /usr/bin/gs
 #	set PS2EPSI /usr/bin/ps2epsi
@@ -81,10 +80,8 @@ array set MIME {
 # timeout for network operations (webdot::get_url)
 set TIMEOUT 5000
 
-# latest mtime of LIBTCLDOT and this script
-set t1 [file mtime $LIBTCLDOT]
-set t2 [file mtime $argv0]
-set SELFMTIME [expr $t1>$t2?$t1:$t2]
+# mtime of this script
+set SELFMTIME [file mtime $argv0]
 
 # filename of webdot tclet preamble (capture here before any cd's)
 set TCLET [pwd]/webdot.tclet
@@ -356,11 +353,9 @@ proc webdot::fix_graph_urls {g serverport dirname} {
 # webdot::read_graph
 #
 proc webdot::read_graph {src} {
-    global LIBTCLDOT
-
     # we're going to need the Tcldot extension to process the graph
     if {! [string length [info command dotread]]} {
-        if {[catch {load $LIBTCLDOT} err]} {
+        if {[catch {package require Tcldot} err]} {
             error $err
         }
     }
@@ -1048,7 +1043,7 @@ if {[info exists env(PATH_INFO)]} {
 if {[string equal $path /blue.png] || [string equal $path /green.png]} {
     set png [string trim $path /]
     if {! [file exists $CACHE_ROOT/$png]} {
-	if {[catch {load $LIBTCLDOT} err]} {
+	if {[catch {package require Tcldot} err]} {
             error $err
 	}
 	# create blue.png and green.png for navigation and zoom bars

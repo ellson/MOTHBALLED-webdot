@@ -23,9 +23,9 @@ tag is replaced by:
 &lt;area shape="rect" href="http://localhost/webdot/d.html" title="d" alt="" coords="135,7,164,36" target="new"&gt;
 &lt;/map&gt;
 &lt;img src="/cgi-bin/webdot/http://localhost/cgi-bin/webdot/webdot/clientmap.dot.neato.png"
-	width="235" height="240" border="0"
-	usemap="#webdot0"
-	alt="Graph by WebDot">
+        width="235" height="240" border="0"
+        usemap="#webdot0"
+        alt="Graph by WebDot">
 </pre></td></tr></table>
 <p>
 The advantages of this mode of WebDot are the much simpler authoring and
