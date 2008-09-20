@@ -35,7 +35,7 @@ graphviz-tcl rpm.
 
 %define cachedir   /var/cache/webdot
 %define tclshbin   %(rpm -ql tcl | grep '/tclsh$')
-%define tcldotlib  %(rpm -ql graphviz-tcl | grep '/libtcldot.so.0.0.0$')
+%define libtcldot  %(rpm -ql graphviz-tcl | grep '/libtcldot.so.0.0.0$')
 %define gsbin      %(which gs)
 %define ps2epsibin %(which ps2epsi)
 
@@ -57,10 +57,10 @@ cp -r html/webdot $RPM_BUILD_ROOT/%{htmldir}/
 %post
 cat > %{cgibindir}/webdot.new << '__EOF__'
 #!%{tclshbin}
-set LIBTCLDOT %{tcldotlib}
-set CACHE_ROOT %{cachedir}
-set GS %{gsbin}
-set PS2EPSI %{ps2epsibin}
+set LIBTCLDOT "%{libtcldot}"
+set CACHE_ROOT "%{cachedir}"
+set GS "%{gsbin}"
+set PS2EPSI "%{ps2epsibin}"
 set LOCALHOSTONLY 1
 __EOF__
 cat %{cgibindir}/webdot >> %{cgibindir}/webdot.new
