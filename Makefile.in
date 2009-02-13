@@ -39,6 +39,8 @@ BUILD_DIR=@BUILD_DIR@
 
 ###############################################################
 
+.PHONY: all genfiles install uninstall distdir dist clean
+
 all: genfiles
 
 genfiles:
