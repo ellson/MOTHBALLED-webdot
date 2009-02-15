@@ -75,6 +75,7 @@ array set MIME {
     txt    "text/plain"
     vrml   "x-world/x-vrml"
     vtx    "application/x-vtx"
+    xdot   "text/vnd.graphviz"
 }
 
 # timeout for network operations (webdot::get_url)
@@ -687,7 +688,7 @@ proc webdot::make_product {url type engine viewport no_cache} {
 	    }
        	    close $f_out
         }
-        dot {
+        dot - xdot {
             set g [webdot::read_graph src]
             webdot::fix_graph_urls $g $serverport $dirname
             if {[catch {open $cachename w} f_out]} {
@@ -696,7 +697,7 @@ proc webdot::make_product {url type engine viewport no_cache} {
             if {[catch {$g layout [string tolower $engine]} err]} {
                 error "Graph layout error: $err" 
             }
-            $g write $f_out dot
+            $g write $f_out $type
             close $f_out
             $g delete
         }
@@ -1285,7 +1286,7 @@ if {[string length $LastModified]} {
 
 # send output header
 switch -- $type {
-    gv - dot - png - gif - jpeg - mif - ps - ps2 - epsi - pdf - hpgl - pic - pcl - vrml - vtx - fig - svg - svgz - src - imap - cmap - gq - gqpng {
+    gv - dot - xdot - png - gif - jpeg - mif - ps - ps2 - epsi - pdf - hpgl - pic - pcl - vrml - vtx - fig - svg - svgz - src - imap - cmap - gq - gqpng {
         puts [join $header \n]
     }
     tcl {
