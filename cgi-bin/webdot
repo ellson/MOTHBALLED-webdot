@@ -32,7 +32,7 @@
 #}
 
 # signature that is hyperlinked to help
-# comment out the next line if you do't want a signature
+# comment out the next line if you don't want a signature
 set SIGNATURE "Graph by WebDot"
 
 # allow user to persistently modify configuration through rpm upgrades
@@ -43,7 +43,7 @@ if {[file exists [pwd]/webdot.config]} {
 ###########################################################################
 # various data definitions - these should not require adjustment
 
-# define the set of mime.types that we can convert graphs to
+# define the set of MIME types that we can convert graphs to
 array set MIME {
     cmap   "text/plain"
     cmapx  "text/plain"
@@ -103,7 +103,7 @@ proc toperror {m} {
 	exit
 }
 
-# propogate error to top
+# propagate error to top
 proc error {m} {
     return -code error $m
 }
@@ -152,7 +152,7 @@ proc webdot::unencode {s} {
 #        file_cache_dir      directory in cache for the src and products
 #        LastModified        time string
 #        Expires             time string
-#        ContentType         mime string
+#        ContentType         MIME string
 #
 proc webdot::get_url {url no_cache} {
     global CACHE_ROOT TIMEOUT LOCALHOSTONLY env
@@ -387,7 +387,7 @@ proc webdot::make_client_map {url type engine viewport no_cache count target} {
 		error $res
 	    }
             foreach {file_cache_dir LastModified Expires ContentType} $res {break}
-            # some types (e.g. vrml) result in mutiple files, so cd to target directory
+            # some types (e.g. vrml) result in multiple files, so cd to target directory
             cd $file_cache_dir
 	    if {[catch {webdot::make_product $url $type $engine $viewport $no_cache} err]} {
 		error $err
@@ -421,7 +421,7 @@ proc webdot::make_client_map {url type engine viewport no_cache count target} {
 		error $res
 	    }
             foreach {file_cache_dir LastModified Expires ContentType} $res {break}
-            # some types (e.g. vrml) result in mutiple files, so cd to target directory
+            # some types (e.g. vrml) result in multiple files, so cd to target directory
             cd $file_cache_dir
             # generate svg
 	    if {[catch {webdot::make_product $url $type $engine $viewport $no_cache} err]} {
@@ -597,7 +597,7 @@ proc webdot::make_product {url type engine viewport no_cache} {
 		foreach {sizex sizey} [webdot::get_image_size $g] {break}
                 set gd [gd create $sizex $sizey]
     
-                # Antialising against transparent background doesn't work well
+                # Antialiasing against transparent background doesn't work well
                 #  if actual background is not near white.  Need alpha channel.
                 #set transparent [gd color new $gd 254 254 254]
                 #gd color transparent $gd $transparent
@@ -624,7 +624,7 @@ proc webdot::make_product {url type engine viewport no_cache} {
                                 gd tile $gd [gd createFromGIF $bgf]
                             }
                             default {
-                                error "unsupported mime type for background in=mage: $ContentType"
+                                error "unsupported MIME type for background image: $ContentType"
                             }
                         }
                         close $bgf
@@ -665,7 +665,7 @@ proc webdot::make_product {url type engine viewport no_cache} {
             } err]} {
 		# try to output an error message 
 		if {! [string length [info command gd]]} {
-		    # a bitmap is expected, but if that wom't work then a stderr message 
+		    # a bitmap is expected, but if that won't work then a stderr message 
 		    error $err
 		}
 		# write the error message to a bitmap
@@ -841,7 +841,7 @@ proc webdot::make_product {url type engine viewport no_cache} {
             if {[string equal $Z {}]} {
 		# initial zoom
 		set Z 125
-		# inital position with viewport centered over graph
+		# initial position with viewport centered over graph
 		foreach {llx lly urx ury} [lindex [$g queryattributes bb] 0] {break}
 		set x [expr {int($urx / 2)}]
 		set y [expr {int($ury / 2)}]
@@ -1149,7 +1149,7 @@ switch -- [llength $parts] {
 	}
 }
 
-# nasty hack to workaround bugs in Apache/2.0.36 and later
+# nasty hack to work around bugs in Apache/2.0.36 and later
 set wd [file tail $argv0]
 set s $env(SCRIPT_NAME)
 set SCRIPT_NAME [string range $s 0 [expr {[string first $wd $s]-1}]]$wd
@@ -1209,7 +1209,7 @@ if {[catch {webdot::get_url $url $no_cache} res]} {
 }
 foreach {file_cache_dir LastModified Expires ContentType} $res {break}
 
-# some types (e.g. vrml) result in mutiple files, so cd to target directory
+# some types (e.g. vrml) result in multiple files, so cd to target directory
 cd $file_cache_dir
 
 # deal with html pages containing <webdot...> tags
@@ -1223,7 +1223,7 @@ if {! ([string equal $ContentType $MIME(dot)]
        || [string equal $ContentType $MIME(gv)]
        || [string equal $srctype gv]
        || [string equal $srctype dot])} {
-    toperror "Unrecognized mimetype for graph: $ContentType\nand unrecognized file extension: $srctype"
+    toperror "Unrecognized MIME type for graph: $ContentType\nand unrecognized file extension: $srctype"
 }
 
 # Support for client-side caching
