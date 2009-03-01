@@ -8,7 +8,8 @@
 ###########################################################################
 # configuration data
 #
-# At the top of this file, or in a file name webdot.congif, should be some installation dependent code like:
+# At the top of this file, or overridden by values in a file name webdot.config,
+# should be some installation dependent code like:
 #
 #	#!/usr/bin/tclsh
 #	set LIBTCLDOT /usr/lib/graphviz/tcl/libtcldot.so
