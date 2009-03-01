@@ -8,9 +8,10 @@
 ###########################################################################
 # configuration data
 #
-# At the top of this file should be some installation dependent code like:
+# At the top of this file, or in a file name webdot.congif, should be some installation dependent code like:
 #
 #	#!/usr/bin/tclsh
+#	set LIBTCLDOT /usr/lib/graphviz/tcl/libtcldot.so
 #	set CACHE_ROOT /var/cache/webdot
 #	set GS /usr/bin/gs
 #	set PS2EPSI /usr/bin/ps2epsi
@@ -141,6 +142,20 @@ proc webdot::unencode {s} {
  regsub -all {([\\\{$[])} $s {\\\1} s
  regsub -all {%([a-fA-F0-9][a-fA-F0-9])} $s {[format %c 0x\1]} s
  subst $s
+}
+
+###########################################################################
+# webdot::load_tcldot
+#
+# for speed, try to load library directly if LIBTCLDOT was set
+#
+proc webdot::load_tcldot {} {
+    global LIBTCLDOT
+    if {! [info exists LIBTCLDOT] || [catch {load $LIBTCLDOT}]} {
+        if {[catch {package require Tcldot} err]} {
+            error $err
+	}
+    }
 }
 
 ###########################################################################
@@ -356,9 +371,7 @@ proc webdot::fix_graph_urls {g serverport dirname} {
 proc webdot::read_graph {src} {
     # we're going to need the Tcldot extension to process the graph
     if {! [string length [info command dotread]]} {
-        if {[catch {package require Tcldot} err]} {
-            error $err
-        }
+	webdot::load_tcldot
     }
 
     # read in source file from cache
@@ -367,7 +380,7 @@ proc webdot::read_graph {src} {
     }
     fconfigure $f -encoding utf-8
     if {[catch {dotread $f} g]} {
-        error "Invalid graph source: $g\nThere may be more details in the WebDot server's error_log,\nor check the graph file by running through dot (or neato or twopi or fdp or circo) locally."
+        error "Invalid graph source: $g\nThere may be more details in the WebDot server's error_log,\nor check the graph file by running through dot (or neato or twopi or fdp or sfdp or circo) locally."
     }
     close $f
     return $g
@@ -942,7 +955,7 @@ proc webdot::send_help {url type engine viewport} {
 
     webdot::make_client_map $url $type $engine $viewport 0 0 new
 
-    set all_engines {DOT NEATO TWOPI FDP CIRCO}
+    set all_engines {DOT NEATO TWOPI FDP SFDP CIRCO}
 
     set this_engine [string toupper $engine]
     set ix [lsearch $all_engines $this_engine]
@@ -1044,9 +1057,7 @@ if {[info exists env(PATH_INFO)]} {
 if {[string equal $path /blue.png] || [string equal $path /green.png]} {
     set png [string trim $path /]
     if {! [file exists $CACHE_ROOT/$png]} {
-	if {[catch {package require Tcldot} err]} {
-            error $err
-	}
+	webdot::load_tcldot
 	# create blue.png and green.png for navigation and zoom bars
 	set gd [gd create 10 10]
 	set blue [gd color new $gd 0 0 255]
