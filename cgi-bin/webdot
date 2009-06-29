@@ -608,8 +608,15 @@ proc webdot::make_product {url type engine viewport no_cache} {
                 if {[catch {$g layout [string tolower $engine]} err]} {
                     error "Graph layout error: $err" 
                 }
+		if {[catch {$g queryattr truecolor} truecolor]} {
+			set truecolor 0
+		}
 		foreach {sizex sizey} [webdot::get_image_size $g] {break}
-                set gd [gd create $sizex $sizey]
+		if {$truecolor} {
+                	set gd [gd createTrueColor $sizex $sizey]
+		} {
+                	set gd [gd create $sizex $sizey]
+		}
     
                 # Antialiasing against transparent background doesn't work well
                 #  if actual background is not near white.  Need alpha channel.
