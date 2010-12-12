@@ -898,35 +898,35 @@ proc webdot::make_product {url type engine viewport no_cache} {
   <base target=\"gq\">
 </head><body>
   <table><tr>
-    <td><a href=\"$SELF/$url.$engine.gq.$X,$Y,$Z,$west,$north\"><img src=\"$SELF/blue.png\" border=\"0\" width=\"5\" height=\"5\" /></a></td>
-    <td><a href=\"$SELF/$url.$engine.gq.$X,$Y,$Z,$x,$north\"><img src=\"$SELF/blue.png\" border=\"0\" width=\"$X\" height=\"5\" /></a></td>
-    <td><a href=\"$SELF/$url.$engine.gq.$X,$Y,$Z,$east,$north\"><img src=\"$SELF/blue.png\" border=\"0\" width=\"5\" height=\"5\" /></a></td>
+    <td><a href=\"$SELF/$url.$engine.gq.$X,$Y,$Z,$west,$north\"><img src=\"$SELF/blue.png\" border=\"0\" width=\"5\" height=\"5\"></a></td>
+    <td><a href=\"$SELF/$url.$engine.gq.$X,$Y,$Z,$x,$north\"><img src=\"$SELF/blue.png\" border=\"0\" width=\"[expr {$X*96/72}]\" height=\"5\"></a></td>
+    <td><a href=\"$SELF/$url.$engine.gq.$X,$Y,$Z,$east,$north\"><img src=\"$SELF/blue.png\" border=\"0\" width=\"5\" height=\"5\"></a></td>
     <td rowspan=\"3\"><table><tr>"
 	    foreach z {200 175 150 125 100 75 50 25} {
 		if {$z == $Z} {
-		    puts $f_out "    <td><a href=\"$SELF/$url.$engine.gq.$X,$Y,$z,$x,$y\"><img src=\"$SELF/green.png\" border=\"0\" width=\"15\" height=\"5\" /></a></td>
+		    puts $f_out "    <td><a href=\"$SELF/$url.$engine.gq.$X,$Y,$z,$x,$y\"><img src=\"$SELF/green.png\" border=\"0\" width=\"15\" height=\"5\"></a></td>
     </tr><tr><td></td></tr><tr>"
 		} {
-		    puts $f_out "    <td><a href=\"$SELF/$url.$engine.gq.$X,$Y,$z,$x,$y\"><img src=\"$SELF/blue.png\" border=\"0\" width=\"15\" height=\"5\" /></a></td>
+		    puts $f_out "    <td><a href=\"$SELF/$url.$engine.gq.$X,$Y,$z,$x,$y\"><img src=\"$SELF/blue.png\" border=\"0\" width=\"15\" height=\"5\"></a></td>
     </tr><tr><td></td></tr><tr>"
 		}
             }
             puts $f_out "    </tr></table></td>
   </tr><tr>
-    <td><a href=\"$SELF/$url.$engine.gq.$X,$Y,$Z,$west,$y\"><img src=\"$SELF/blue.png\" border=\"0\" width=\"5\" height=\"$Y\" /></a></td>
+    <td><a href=\"$SELF/$url.$engine.gq.$X,$Y,$Z,$west,$y\"><img src=\"$SELF/blue.png\" border=\"0\" width=\"5\" height=\"[expr {$Y*96/72}]\"></a></td>
     <td>
       <map name=\"gq\">"
             flush $f_out
             $g write $f_out cmap
             flush $f_out
             puts $f_out "      </map>
-      <img src=\"$SELF/$url.$engine.gqpng.$vp\" width=\"$X\" height=\"$Y\" border=\"0\" usemap=\"#gq\" alt=\"Graph by WebDot\" />
+      <img src=\"$SELF/$url.$engine.gqpng.$vp\" width=\"[expr {$X*96/72}]\" height=\"[expr {$Y*96/72}]\" border=\"0\" usemap=\"#gq\" alt=\"Graph by WebDot\">
     </td>
-    <td><a href=\"$SELF/$url.$engine.gq.$X,$Y,$Z,$east,$y\"><img src=\"$SELF/blue.png\" border=\"0\" width=\"5\" height=\"$Y\" /></a></td>
+    <td><a href=\"$SELF/$url.$engine.gq.$X,$Y,$Z,$east,$y\"><img src=\"$SELF/blue.png\" border=\"0\" width=\"5\" height=\"[expr {$Y*96/72}]\"></a></td>
   </tr><tr>
-    <td><a href=\"$SELF/$url.$engine.gq.$X,$Y,$Z,$west,$south\"><img src=\"$SELF/blue.png\" border=\"0\" width=\"5\" height=\"5\" /></a></td>
-    <td><a href=\"$SELF/$url.$engine.gq.$X,$Y,$Z,$x,$south\"><img src=\"$SELF/blue.png\" border=\"0\" width=\"$X\" height=\"5\" /></a></td>
-    <td><a href=\"$SELF/$url.$engine.gq.$X,$Y,$Z,$east,$south\"><img src=\"$SELF/blue.png\" border=\"0\" width=\"5\" height=\"5\" /></a></td>
+    <td><a href=\"$SELF/$url.$engine.gq.$X,$Y,$Z,$west,$south\"><img src=\"$SELF/blue.png\" border=\"0\" width=\"5\" height=\"5\"></a></td>
+    <td><a href=\"$SELF/$url.$engine.gq.$X,$Y,$Z,$x,$south\"><img src=\"$SELF/blue.png\" border=\"0\" width=\"[expr {$X*96/72}]\" height=\"5\"></a></td>
+    <td><a href=\"$SELF/$url.$engine.gq.$X,$Y,$Z,$east,$south\"><img src=\"$SELF/blue.png\" border=\"0\" width=\"5\" height=\"5\"></a></td>
   </tr></table>
 </body></html>"
             close $f_out

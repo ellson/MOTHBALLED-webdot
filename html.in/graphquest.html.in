@@ -1,9 +1,9 @@
 <p>
 <iframe
   name="gq"
-  src="$CGIBASE$BASE/$SELF.dot.neato.gq.300,300"
-  width="360"
-  height="340"
+  src="$CGIBASE$BASE/$SELF.dot.neato.gq.240,240"
+  width="380"
+  height="360"
   frameborder="0"
   scrolling="no"
 ></iframe>
@@ -18,9 +18,9 @@ and the source of this page contains (for the graph above):
 <table border=1><tr><td><pre>
 &lt;iframe
   name="gq"
-  src="$CGIBASE$BASE/$SELF.dot.neato.gq.300,300"
-  width="360"
-  height="340"
+  src="$CGIBASE$BASE/$SELF.dot.neato.gq.240,240"
+  width="380"
+  height="360"
   frameborder="0"
   scrolling="no"
 &gt;&lt;/iframe&gt;
@@ -37,7 +37,7 @@ the whole graph.
 <p>
 The size of the image does not depend on the contents of the graph,
 but is fixed by the viewport dimensions specified in the URL,
-300x300 in this example.
+320x320 in this example (320 = 240 * 96/72).
 This eases page design.
 The width and height of the &lt;iframe&gt; needs to be 60 wider and 40 higher
 than the graph image to allow for the pan&amp;zoom controls.
