@@ -10,13 +10,13 @@ Version:        @PACKAGE_VERSION@
 
 Release: %{?release}
 
-Group:          Applications/Graphics
+Group:          Applications/Multimedia
 License:        BSD-style
 URL:            http://www.graphviz.org/
 Requires:       graphviz-tcl >= 2.9 graphviz-gd ghostscript tcl >= 8.4 httpd
-Source:         http://www.graphviz.org/pub/graphviz/%{name}-%{version}.tar.gz
+Source:         http://www.graphviz.org/pub/graphviz/development/SOURCES/%{name}-%{version}.tar.gz
 BuildArchitectures: noarch
-BuildRoot:	%{_tmppath}/%{name}-root
+BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 %description
 A cgi-bin program that produces clickable graphs in web pages
@@ -27,9 +27,13 @@ graphviz-tcl rpm.
 # %setup -n %{name}-%{version}
 %setup -q
 
-%define cgibindir  %(rpm -ql httpd | grep -v doc | grep '/cgi-bin$')
-%define htmldir    %(rpm -ql httpd | grep -v doc | grep '/html$')
-%define httpdconf  %(rpm -ql httpd | grep -v doc | grep '/httpd\\\.conf$')
+#define cgibindir  #(rpm -ql httpd | grep -v doc | grep '/cgi-bin$')
+#define htmldir    #(rpm -ql httpd | grep -v doc | grep '/html$')
+#define httpdconf  #(rpm -ql httpd | grep -v doc | grep '/httpd\\\.conf$')
+%define cgibindir  /var/www/cgi-bin
+%define htmldir    /var/www/html
+%define httpdconf  /etc/httpd/conf/httpd.conf
+
 %define apacheuser %(grep -i '^user ' %{httpdconf} | awk '{print $2}')
 %define apachegroup %(grep -i '^group ' %{httpdconf} | awk '{print $2}')
 
