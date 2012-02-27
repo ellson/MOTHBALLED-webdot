@@ -45,14 +45,13 @@ or an svg plugin such as:</td>
 </a></td>
 </tr></tr>
 <td>For viewing <b>pdf</b> files you will need a pdf plugin such as:</td>
-<td><a href="http://www.adobe.com/prodindex/acrobat/readstep.html">
-<img src="getacro.png"
+<td><a href="http://pdfreaders.org/">
+<img src="http://pdfreaders.org/graphics/pdfreaders-free.png"
 	width="89"
 	height="30"
 	align="center"
 	border="0"
-	alt="get acrobat reader">
-</a></td>
+ alt="get pdf reader" /></td>
 <!--
 <td>For for viewing <b>tcl</b> files you will need the tcl plugin:</td>
 <td><a href="http://www.demailly.com/tcl/plugin/download.html">
