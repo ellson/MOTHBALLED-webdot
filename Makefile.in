@@ -70,28 +70,33 @@ uninstall:
 	rm -rf $(DESTDIR)$(HTML_DIR)/webdot
 	rm -rf $(DESTDIR)$(CACHE_DIR)/webdot
 
-distdir=webdot-$(VERSION)
+distname=webdot-$(VERSION)
 
+.PHONY: dist
 dist: genfiles
-	rm -rf $(distdir)*
-	mkdir -p $(distdir)/cgi-bin $(distdir)/config $(distdir)/html.in
-	mkdir -p $(distdir)/html/webdot/graphs/directed $(distdir)/html/webdot/graphs/undirected
-	cp AUTHORS CHANGES COPYING INSTALL README $(distdir)/
-	cp configure.ac configure Makefile.in Makefile webdot.spec.in webdot.spec $(distdir)/
-	cp genindex.tcl linktut.tcl scaffold.tcl $(distdir)/
-	cp config/config.guess config/config.sub config/install-sh $(distdir)/config/
-	cp cgi-bin/webdot $(distdir)/cgi-bin/
-	cp cgi-bin/webdot.tclet $(distdir)/cgi-bin/
-	cp html/webdot/*.html $(distdir)/html/webdot/
-	cp html/webdot/*.dot $(distdir)/html/webdot/
-	cp html/webdot/*.png $(distdir)/html/webdot/
-	cp html/webdot/*.gif $(distdir)/html/webdot/
-	cp html.in/*.html.in $(distdir)/html.in/
-	cp html.in/*.dot.in $(distdir)/html.in/
-	cp html/webdot/graphs/directed/*dot $(distdir)/html/webdot/graphs/directed/
-	cp html/webdot/graphs/undirected/*dot $(distdir)/html/webdot/graphs/undirected/
-	tar cf - $(distdir) | gzip > $(distdir).tar.gz
-	rm -rf $(distdir)
+	rm -rf $(distname)*
+	mkdir -p $(distname)/cgi-bin $(distname)/config $(distname)/html.in
+	mkdir -p $(distname)/html/webdot/graphs/directed $(distname)/html/webdot/graphs/undirected
+	cp AUTHORS CHANGES COPYING INSTALL README $(distname)/
+	cp configure.ac configure Makefile.in Makefile webdot.spec.in webdot.spec $(distname)/
+	cp genindex.tcl linktut.tcl scaffold.tcl $(distname)/
+	cp config/config.guess config/config.sub config/install-sh $(distname)/config/
+	cp cgi-bin/webdot $(distname)/cgi-bin/
+	cp cgi-bin/webdot.tclet $(distname)/cgi-bin/
+	cp html/webdot/*.html $(distname)/html/webdot/
+	cp html/webdot/*.dot $(distname)/html/webdot/
+	cp html/webdot/*.png $(distname)/html/webdot/
+	cp html/webdot/*.gif $(distname)/html/webdot/
+	cp html.in/*.html.in $(distname)/html.in/
+	cp html.in/*.dot.in $(distname)/html.in/
+	cp html/webdot/graphs/directed/*dot $(distname)/html/webdot/graphs/directed/
+	cp html/webdot/graphs/undirected/*dot $(distname)/html/webdot/graphs/undirected/
+	tar cf - $(distname) | gzip > $(distname).tar.gz
+	rm -rf $(distname)
+
+.PHONY: rpm
+rpm: dist
+	rpmbuild -ta $(distname).tar.gz
 
 clean:
 	( cd html.in; for i in *.in; do rm -f ../html/webdot/$${i%%.in}; done )

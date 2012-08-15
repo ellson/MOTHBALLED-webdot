@@ -38,8 +38,8 @@ graphviz-tcl rpm.
 %define apachegroup %(grep -i '^group ' %{httpdconf} | awk '{print $2}')
 
 %define cachedir   /var/cache/webdot
-%define tclshbin   %(rpm -ql tcl | grep '/tclsh$')
-%define libtcldot  %(rpm -ql graphviz-tcl | grep '/libtcldot.so.0.0.0$')
+%define tclshbin   %(which tclsh)
+%define libtcldot  %{_libdir}/graphviz/tcl/libtcldot.so
 %define gsbin      %(which gs)
 %define ps2epsibin %(which ps2epsi)
 

@@ -17,6 +17,6 @@ set env(QUERY_STRING) {}
 #set env(PATH_INFO) /webdot/demo.html
 #set env(PATH_INFO)  /webdot/graphs/undirected/ER.dot.neato.png.help
 #set env(PATH_INFO) /webdot/graphs/directed/NaN.dot.dot.png
-set env(PATH_INFO) /~ellson/graph.cgi.dot.dot
+set env(PATH_INFO) /webdot/demo.dot.dot
 
 source /var/www/cgi-bin/webdot
