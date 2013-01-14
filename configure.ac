@@ -1,5 +1,5 @@
 # Process this file with autoconf to produce a configure script
-AC_INIT(webdot, 2.30)
+AC_INIT(webdot, 2.31)
 AC_CONFIG_SRCDIR([configure.ac])
 AC_CONFIG_AUX_DIR(config)
 
