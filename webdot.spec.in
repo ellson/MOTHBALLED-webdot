@@ -17,6 +17,7 @@ Requires:       graphviz-tcl >= 2.9 graphviz-gd ghostscript tcl >= 8.4 httpd
 Source:         http://www.graphviz.org/pub/graphviz/development/SOURCES/%{name}-%{version}.tar.gz
 BuildArchitectures: noarch
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
+BuildRequires:  httpd
 
 %description
 A cgi-bin program that produces clickable graphs in web pages
