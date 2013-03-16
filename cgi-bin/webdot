@@ -179,14 +179,19 @@ proc webdot::get_url {url no_cache} {
     }
     if {[scan $serverport {%[^:]:%s} server port] == 1} {set port 80}
 
-    # now check for security
-    if {$LOCALHOSTONLY
-      && ! ([string equal $env(SERVER_ADDR) $server]
-	  || [string equal $env(SERVER_NAME) $server]
-          || [string equal localhost $server]
-          || [string equal 127.0.0.1 $server])} {
+    # check for special case of upstream server being the same as this - i.e. LOCALHOST
+    if {[string equal $env(SERVER_ADDR) $server]
+      || [string equal $env(SERVER_NAME) $server]
+      || [string equal localhost $server]
+      || [string equal 127.0.0.1 $server]} {
+        # force use of "127.0.0.1" for case where this server's IP address can't be reached locally
+        set server 127.0.0.1
+    } {
+    # now check for security  - reject external addresses if on locall addresses are allowed
+        if {$LOCALHOSTONLY} {
             error "This webdot installation only delivers graphs from localhost"
-    }
+        }
+   }
 
     # set default values
     foreach {ResponseCode Expires LastModified ContentType} {{} {} {} {}} {break}
