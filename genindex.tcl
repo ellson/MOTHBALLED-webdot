@@ -78,46 +78,11 @@ foreach dir {Directed Undirected} {
 puts $f "</tr>
 </table>
 <p>
-<table>
-<tr>
-<td>For viewing <b>svg</b> files you will need a pdf plugin such as:</td>
-<td><a href=http://www.adobe.com/svg/viewer/install/old.html>
-   <img src=svgdownload.gif
-	width=88
-	height=31
-	align=center
-	border=0
-	alt=\"get acrobat svg plugin\">
-</a></td>
-<td>For viewing <b>pdf</b> files you will need a pdf plugin such as:</td>
-<td><a href=http://www.adobe.com/prodindex/acrobat/readstep.html>
-   <img src=getacro.png
-	width=89
-	height=30
-	align=center
-	border=0
-	alt=\"get acrobat reader\">
-</a></td>
-<!--
-<td>For for viewing <b>tcl</b> files you will need the tcl plugin:</td>
-<td><a href=http://www.demailly.com/tcl/plugin/download.html>
-   <img src=tclp.png
-	width=42
-	height=64
-	align=center
-	border=0
-	alt=\"get tcl plugin\">
-</a></td>
--->
-</tr>
-</table>
-
-<p>
 The graph renderings are produced on-demand by the 
 <a href=$h/>WebDot Graph Server</a>.
 Please send problem reports first to the person that installed
 this server locally.  WebDot was written by:
-<a href=mailto:ellson@graphviz.org>John Ellson</a>.
+<a href=mailto:ellson@research.att.com>John Ellson</a>.
 <p>
 Thanks for trying <a href=$h/>WebDot</a>.
 </body>

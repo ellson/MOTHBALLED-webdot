@@ -1,7 +1,7 @@
 ###########################################################################
 # WebDot, the Server                                                      #
 #                                                                         #
-# John Ellson, ellson@graphviz.org                                        #
+# John Ellson, ellson@research.att.com                                        #
 #                                                                         #
 ###########################################################################
 
@@ -998,7 +998,7 @@ formats:<pre>"
 <p> Sources for WebDot can be found at:
 <a href=http://www.graphviz.org/pub/graphviz/>http://www.graphviz.org/pub/graphviz/</a>
 <p>
-WebDot is by: <a href=mailto:ellson@graphviz.org>John Ellson (ellson@graphviz.org)</a>
+WebDot is by: <a href=mailto:ellson@research.att.com>John Ellson (ellson@research.att.com)</a>
 </body></html>"
 }
 

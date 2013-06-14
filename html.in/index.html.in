@@ -39,7 +39,7 @@ Other formats are available from the png result page.
 There is an online tutorial describing how to use WebDot:
 $CONTENTS
 <h2>Who wrote it?</h2>
-WebDot was written by <a mailto:ellson@graphviz.org>John Ellson</a>
+WebDot was written by <a mailto:ellson@research.att.com>John Ellson</a>
 and is released under a BSD-style license.
 <h2>Warnings</h2>
 It's difficult to find a TCL plugin that works any more,

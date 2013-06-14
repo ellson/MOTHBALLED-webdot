@@ -6,7 +6,7 @@ exec wish "$0" ${1+"$@"}
 #
 # tclet preamble code that runs in the browser (no wish required on server)
 #
-# Zoomable canvas tclet preamble by: John Ellson (ellson@graphviz.org)
+# Zoomable canvas tclet preamble by: John Ellson (ellson@research.att.com)
 # if running in a tclet...
 # set tclet security policy to allow ::browser::displayURL
 if {[catch {policy home}]} {
