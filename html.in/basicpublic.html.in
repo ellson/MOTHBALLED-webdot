@@ -1,11 +1,10 @@
 <p>
-<img src="http://webdot.graphviz.org/cgi-bin/webdot/http://www.graphviz.org/demo.dot.dot.png"
+<img src="http://64.143.228.80/cgi-bin/webdot/http://www.graphviz.org/demo.dot.dot.png"
     alt="graph from public webdot server">
 <p>
-<font color="darkred">Notice: Although webdot can still be configured as a public server, we no longer provide such a server ourselves and we don't recommend
-that others do so either.  Webdot contains no mechanisms for limiting the load
-on a public server.  Instead we recommend that you set up a server just for
-your own graphs.
+<font color="darkred">Notice: Although webdot can be configured as a public server, we don't particularly recommend it.
+Webdot contains insufficient mechanisms for limiting the load on a public server.
+Instead we recommend that you set up a webdot server just for your own graphs in LOCALHOSTONLY mode: i.e. where the source graph is always on the same host as the webdot server.
 </font>
 <p>
 If a public WebDot server is available then graphs can be served without
@@ -14,7 +13,7 @@ installing WebDot locally.  For example, if there is a graph at:
 <p>
 then this img tag in an html web page:
 <table border="1"><tr><td><pre>
-&lt;img src="http://webdot.graphviz.org/cgi-bin/webdot<b>/http://www.graphviz.org/demo.dot</b>.dot<b>.png</b>"
+&lt;img src="http://64.143.228.80/cgi-bin/webdot<b>/http://www.graphviz.org/demo.dot</b>.dot<b>.png</b>"
     alt="graph from public webdot server"&gt;
 </pre></td></tr></table>
 <p>
