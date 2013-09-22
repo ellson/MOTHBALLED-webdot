@@ -1,0 +1,36 @@
+digraph G {
+  graph [rankdir=LR, size="7,1.5"]
+  subgraph cluster_0 {
+    graph [label=User]
+    edge [style=dashed]
+    browser [label="WWW\nbrowser" URL="http://www.mozilla.org/"]
+    svgplugin [label="SVG Plugin" URL="http://www.adobe.com/svg/viewer/install/old.html"]
+    pdfplugin [label="PDF Plugin" URL="http://www.adobe.com/support/downloads/product.jsp?product=10&platform=unix"]
+    svgplugin -> browser
+    svgplugin -> browser [dir=back]
+    pdfplugin -> browser
+    pdfplugin -> browser [dir=back]
+    {
+      graph [rank=same]
+      pngpage [label=PNG shape=box URL="$CGIBASE$HTMLBASE/demo.dot.dot.png"]
+      svgpage [label=SVGZ shape=box URL="$CGIBASE$HTMLBASE/demo.dot.dot.svgz"]
+      pdfpage [label=PDF shape=box URL="$CGIBASE$HTMLBASE/demo.dot.dot.pdf"]
+    }
+    pngpage -> browser [dir=none style=dotted]
+    svgpage -> svgplugin [dir=none style=dotted]
+    pdfpage -> pdfplugin [dir=none style=dotted]
+  }
+  subgraph cluster_1 {
+    graph [label="Server 1"]
+    httpd1 [label=httpd URL="http://httpd.apache.org/"]
+    webdot [label="$CGIBASE" style=filled fillcolor=yellow color=black URL="$HTMLBASE/"]
+  }
+  subgraph cluster_2 {
+    graph [label="Server 2"]
+    httpd2 [label=httpd URL="http://httpd.apache.org/"]
+    "demo.dot" [shape=box URL="$HTMLBASE/demo.dot"]
+    httpd2 -> "demo.dot" [dir=none style=dotted]
+  }
+  browser -> httpd1 -> webdot -> httpd2
+  browser -> httpd1 -> webdot -> httpd2 [dir=back]
+}

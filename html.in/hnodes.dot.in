@@ -1,0 +1,8 @@
+digraph G {
+        graph [URL="default.html"]
+        a [URL="a.html"]
+        b [URL="b.html"]
+        c [URL="c.html"]
+        a -> b -> c
+        a -> c
+}

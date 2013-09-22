@@ -1,0 +1,4 @@
+WebDot is a server-side graph layout engine
+that allows authors to publish .dot files
+and have them rendered in their .html pages 
+as .png with associated imagemaps.

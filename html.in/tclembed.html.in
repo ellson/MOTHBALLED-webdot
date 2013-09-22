@@ -1,0 +1,20 @@
+<p>
+<webdot src="$BASE/$SELF.dot" engine="neato" type="tcl" target="new">
+<p>
+WebDot can convert a graph into a "Tclet" for the
+<a href="http://www.demailly.com/tcl/plugin/download.html">Tcl Plugin</a>.
+For example, $SELF.dot contains:
+$DOT
+and the source of this page contains (for the Tclet which should be displayed below):
+<table border="1"><tr><td><pre>
+&lt;webdot src="$BASE/$SELF.dot" engine="neato" type="tcl" target="new"&gt;
+</pre></td></tr></table>
+<p>
+after serving this page through $CGIBASE, this &lt;webdot...&gt;
+tag is replaced by:
+<table border="1"><tr><td><pre>
+&lt;embed src="$CGIBASE/http://127.0.0.1$BASE/$SELF.dot.neato.tcl"
+  width="600" height="400"&gt;
+Graph in Tclet
+&lt;/embed&gt;
+</pre></td></tr></table>

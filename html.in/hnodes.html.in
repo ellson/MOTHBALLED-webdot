@@ -1,0 +1,22 @@
+<p>
+<a href="$CGIBASE$BASE/$SELF.dot.dot.map">
+<img src="$CGIBASE$BASE/$SELF.dot.dot.png" ismap>
+</a>
+<p>
+A graph can contain URLs so that the nodes and background are clickable, e.g.:
+$DOT
+<p>
+To respond to user mouse events, a map must be provided.  WebDot supports either
+server-side or client-side maps.  First we describe server-side maps.
+<p>
+The mapping information is generated dynamically from the same graph source
+file as the image, using this construct:
+<table border="1"><tr><td><pre>
+&lt;a href="$CGIBASE$BASE/$SELF.dot.dot.map"&gt;
+&lt;img src="$CGIBASE$BASE/$SELF.dot.dot.png" ismap&gt;
+&lt;/a&gt;
+</pre></td></tr></table>
+<p>
+Which produces the graph at the top.
+Note that the "Graph by WebDot" signature is also hyperlinked to a
+customized help page.

@@ -1,0 +1,46 @@
+<p>
+<iframe
+  name="gq"
+  src="$CGIBASE$BASE/$SELF.dot.neato.gq.240,240"
+  width="380"
+  height="360"
+  frameborder="0"
+  scrolling="no"
+></iframe>
+<p>
+Webdot can convert the graph into the contents of an &lt;iframe&gt;
+with a graph image, pan &amp; zoom controls, and client-side
+mapping of the graph objects.
+<p>
+For example, $SELF.dot contains:
+$DOT
+and the source of this page contains (for the graph above):
+<table border=1><tr><td><pre>
+&lt;iframe
+  name="gq"
+  src="$CGIBASE$BASE/$SELF.dot.neato.gq.240,240"
+  width="380"
+  height="360"
+  frameborder="0"
+  scrolling="no"
+&gt;&lt;/iframe&gt;
+</pre></td></tr></table>
+<p>
+The advantages of this mode of WebDot are simple authoring and
+the responsiveness of client-side mapping.  Notice that the URL that
+would be reached by clicking on a node is flashed into the
+status bar at the bottom of the browser.
+<p>
+One disadvantage is that there is no guarantee that a graph will fit the frame
+at the initial zoom setting, possibly requiring the user to zoom to see
+the whole graph.
+<p>
+The size of the image does not depend on the contents of the graph,
+but is fixed by the viewport dimensions specified in the URL,
+320x320 in this example (320 = 240 * 96/72).
+This eases page design.
+The width and height of the &lt;iframe&gt; needs to be 60 wider and 40 higher
+than the graph image to allow for the pan&amp;zoom controls.
+<p>
+The &lt;iframe&gt; must be named "gq" for the pan&amp;zoom updates to be
+correctly targeted.

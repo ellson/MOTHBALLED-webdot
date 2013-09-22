@@ -1,0 +1,48 @@
+FIXME.  webdot nneds to be modified to align with these recommendations.
+--------------------------------------------------------------------------
+On Sun, 2006-05-07 at 22:42 +0200, Nicolas Mailhot wrote:
+
+> > The core of the problem is webapp authors choose monolithic filetree
+> > deployments for ease-of-development and ease-of-deployment reasons while
+> > the FHS mandates split trees for ease-of-administration reasons. And
+> > that all the infrastructure which makes pleasing admins not too hard for
+> > app authors is severily lacking for webapp authors.
+
+Having packaged a number of webapps and previously researched a number
+of these issues here are my working guidelines as of the moment (subject
+to change on a whim  :-) 
+
+* It's the job of the packager to split the webapp into separate
+installation locations based on FHS and existing Fedora conventions.
+This should be done via some type of parametrization, (e.g. adding
+options to the autotool configure script). Those installation parameters
+should default to match upstream but are overridden in the rpm spec
+file. Those changes need to be submitted upstream, but because
+everything defaults to match upstream there should be little resistance
+to accepting the patch.
+
+* The current convention of /var/www is probably broken, but the pain of
+changing it is probably not worth it.
+
+* Install the webapp "code" into /var/www/<package>
+(or /usr/lib/<package>), config files into /etc/<package>, temporary
+files created by the webapp belong in /var/cache/<package>
+
+* Provide a /etc/httpd/conf.d/<package>.conf file which configures the
+webapp for use with the Fedora conventions. (e.g. providing ScriptAlias,
+modrewrite rules to map URL's to installation location, etc.)
+
+* Absolutely nothing should install into the docroot.
+
+* Not following existing Fedora conventions will play havoc with SELinux
+which will cause much pain  :-) 
+
+Note: I've studied FHS a number of times trying to make sure I follow
+the guidelines and its clear to me that FHS is often ambiguous, or
+rather that reasonable people could reasonably apply the FHS guidelines
+differently but be compliant. Therefore don't get too hung up on FHS,
+try to follow the spirit and when uncertain look for existing precedent
+in Fedora.
+
+-- John Dennis <jdennis@redhat.com> Red Hat Inc.
+-- fedora-extras-list mailing list fedora-extras-list@redhat.com https://www.redhat.com/mailman/listinfo/fedora-extras-list 

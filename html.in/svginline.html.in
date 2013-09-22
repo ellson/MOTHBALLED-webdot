@@ -1,0 +1,26 @@
+<p>
+<webdot src="$BASE/$SELF.dot" engine="neato" type="svg">
+<p>
+Similarly to the support for client-side maps, WebDot can filter an
+html page and replace all occurrences of &lt;webdot...&gt; tags
+with a client-side SVG image.
+
+For example, $SELF.dot contains:
+$DOT
+and the source of this page contains:
+<table border="1"><tr><td><pre>
+&lt;webdot src="$BASE/$SELF.dot" engine="neato" type="svg"&gt;
+</pre></td></tr></table>
+which serving through $CGIBASE replaces the &lt;webdot...&gt; tag. 
+To see the result please view the source of this page.
+<p>
+The advantages of this mode of WebDot are the much simpler authoring and
+the responsiveness of client-side mapping.
+<p>
+The disadvantages are that the html source now contains non-standard markup and
+the page has to be served through the $CGIBASE program.
+Care must be taken that relative URLs in the html don't also get served
+through the WebDot cgi program so it is important to use "rooted" hrefs
+in documents and graphs served this way.
+<p>
+Embedded SVG is probably a better choice.

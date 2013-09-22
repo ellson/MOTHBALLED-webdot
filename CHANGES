@@ -1,0 +1,76 @@
+January 13, 2013 - Release 2.30 (aligned with graphviz-2.30)
+Dec 10, 2009 - Release 2.26 (aligned with graphviz-2.26)
+June 29, 2009 - Start 2.25 development series (aligned with graphviz-2.25)
+	- add support for "truecolor=1" in graphs
+March 3, 2009 - Release 2.22 (aligned with graphviz-2.22)
+November 9, 2007 - Release 2.16 (aligned with graphviz-2.16)
+November 27, 2006 - Release 2.10 (aligned with graphviz-2.10)
+February 3, 2006 - Release 2.8 (aligned with graphviz-2.8)
+August 28, 2005 - Release 2.6 (aligned with graphviz-2.6)
+July 20, 2005 - Release 2.4 (aligned with graphviz-2.4)
+	- fixes for graphquest
+January 19, 2005 - Release 2.2 (aligned with graphviz-2.2)
+December 11, 2004 - Release 2.0 (aligned with graphviz-2.0)
+December 11, 2004 - Release 1.18 (aligned with graphviz-1.18)
+September 14, 2004 - Release 1.16 (aligned with graphviz-1.16)
+August 30, 2004 - Release 1.14 (aligned with graphviz-1.14)
+February 13, 2004 - Release 1.10.2
+	- fix problem with margins
+August 21, 2003 - Release 1.10
+	- support operation without SIGNATURE feature
+	- realign version number with graphviz
+June 11, 2003 - Release 1.9.1
+	- generalize the workaround hack for apache bugs
+February 26, 2003 - Release 1.9.0
+        - add "target" support to client-maps
+August 4, 2002 - Release 1.8.9  (to realign with graphviz)
+	- use cmap to generate client-maps directly
+	- support for and demo of tooltips
+June 7, 2002 - Release 1.8.5
+        - allow encoded QUERY_STRINGS to be passed through to the graph server
+	  Specifically, "%3f" is required to represent the "?"
+	  (non encoded QUERY_STRINGS are used to pass coordinates to
+	  server-side image maps.)
+	- use <iframe> trick from http://richardinfo.com/svg/iframetest.html
+		to avoid Mozilla-1.0 crash with SVG embedding
+	- update newarrows.dot demo graph
+April 17, 2002 - Release 1.8.4
+        - strip preamble (DOCTYPE etc) from SVG when using inline.
+        - strip extra infor after ";" from Content-type: headers.
+        - don't put text in <embed>...</embed> 'cos Amaya prints it.
+April 7, 2002 - Release 1.8.3
+	- improve error handling
+April 4, 2002 - Release 1.8.2
+	- fix problem with 127.0.0.1 used in URLs in maps
+		(did this ever work????)
+April 2, 2002 - Release 1.8.1
+	- support ps2 format and use in pdf generation
+	- add 2 new demo graphs (to match graphviz demos)
+February 12, 2002 - Release 1.7.17
+        - replace missing graphs
+January 2, 2002 - Release 1.7.16
+	- some improvements to demo graphs
+December 11, 2001 - Release 1.7.14
+	- add ps to demo formats
+	- add svgz format support
+	- use svgz instead of svg in demo
+December 2, 2001 - Release 1.7.12
+	- [ I haven't been maintaining this Changes file properly, sorry. ]
+	- SVG support added
+	- Support for "twopi" layouts
+	- RPM package surrport for RedHat 7.x systems
+	- more tutorials and demos
+November 1, 2000 - Release 1.7.2
+	- use webfonts installed with graphviz with path builtin to gdtclft.
+October 30, 2000 - Release 1.7.1
+	- Support for tags in html pages.  tags are of the form:
+		<webdot src=demo.dot type=png> 
+	  and get replaced by a client side map and an <img ...> 
+	- New local host installation.  Option to serve graphs only
+	  from the same server. 
+	- Security.  No more support for file: urls, or any other
+	  local files (except for private cache area).  All upstream
+	  files are obtained by http even if in LOCALHOSTONLY mode, so
+	  the security is provided by the httpd configuration.
+	- Support for clickable edge labels in gif, png, and jpegs.
+	- Upgrade to use graphviz-1.7

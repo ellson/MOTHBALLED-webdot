@@ -1,0 +1,103 @@
+DESTDIR=
+
+# Location for the webdot cgi program
+CGI-BIN_DIR=/var/www/cgi-bin
+
+# Location for some example web pages using webdot
+HTML_DIR=/var/www/html
+
+# A place that the webdot cgi program can cache its generated images
+# (make install creates a webdot subdirectory in this dir.)
+CACHE_DIR=/var/cache
+
+# The uid:gid in effect when cgi-bin programs are running, only this
+# user should be able to read/write the webdot cache.
+HTTPD-USER-GROUP=apache:apache
+
+# Location of tclsh8.3 (or later) executable
+TCLSH_EXECUTABLE=/usr/bin/tclsh8.3
+
+# Direct reference to libtcldot.so to avoid directory searching overhead
+# of tcl package mechanism.
+LIBTCLDOT=/usr/lib/graphviz/libtcldot.so.0.0.0
+
+# Ghostscript is used for pdf output format
+GS=/usr/bin/gs
+
+# ps2epsi for epsi output format
+PS2EPSI=/usr/bin/ps2epsi
+
+# LOCALHOSTONLY set to 0 to allow conversion of graphs from other hosts
+#      warning: use only if you want to provide a public graph server
+#      this can result in uncontrolled load on your system
+LOCALHOSTONLY=1
+
+# version number for webdot-*.tar.gz
+VERSION=@PACKAGE_VERSION@
+TOP_DIR=@TOP_DIR@
+BUILD_DIR=@BUILD_DIR@
+
+###############################################################
+
+.PHONY: all genfiles install uninstall distdir dist clean
+
+all: genfiles
+
+genfiles:
+	tclsh linktut.tcl
+	tclsh genindex.tcl
+
+install:
+	mkdir -p $(DESTDIR)$(CGI-BIN_DIR) $(DESTDIR)$(HTML_DIR)
+	echo "#!$(TCLSH_EXECUTABLE)" > $(DESTDIR)$(CGI-BIN_DIR)/webdot
+	echo "set LIBTCLDOT $(LIBTCLDOT)" >> $(DESTDIR)$(CGI-BIN_DIR)/webdot
+	echo "set CACHE_ROOT $(CACHE_DIR)/webdot" >> $(DESTDIR)$(CGI-BIN_DIR)/webdot
+	echo "set GS $(GS)" >> $(DESTDIR)$(CGI-BIN_DIR)/webdot
+	echo "set PS2EPSI $(PS2EPSI)" >> $(DESTDIR)$(CGI-BIN_DIR)/webdot
+	echo "set LOCALHOSTONLY  $(LOCALHOSTONLY)" >> $(DESTDIR)$(CGI-BIN_DIR)/webdot
+	cat ${BUILD_DIR}/cgi-bin/webdot >> $(DESTDIR)$(CGI-BIN_DIR)/webdot
+	cp ${BUILD_DIR}/cgi-bin/webdot.tclet $(DESTDIR)$(CGI-BIN_DIR)/webdot.tcl
+	chmod +x $(DESTDIR)$(CGI-BIN_DIR)/webdot
+	cp -r ${BUILD_DIR}/html/webdot $(DESTDIR)$(HTML_DIR)/
+	rm -rf $(DESTDIR)$(CACHE_DIR)/webdot
+	mkdir -p $(DESTDIR)$(CACHE_DIR)/webdot
+	chmod 700 $(DESTDIR)$(CACHE_DIR)/webdot
+	chown $(HTTPD-USER-GROUP) $(DESTDIR)$(CACHE_DIR)/webdot
+
+uninstall:
+	rm -f $(DESTDIR)$(CGI-BIN_DIR)/webdot
+	rm -f $(DESTDIR)$(CGI-BIN_DIR)/webdot.tclet
+	rm -rf $(DESTDIR)$(HTML_DIR)/webdot
+	rm -rf $(DESTDIR)$(CACHE_DIR)/webdot
+
+distname=webdot-$(VERSION)
+
+.PHONY: dist
+dist: genfiles
+	rm -rf $(distname)*
+	mkdir -p $(distname)/cgi-bin $(distname)/config $(distname)/html.in
+	mkdir -p $(distname)/html/webdot/graphs/directed $(distname)/html/webdot/graphs/undirected
+	cp AUTHORS CHANGES COPYING INSTALL README $(distname)/
+	cp configure.ac configure Makefile.in Makefile webdot.spec.in webdot.spec $(distname)/
+	cp genindex.tcl linktut.tcl scaffold.tcl $(distname)/
+	cp config/config.guess config/config.sub config/install-sh $(distname)/config/
+	cp cgi-bin/webdot $(distname)/cgi-bin/
+	cp cgi-bin/webdot.tclet $(distname)/cgi-bin/
+	cp html/webdot/*.html $(distname)/html/webdot/
+	cp html/webdot/*.dot $(distname)/html/webdot/
+	cp html/webdot/*.png $(distname)/html/webdot/
+	cp html/webdot/*.gif $(distname)/html/webdot/
+	cp html.in/*.html.in $(distname)/html.in/
+	cp html.in/*.dot.in $(distname)/html.in/
+	cp html/webdot/graphs/directed/*dot $(distname)/html/webdot/graphs/directed/
+	cp html/webdot/graphs/undirected/*dot $(distname)/html/webdot/graphs/undirected/
+	tar cf - $(distname) | gzip > $(distname).tar.gz
+	rm -rf $(distname)
+
+.PHONY: rpm
+rpm: dist
+	rpmbuild -ta $(distname).tar.gz
+
+clean:
+	( cd html.in; for i in *.in; do rm -f ../html/webdot/$${i%%.in}; done )
+	rm -f html/webdot/demo.html

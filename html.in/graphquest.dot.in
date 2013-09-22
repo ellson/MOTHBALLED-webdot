@@ -1,0 +1,4 @@
+graph G {
+        node [URL="\N.html" target="new" label="" tooltip="Node \N" width=0.3 height=0.3 style=filled fillcolor=lightblue pencolor=black]
+        a -- b -- c -- d -- e; f -- g -- c -- h -- i; j -- k -- c;
+}

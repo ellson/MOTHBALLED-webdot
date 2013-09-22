@@ -1,0 +1,1385 @@
+###########################################################################
+# WebDot, the Server                                                      #
+#                                                                         #
+# John Ellson, ellson@research.att.com                                        #
+#                                                                         #
+###########################################################################
+
+###########################################################################
+# configuration data
+#
+# At the top of this file, or overridden by values in a file name webdot.config,
+# should be some installation dependent code like:
+#
+#	#!/usr/bin/tclsh
+#	set LIBTCLDOT /usr/lib/graphviz/tcl/libtcldot.so
+#	set CACHE_ROOT /var/cache/webdot
+#	set GS /usr/bin/gs
+#	set PS2EPSI /usr/bin/ps2epsi
+#	set LOCALHOSTONLY 1
+#
+# This code is normally created during "make install"
+#
+# If fonts are not found automatically, you may also want to 
+# add a line like:
+#	set env(GDFONTPATH) /mnt/dos/c/windows/fonts/
+#
+# For a public webdot server, set LOCALHOSTONLY 0
+#
+###########################################################################
+
+#set f_debug [open /tmp/webdot_debug_[pid] w]
+#foreach e [lsort [array names env]] {
+#    puts $f_debug "$e=$env($e)"
+#}
+
+# signature that is hyperlinked to help
+# comment out the next line if you don't want a signature
+set SIGNATURE "Graph by WebDot"
+
+# allow user to persistently modify configuration through rpm upgrades
+if {[file exists [pwd]/webdot.config]} {
+	source [pwd]/webdot.config
+}
+
+###########################################################################
+# various data definitions - these should not require adjustment
+
+# define the set of MIME types that we can convert graphs to
+array set MIME {
+    cmap   "text/plain"
+    cmapx  "text/plain"
+    dot    "text/vnd.graphviz"
+    epsi   "application/postscript"
+    fig    "application/x-fig"
+    gif    "image/gif"
+    gq     "text/html"
+    gqpng  "image/png"
+    gv     "text/vnd.graphviz"
+    hpgl   "application/x-hpgl"
+    html   "text/html"
+    imap   "text/plain"
+    ismap  "text/plain"
+    jpeg   "image/jpeg"
+    map    "text/plain"
+    mif    "application/x-mif"
+    pcl    "application/x-pcl"
+    pdf    "application/pdf"
+    pic    "application/x-pic"
+    png    "image/png"
+    ps     "application/postscript"
+    ps2    "application/postscript"
+    src    "text/plain"
+    svg    "image/svg+xml"
+    svgz   "image/svg+xml"
+    tcl    "application/x-tcl"
+    tclmap "text/plain"
+    txt    "text/plain"
+    vrml   "x-world/x-vrml"
+    vtx    "application/x-vtx"
+    xdot   "text/vnd.graphviz"
+}
+
+# timeout for network operations (webdot::get_url)
+set TIMEOUT 5000
+
+# mtime of this script
+set SELFMTIME [file mtime $argv0]
+
+# filename of webdot tclet preamble (capture here before any cd's)
+set TCLET [pwd]/webdot.tclet
+
+###########################################################################
+# proc definitions
+###########################################################################
+
+###########################################################################
+# error 
+#
+# generate an error with an error message
+#
+proc toperror {m} {
+	puts "Content-type: text/plain\n\nWebDot Error:\n\n$m"
+	flush stdout
+	puts {}
+	exit
+}
+
+# propagate error to top
+proc error {m} {
+    return -code error $m
+}
+
+# webdot namespace
+
+namespace eval webdot {
+	namespace export \
+		unencode \
+		get_url \
+		make_absolute_url \
+		fix_graph_urls \
+		read_graph \
+		make_client_map \
+		filter_html \
+		get_image_size \
+		make_product \
+		send_help
+}
+
+###########################################################################
+# webdot::unencode
+#
+# used to unescape query-strings in cgi scripts
+#
+#remove existing \ escapes
+#translate + to space
+#escape tcl sensitive characters
+#replace all %nn sequences with formats
+#evaluate all formats and lose the tcl escapes, result is return value
+
+proc webdot::unencode {s} {
+ regsub -all {\\(.)} $s {\1} s
+ regsub -all {\+} $s { } s
+ regsub -all {([\\\{$[])} $s {\\\1} s
+ regsub -all {%([a-fA-F0-9][a-fA-F0-9])} $s {[format %c 0x\1]} s
+ subst $s
+}
+
+###########################################################################
+# webdot::load_tcldot
+#
+# for speed, try to load library directly if LIBTCLDOT was set
+#
+proc webdot::load_tcldot {} {
+    global LIBTCLDOT
+    if {! [info exists LIBTCLDOT] || [catch {load $LIBTCLDOT}]} {
+        if {[catch {package require Tcldot} err]} {
+            error $err
+	}
+    }
+}
+
+###########################################################################
+# webdot::get_url
+#
+# get file from a url, using previously cached copy if still good
+#
+# returns a list containing:
+#        file_cache_dir      directory in cache for the src and products
+#        LastModified        time string
+#        Expires             time string
+#        ContentType         MIME string
+#
+proc webdot::get_url {url no_cache} {
+    global CACHE_ROOT TIMEOUT LOCALHOSTONLY env
+
+    # parse the url into component parts
+    if {[scan $url {http://%[^/]%s} serverport path] != 2} {
+        error "bad URL $url"
+    }
+    if {[scan $serverport {%[^:]:%s} server port] == 1} {set port 80}
+
+    # check for special case of upstream server being the same as this - i.e. LOCALHOST
+    if {[string equal $env(SERVER_ADDR) $server]
+      || [string equal $env(SERVER_NAME) $server]
+      || [string equal localhost $server]
+      || [string equal 127.0.0.1 $server]} {
+        # force use of "127.0.0.1" for case where this server's IP address can't be reached locally
+        set server 127.0.0.1
+    } {
+    # now check for security  - reject external addresses if on locall addresses are allowed
+        if {$LOCALHOSTONLY} {
+            error "This webdot installation only delivers graphs from localhost"
+        }
+   }
+
+    # set default values
+    foreach {ResponseCode Expires LastModified ContentType} {{} {} {} {}} {break}
+    regsub -all {~} $path {%7E} path
+    set file_cache_dir $CACHE_ROOT/$serverport$path
+    if {[file isdirectory $file_cache_dir]} {
+        if {! [catch {open $file_cache_dir/info r} f]} {
+	    foreach {LastModified Expires ContentType} [read $f] {break}
+	    close $f
+	}
+    } {
+        if {[catch {file mkdir $file_cache_dir}]} {
+            error "failure to create cache directory: $file_cache_dir"
+        }
+    }
+
+    # see if we can use straight from cache
+    if {![string length $Expires]
+      || $no_cache
+      || [catch {clock scan $Expires -gmt 1} t]
+      || $t < [clock seconds]} {
+        # no - so open connection to server
+        if {[catch {socket $server $port} skt]} {
+            error "failure to connect to $server:$port"
+        }
+
+        # send request
+        regsub -all {%7E} $path {~} lpath
+        puts $skt "GET $lpath HTTP/1.0"
+        puts $skt "User-Agent: webdot"
+        puts $skt "Host: $server"
+        puts $skt "Accept: */*"
+        if {$no_cache} {
+            puts $skt "Pragma: no-cache"
+        } {
+            if {[string length $LastModified]} {
+                puts $skt "If-Modified-Since: $LastModified"
+            }
+        }
+        puts $skt {}
+        flush $skt
+
+        # get response
+        set inbody 0
+        while {$inbody < 2} {
+            set selread {}
+            after $TIMEOUT "error \"timeout on select read from $url\""
+            fileevent $skt readable "set selread $skt"
+            vwait selread
+            after cancel "error \"timeout on select read from $url\""
+            if {! $inbody} {
+                # still processing header
+                if {[catch {gets $skt} line]} {
+		    close $skt
+                    error "failure reading from: $url\nresponse was: $line"
+                }
+                regsub -all \r $line {} line
+                switch [string tolower [lindex $line 0]] {
+                    "http/1.0" - "http/1.1" {
+                        scan $line {%*s %d %*s} ResponseCode
+                        switch $ResponseCode {
+                            200 {
+                                if {[catch {open $file_cache_dir/src w} f_src]} {
+        			    close $skt
+                                    error "failure to open $file_cache_dir/src for write"
+                                }
+                            }
+                            304 {set inbody 2}
+                            404 {
+        			close $skt
+                                error "URL \"http://$server:$port$lpath\" was not found"
+                            }
+                            default {
+        			close $skt
+                                error "Response Code = $ResponseCode"
+                            }
+                        }
+                    }
+                    "last-modified:" {scan $line {%*s %[^~]} LastModified}
+                    "expires:" {scan $line {%*s %[^~]} Expires}
+                    "content-type:" {
+			scan $line {%*s %[^~]} ContentType
+			set ContentType [lindex [split $ContentType ;] 0]
+		    }
+                    {} {
+                        incr inbody
+                        if {[string equal $ResponseCode 200]} {
+                            if {[catch {open $file_cache_dir/info w} f_info]} {
+        			close $skt
+                                error "failure to open $file_cache_dir/info for write"
+                            }
+                            puts -nonewline $f_info [list $LastModified $Expires $ContentType]
+                            close $f_info
+                        }
+                    }
+                }
+            } {
+                # in body - copy directly so no prob with binary data
+                fconfigure $skt -translation binary
+                fconfigure $f_src -translation binary
+                fcopy $skt $f_src
+                close $f_src
+                incr inbody
+            }
+        }
+        close $skt
+    }
+
+    return [list $file_cache_dir $LastModified $Expires $ContentType]
+}
+
+###########################################################################
+# webdot::make_absolute_url
+#
+# support routine for webdot::fix_graph_urls
+#
+# returns: absolute_url
+#
+proc webdot::make_absolute_url {serverport dirname ref name} {
+    regsub -all {\\N} $ref $name ref
+    if {[scan $ref {http://%s} .] != 1} {
+        if {[string first / $ref] == 0} {
+            set ref http://$serverport$ref
+        } {
+            set ref http://$serverport$dirname/$ref
+        }
+    }
+    return $ref
+}
+
+###########################################################################
+# webdot::fix_graph_urls
+#
+# URL attributes of graph objects can be relative, and URLs of nodes
+# can contain the escape sequence "\N" which will be replaced by the
+# name of the node
+#
+# returns count of URLs found in graph (not BGURL)
+#
+proc webdot::fix_graph_urls {g serverport dirname} {
+    set urls_found 0
+    # expand relative URLs if we need them in the output format
+    set name [$g showname]
+    if {![catch {$g queryattr BGURL} bg_url]} {
+        set bg_url [lindex $bg_url 0]
+        if {[string length $bg_url]} {
+            $g setattributes BGURL [webdot::make_absolute_url $serverport $dirname $bg_url $name]
+        }
+    }
+    if {![catch {$g queryattr URL} g_url]} {
+        set g_url [lindex $g_url 0]
+        if {[string length $g_url]} {
+            incr urls_found
+            $g setattributes URL [webdot::make_absolute_url $serverport $dirname $g_url $name]
+        }
+    }
+    foreach n [$g listnodes] {
+        set name [$n showname]
+        if {![catch {$n queryattr URL} n_url]} {
+            set n_url [lindex $n_url 0]
+            if {[string length $n_url]} {
+                incr urls_found
+                $n setattributes URL [webdot::make_absolute_url $serverport $dirname $n_url $name]
+            }
+        }
+        foreach e [$n listoutedges] {
+            set name [$e showname]
+            if {![catch {$e queryattr URL} e_url]} {
+                set e_url [lindex $e_url 0]
+                if {[string length $e_url]} {
+                    incr urls_found
+                    $e setattributes URL [webdot::make_absolute_url $serverport $dirname $e_url $name]
+                }
+            }
+        }
+    }
+    return $urls_found
+}
+
+###########################################################################
+# webdot::read_graph
+#
+proc webdot::read_graph {src} {
+    # we're going to need the Tcldot extension to process the graph
+    if {! [string length [info command dotread]]} {
+	webdot::load_tcldot
+    }
+
+    # read in source file from cache
+    if {[catch {open $src r} f]} {
+        error "Unable to open cache file for read: $src"
+    }
+    fconfigure $f -encoding utf-8
+    if {[catch {dotread $f} g]} {
+        error "Invalid graph source: $g\nThere may be more details in the WebDot server's error_log,\nor check the graph file by running through dot (or neato or twopi or fdp or sfdp or circo) locally."
+    }
+    close $f
+    return $g
+}
+        
+###########################################################################
+# webdot::make_client_map
+#
+proc webdot::make_client_map {url type engine viewport no_cache count target} {
+   global SELF
+
+    # generate graph in requested format
+    switch -- $type {
+        png - gif - jpeg {
+            # get source file into cache (may already be there)
+	    if {[catch {webdot::get_url $url $no_cache} res]} {
+		error $res
+	    }
+            foreach {file_cache_dir LastModified Expires ContentType} $res {break}
+            # some types (e.g. vrml) result in multiple files, so cd to target directory
+            cd $file_cache_dir
+	    if {[catch {webdot::make_product $url $type $engine $viewport $no_cache} err]} {
+		error $err
+	    }
+            # generate map
+            if {[catch {open $engine.cmap r} f]} {
+                error "Unable to open cache file for read: $file_cache_dir/$engine.cmap"
+            }
+            puts "<map name=\"webdot$count\">"
+            set default ""
+            set havetarget [string length $target]
+            foreach l [split [read $f] \n] {
+                if {[scan $l {<!-- bb (%d,%d)} sizex sizey] == 2} {
+                    # save bb for size
+                } elseif {$havetarget && [regexp {<area (.*)>} $l . allbuttarget]} {
+                    puts "<area $allbuttarget target=\"$target\">"
+                } elseif {[string length $l]} {
+                    puts $l
+                }
+            }
+            close $f
+            puts "</map>"
+            puts "<img src=\"$SELF/$url.$engine.$type\"
+	    width=\"$sizex\" height=\"$sizey\" border=\"0\"
+	    usemap=\"#webdot$count\"
+	    alt=\"Graph by WebDot\">"
+        }
+	svg {
+            # get source file into cache (may already be there)
+	    if {[catch {webdot::get_url $url $no_cache} res]} {
+		error $res
+	    }
+            foreach {file_cache_dir LastModified Expires ContentType} $res {break}
+            # some types (e.g. vrml) result in multiple files, so cd to target directory
+            cd $file_cache_dir
+            # generate svg
+	    if {[catch {webdot::make_product $url $type $engine $viewport $no_cache} err]} {
+		error $err
+	    }
+            if {[catch {open $engine.$type r} f]} {
+                error "Unable to open cache file for read: $file_cache_dir/$engine.$type"
+            }
+            while {![eof $f]} {
+                # remove leading comment when embedding svg in an html page
+		if {[string equal [string range [gets $f] end-2 end] {-->}]} {break}
+            }
+            fcopy $f stdout
+	    close $f
+	}
+        tcl {
+            puts "<embed src=\"$SELF/$url.$engine.tcl\"
+	width=\"600\" height=\"400\">
+Graph in Tclet
+</embed>"
+        }
+    }
+}
+###########################################################################
+# webdot::filter_html 
+#
+#   processes <webdot> tags embedded in an html page
+#
+proc webdot::filter_html {serverport dirname no_cache} {
+    set f [open src r]
+    set h [read $f]
+    close $f
+
+    puts "Content-Type: text/html\n"
+    if {[catch {
+        #iterate through "<webdot...>" tags in html document
+        set count 0
+        set start 0
+        foreach {e_range se_range} \
+          [regexp -all -nocase -indices -inline -- {\s*<webdot([^>]*)>\s*} $h] {
+        
+            #extract indices for the whole tag and for the subrange with the tag contents
+            foreach {e_start e_end} $e_range {break}
+            foreach {se_start se_end} $se_range {break}
+    
+            # output text before "<webdot"
+            puts [string range $h $start [incr e_start -1]]
+    
+            # initialize args to default values
+            foreach {src engine type alt target viewport} {{} dot png {[graph]} {}} {break}
+    
+            # extract args
+            foreach {. arg val} \
+              [regexp -all -inline -- {(\w*)=([^\s]*)} [string range $h $se_start $se_end]] {
+
+                # case ignore arg names
+                set arg [string tolower $arg]
+    
+                # trim any quotes around val
+                set val [string trim $val "\""]
+    
+                # check for legal args only
+                switch -- $arg {
+                    type - engine - src - alt - target - viewport {set $arg $val}
+                }
+            }
+
+            set url [webdot::make_absolute_url $serverport $dirname $src {}]
+    
+            #case ignore type value
+            set type [string tolower $type]
+    
+            webdot::make_client_map $url $type $engine $viewport $no_cache $count $target
+
+            # mark start of text after current "<webdot...>" tag
+            set start [incr e_end]
+    
+            # increment the counter that is used for "<map.." names in the generated html
+            incr count
+        }
+    
+        # output text after last "<webdot"
+        puts -nonewline [string range $h $start end]
+
+    } err ]} {
+	puts "<pre><font color=red>$err</pre>"
+    }
+}
+
+###########################################################################
+# webdot::get_image_size
+# 
+# encapsulate this rather ugly calculation  (used in two places)
+#
+proc webdot::get_image_size {g} {
+    global SIGNATURE
+    if {![catch {$g queryattr orientation} or]
+      && [string first land [string tolower $or]] == 0} {
+        set landscape 1
+    } {
+        set landscape 0
+    }
+    if {[catch {$g queryattr size} sz]} {
+        foreach {lrx lry ulx uly} [lindex [$g queryattr bb] 0] {break}
+    	#  size of image is size of graph + (2 * margin)
+    	set sizex [expr {($ulx - $lrx + 5 + 5) * 96/72}]
+    	set sizey [expr {($uly - $lry + 5 + 5) * 96/72}]
+    } {
+	if {$landscape} {
+		foreach {sizey sizex} [split [lindex $sz 0] ,] {break}
+	} {
+		foreach {sizex sizey} [split [lindex $sz 0] ,] {break}
+	}
+    	#  size of image is size of graph + (2 * margin)
+	set sizex [expr int(($sizex +(5+5)/72.) * 96)]
+    	set sizey [expr int(($sizey +(5+5)/72.) * 96)]
+    }
+    if {[info exists SIGNATURE]} {
+        #  add a bit more for the signature
+        incr sizex 5
+        incr sizey 10
+        # enforce a minimum width
+        if {$sizex < 50} {set sizex 50}
+    }
+    list $sizex $sizey
+}
+
+###########################################################################
+# webdot::make_product
+#
+# convert "src" into "$type" in current directory
+#
+proc webdot::make_product {url type engine viewport no_cache} {
+    global env SIGNATURE GS PS2EPSI SELF TCLET SELFMTIME
+
+    if {[scan $url {http://%[^/]%s} serverport path] != 2} {
+        error "Invalid url: $url"
+    }
+    set dirname [file dirname $path]
+    if {[string length $viewport]} {
+        set cachename $engine.$type.$viewport
+    } {
+        set cachename $engine.$type
+    }
+
+    # see if we can use product from cache
+    if {[file exists $cachename] && [file size $cachename] && ! $no_cache} {
+        set t [file mtime $cachename]
+	# must be later than the source, and later than the last modification
+	# to this webdot script or libtcldot.so
+        if {$t >= [file mtime src] && $t > $SELFMTIME} {
+            return
+        }
+    }
+
+    # no - so now we need to build it and save it in cache
+    switch -- $type {
+        png - jpeg - gif {
+            # generates a map at the same time ready for inclusion
+            # in an html page
+            if {[catch {open $cachename w} f_out]} {
+                error "Unable to open cache file for write: $cachename"
+            }
+            if {[catch {
+                set g [webdot::read_graph src]
+		# set default background to transparent for web use
+		if {[catch {$g queryattr bgcolor}]} {
+		    $g setattributes bgcolor white
+		}
+                if {[catch {$g layout [string tolower $engine]} err]} {
+                    error "Graph layout error: $err" 
+                }
+		if {[catch {$g queryattr truecolor} truecolor]} {
+			set truecolor 0
+		}
+		foreach {sizex sizey} [webdot::get_image_size $g] {break}
+		if {$truecolor} {
+                	set gd [gd createTrueColor $sizex $sizey]
+		} {
+                	set gd [gd create $sizex $sizey]
+		}
+    
+                # Antialiasing against transparent background doesn't work well
+                #  if actual background is not near white.  Need alpha channel.
+                #set transparent [gd color new $gd 254 254 254]
+                #gd color transparent $gd $transparent
+                # Instead, set default background color to white
+                gd color new $gd 255 255 255
+        
+                set hyperlink_blue [gd color new $gd 0 0 238]
+                if {! [catch {$g queryattr BGURL} bgurl]} {
+                    set bgurl [lindex $bgurl 0]
+                    if {[string length $bgurl]} {
+                        set bgurl [webdot::make_absolute_url $serverport $dirname $bgurl [$g showname]]
+	                if {[catch {webdot::get_url $bgurl $no_cache} res]} {
+                	    error $res
+            		}
+                        foreach {bg_file_cache_dir . . ContentType} $res {break}
+                        if {[catch {open $bg_file_cache_dir/src r} bgf]} {
+                            error "Unable to open background image file: $bg_file_cache_dir/src"
+                        }
+                        switch -- [string tolower $ContentType] {
+                            image/png {
+                                gd tile $gd [gd createFromPNG $bgf]
+                            }
+                            image/gif {
+                                gd tile $gd [gd createFromGIF $bgf]
+                            }
+                            default {
+                                error "unsupported MIME type for background image: $ContentType"
+                            }
+                        }
+                        close $bgf
+                        gd fill $gd tiled 0 0
+                    }
+                }
+    
+                # render graph
+                $g rendergd $gd
+
+                if {[info exists SIGNATURE]} {
+                    # Sign this piece of art (signature is hyperlinked to help)
+                    # first work out size of the signature in this font
+                    foreach {x0 y0 x1 y1 x2 y2 x3 y3} [gd text {} 0 \
+                        times 8.0 0.0 0 0 $SIGNATURE] {break}
+                    # then place it accordingly in lower right corner
+                    gd text $gd $hyperlink_blue \
+                        times 8.0 0.0 [expr $sizex - $x2 - 2] \
+                        [expr $sizey - $y0 - 2] $SIGNATURE
+                }
+
+                gd write[string toupper $type] $gd $f_out
+                close $f_out
+                gd destroy $gd
+
+                # generate map
+                if {[catch {open $engine.cmap w} f_out]} {
+                    error "Unable to open cache file for write: $engine.cmap"
+                }
+                puts $f_out "<!-- bb ($sizex,$sizey) -->"
+                if {[info exists SIGNATURE]} {
+                    # make the signature area a hyperlink to a help page.
+                    puts $f_out "<area shape=\"rect\" href=\"$SELF/$url.$cachename.help\" title=\"$SIGNATURE\" alt=\"$SIGNATURE\" coords=\"[expr $sizex - $x2 - 4],[expr $sizey - ($x0 - $y2) - 4],$sizex,$sizey\">"
+                }
+                flush $f_out
+                $g write $f_out cmap
+            	$g delete
+            } err]} {
+		# try to output an error message 
+		if {! [string length [info command gd]]} {
+		    # a bitmap is expected, but if that won't work then a stderr message 
+		    error $err
+		}
+		# write the error message to a bitmap
+                set gd [gd create 500 100]
+                set white [gd color new $gd 255 255 255]
+                set red [gd color new $gd 255 0 0]
+                set y 5
+		foreach l [split $err \n] {
+                    gd text $gd $red times 10.0 0.0 5 [incr y 20] $l
+                }
+                gd write[string toupper $type] $gd $f_out
+                close $f_out
+                gd destroy $gd
+
+                # generate empty map with bb info of error message
+                if {[catch {open $engine.cmap w} f_out]} {
+                    error "Unable to open cache file for write: $engine.cmap"
+                }
+		puts $f_out "<!-- bb (500,100) -->"
+	    }
+       	    close $f_out
+        }
+        dot - xdot {
+            set g [webdot::read_graph src]
+            webdot::fix_graph_urls $g $serverport $dirname
+            if {[catch {open $cachename w} f_out]} {
+                error "Unable to open cache file for write: $cachename"
+            }
+            if {[catch {$g layout [string tolower $engine]} err]} {
+                error "Graph layout error: $err" 
+            }
+            $g write $f_out $type
+            close $f_out
+            $g delete
+        }
+	gv {
+            # for client side we use canonical dot format and don't bother with server side layout.
+            set g [webdot::read_graph src]
+            webdot::fix_graph_urls $g $serverport $dirname
+            if {[catch {open $cachename w} f_out]} {
+                error "Unable to open cache file for write: $cachename"
+            }
+            $g write $f_out canon
+            close $f_out
+            $g delete
+        }
+        map {
+            set g [webdot::read_graph src]
+            webdot::fix_graph_urls $g $serverport $dirname
+            if {[catch {$g layout [string tolower $engine]} err]} {
+                error "Graph layout error: $err" 
+            }
+            if {[catch {open $cachename w} f_out]} {
+                error "Unable to open cache file for write: $cachename"
+            }
+            foreach {sizex sizey} [webdot::get_image_size $g] {break}
+            puts $f_out "bb ($sizex,$sizey)"
+	    if {[info exists SIGNATURE]} {
+                # work out size of the signature in this font
+                foreach {x0 y0 x1 y1 x2 y2 x3 y3} [gd text {} 0 \
+                    times 8.0 0.0 0 0 $SIGNATURE] {break}
+                puts $f_out "rectangle ([expr $sizex - $x2 - 4],$sizey) ($sizex,[expr $sizey - ($x0 - $y2) - 4]) $SELF/$url.$cachename.help $SIGNATURE"
+            }
+            flush $f_out
+            $g write $f_out ismap
+            close $f_out
+            $g delete
+	}
+        cmap {
+            set g [webdot::read_graph src]
+            webdot::fix_graph_urls $g $serverport $dirname
+            if {[catch {$g layout [string tolower $engine]} err]} {
+                error "Graph layout error: $err" 
+            }
+            if {[catch {open $cachename w} f_out]} {
+                error "Unable to open cache file for write: $cachename"
+            }
+            foreach {sizex sizey} [webdot::get_image_size $g] {break}
+            puts $f_out "<!-- bb ($sizex,$sizey) -->"
+            if {[info exists SIGNATURE]} {
+                # work out size of the signature in this font
+                foreach {x0 y0 x1 y1 x2 y2 x3 y3} [gd text {} 0 \
+                    times 8.0 0.0 0 0 $SIGNATURE] {break}
+                puts $f_out "<area shape=\"rect\" href=\"$SELF/$url.$cachename.help\" title=\"$SIGNATURE\" alt=\"$SIGNATURE\" coords=\"[expr $sizex - $x2 - 4],[expr $sizey - ($x0 - $y2) - 4],$sizex,$sizey\">"
+            }
+            flush $f_out
+            $g write $f_out cmap
+            close $f_out
+            $g delete
+        }
+        tcl {
+            set g [webdot::read_graph src]
+            if {[catch {$g layout [string tolower $engine]} err]} {
+                error "Graph layout error: $err" 
+            }
+            if {[catch {open $cachename w} f_out]} {
+                error "Unable to open cache file for write: $cachename"
+            }
+            # output the base tclet code
+            #
+	    set f [open $TCLET r]
+	    fcopy $f $f_out
+	    close $f
+            # output commands that render the graph on the canvas
+            puts $f_out [$g render]
+            close $f_out
+            $g delete
+        }
+        tclmap {
+            set g [webdot::read_graph src]
+            webdot::fix_graph_urls $g $serverport $dirname
+            if {[catch {$g layout [string tolower $engine]} err]} {
+                error "Graph layout error: $err" 
+            }
+            if {[catch {open $cachename w} f_out]} {
+                error "Unable to open cache file for write: $cachename"
+            }
+            if {![catch {$g queryattr URL} url]} {
+                set urls($g) $url
+            }
+            foreach n [$g listnodes] {
+                if {![catch {$n queryattr URL} url]} {
+                    set urls($n) $url
+                }
+                foreach e [$n listout] {
+                    if {! [catch {$e queryattr URL} url]} {
+                        set urls($e) $url
+                    }
+                }
+            }
+            if {[array exists urls]} {
+                puts $f_out [array get urls]
+            }
+            close $f_out
+            $g delete
+        }
+        pdf {
+            if {[catch {webdot::make_product $url ps2 $engine $viewport $no_cache} err]} {
+                error $err
+            }
+            exec $GS -q -dNOPAUSE -dBATCH -sPAPERSIZE=a0 -sDEVICE=pdfwrite -sOutputFile=$cachename $engine.ps2
+        }
+        epsi {
+            if {[catch {webdot::make_product $url ps $engine $viewport $no_cache} err]} {
+                error $err
+            }
+            exec $PS2EPSI $engine.ps $cachename
+        }
+        hpgl - fig - imap - mif - pcl - pic - ps - ps2 - svg - svgz - vtx - vrml {
+            set g [webdot::read_graph src]
+            if {[catch {$g layout [string tolower $engine]} err]} {
+                error "Graph layout error: $err" 
+            }
+            if {[catch {open $cachename w} f_out]} {
+                error "Unable to open cache file for write: $cachename"
+            }
+            $g write $f_out $type
+            close $f_out
+            $g delete
+        }
+	src {}
+	gqpng - gq {
+	    # make a layout graph
+	    if {[catch {webdot::make_product $url dot $engine {} $no_cache} err]} {
+		error $err
+	    }
+	    # use cached layout
+            set g [webdot::read_graph $engine.dot]
+	    # use position info from cached layout
+	    $g layout nop
+	    set Z {}
+	    foreach {X Y Z x y} [split $viewport ,] {break}
+            if {[string equal $Z {}]} {
+		# initial zoom
+		set Z 125
+		# initial position with viewport centered over graph
+		foreach {llx lly urx ury} [lindex [$g queryattributes bb] 0] {break}
+		set x [expr {int($urx / 2)}]
+		set y [expr {int($ury / 2)}]
+	    }
+	    set vp "$X,$Y,$Z,$x,$y"
+	    $g setattribute viewport "$X,$Y,[expr {$Z/100.}],$x,$y"
+	    # create viewport image
+	    set cachename $engine.gqpng.$vp
+            if {[catch {open $cachename w} f_out]} {
+                error "Unable to open cache file for write: $cachename"
+            }
+            $g write $f_out png
+            close $f_out
+
+	    # create graphquest (gq) html and map
+	    set cachename $engine.gq.$vp
+            if {[catch {open $cachename w} f_out]} {
+                error "Unable to open cache file for write: $cachename"
+            }
+
+	    # precompute pans
+	    set pansize 50
+	    set north [expr {int($y+$Y*$pansize/$Z)}]
+	    set south [expr {int($y-$Y*$pansize/$Z)}]
+	    set west [expr {int($x-$X*$pansize/$Z)}]
+	    set east [expr {int($x+$X*$pansize/$Z)}]
+
+	    # write graphquest page with pan & zoom controls, map, and img reference
+            puts $f_out "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\" \"http://www.w3.org/TR/html4/loose.dtd\">
+<html><head>
+  <meta name=\"robots\" content=\"noindex,nofollow\">
+  <title>GraphQuest</title>
+  <base target=\"gq\">
+</head><body>
+  <table><tr>
+    <td><a href=\"$SELF/$url.$engine.gq.$X,$Y,$Z,$west,$north\"><img src=\"$SELF/blue.png\" border=\"0\" width=\"5\" height=\"5\"></a></td>
+    <td><a href=\"$SELF/$url.$engine.gq.$X,$Y,$Z,$x,$north\"><img src=\"$SELF/blue.png\" border=\"0\" width=\"[expr {$X*96/72}]\" height=\"5\"></a></td>
+    <td><a href=\"$SELF/$url.$engine.gq.$X,$Y,$Z,$east,$north\"><img src=\"$SELF/blue.png\" border=\"0\" width=\"5\" height=\"5\"></a></td>
+    <td rowspan=\"3\"><table><tr>"
+	    foreach z {200 175 150 125 100 75 50 25} {
+		if {$z == $Z} {
+		    puts $f_out "    <td><a href=\"$SELF/$url.$engine.gq.$X,$Y,$z,$x,$y\"><img src=\"$SELF/green.png\" border=\"0\" width=\"15\" height=\"5\"></a></td>
+    </tr><tr><td></td></tr><tr>"
+		} {
+		    puts $f_out "    <td><a href=\"$SELF/$url.$engine.gq.$X,$Y,$z,$x,$y\"><img src=\"$SELF/blue.png\" border=\"0\" width=\"15\" height=\"5\"></a></td>
+    </tr><tr><td></td></tr><tr>"
+		}
+            }
+            puts $f_out "    </tr></table></td>
+  </tr><tr>
+    <td><a href=\"$SELF/$url.$engine.gq.$X,$Y,$Z,$west,$y\"><img src=\"$SELF/blue.png\" border=\"0\" width=\"5\" height=\"[expr {$Y*96/72}]\"></a></td>
+    <td>
+      <map name=\"gq\">"
+            flush $f_out
+            $g write $f_out cmap
+            flush $f_out
+            puts $f_out "      </map>
+      <img src=\"$SELF/$url.$engine.gqpng.$vp\" width=\"[expr {$X*96/72}]\" height=\"[expr {$Y*96/72}]\" border=\"0\" usemap=\"#gq\" alt=\"Graph by WebDot\">
+    </td>
+    <td><a href=\"$SELF/$url.$engine.gq.$X,$Y,$Z,$east,$y\"><img src=\"$SELF/blue.png\" border=\"0\" width=\"5\" height=\"[expr {$Y*96/72}]\"></a></td>
+  </tr><tr>
+    <td><a href=\"$SELF/$url.$engine.gq.$X,$Y,$Z,$west,$south\"><img src=\"$SELF/blue.png\" border=\"0\" width=\"5\" height=\"5\"></a></td>
+    <td><a href=\"$SELF/$url.$engine.gq.$X,$Y,$Z,$x,$south\"><img src=\"$SELF/blue.png\" border=\"0\" width=\"[expr {$X*96/72}]\" height=\"5\"></a></td>
+    <td><a href=\"$SELF/$url.$engine.gq.$X,$Y,$Z,$east,$south\"><img src=\"$SELF/blue.png\" border=\"0\" width=\"5\" height=\"5\"></a></td>
+  </tr></table>
+</body></html>"
+            close $f_out
+            $g delete
+
+            if {! [string equal $vp $viewport]} {
+		exec /bin/rm -f $engine.gq.$viewport
+		exec /bin/ln -s $engine.gq.$vp $engine.gq.$viewport
+#		file delete -force $engine.gq.$viewport
+#		file link -symbolic $engine.gq.$vp $engine.gq.$viewport
+	    }
+	}
+        default {
+            error "Don't know how to make target type: $type"
+        }
+    }
+}
+
+###########################################################################
+# webdot::send_help
+#
+proc webdot::send_help {url type engine viewport} {
+    global SELF MIME
+
+    puts "Content-Type: text/html\n
+<html>
+<head>
+<meta name=\"robots\" content=\"noindex,nofollow\">
+<title>WebDot Help Page</title>
+<link rel=\"shortcut icon\" href=\"/webdot/icon.png\">
+</head>
+<body bgcolor=white>
+<h1>WebDot Help Page</h1>"
+
+    webdot::make_client_map $url $type $engine $viewport 0 0 new
+
+    set all_engines {DOT NEATO TWOPI FDP SFDP CIRCO}
+
+    set this_engine [string toupper $engine]
+    set ix [lsearch $all_engines $this_engine]
+    set rest_engines [lreplace $all_engines $ix $ix]
+    
+    puts "<p>This <a href=$url>graph</a> can be rendered by
+WebDot using the $this_engine layout engine, in any of the following
+formats:<pre>"
+
+    set column 0
+    foreach t {dot epsi fig gif gv hpgl jpeg mif pcl pdf pic png ps ps2 svg svgz tcl vrml vtx map ismap imap cmap src} {
+	set mime "($MIME($t))"
+	if {[string equal $t src]} {
+	    set anchor "<a href=$SELF/$url.$t>$t $mime</a>"
+	} {
+	    set anchor "<a href=$SELF/$url.$engine.$t>$t $mime</a>"
+	}
+        puts -nonewline [format "%[expr 6-[string length $t]]s%s%[expr 25-[string length $mime]]s" {} $anchor {}]
+        if {!([incr column]%3)} {puts ""}
+    }
+    puts "</pre>
+<p>It can also be formatted by the:"
+    foreach {eng} $rest_engines {
+        puts "<a href=$SELF/$url.[string tolower $eng].$type.help>$eng</a>,"
+    }
+    puts "layout engines.
+<p> Sources for WebDot can be found at:
+<a href=http://www.graphviz.org/pub/graphviz/>http://www.graphviz.org/pub/graphviz/</a>
+<p>
+WebDot is by: <a href=mailto:ellson@research.att.com>John Ellson (ellson@research.att.com)</a>
+</body></html>"
+}
+
+#############################################################
+# If we are sourced from "Dtcl_Script ChildInitScript" then
+# quit now.  The remaining function is provided by webdot.ttml/
+if {[string length [info commands dtcl_info]]} {return}
+
+###########################################################################
+# main                                                                    #
+###########################################################################
+
+# check cgi environment
+foreach v {REMOTE_ADDR SERVER_NAME SERVER_PORT SCRIPT_NAME REQUEST_METHOD} {
+        if {![info exists env($v)]} {toperror "Missing: $v"}
+}
+# some httpd don't provide SERVER_ADDR
+if {![info exists env(SERVER_ADDR)]} {
+	# stub in a safe address.  client won't be able to use IP
+	# in URLs to dot files.
+	set env(SERVER_ADDR) {127.0.0.1}
+}
+if {!([string equal $env(REQUEST_METHOD) GET]
+    || [string equal $env(REQUEST_METHOD) HEAD])} {
+        toperror "Missing or unsupported: REQUEST_METHOD"
+}
+set server_port ":$env(SERVER_PORT)"
+if {[string equal $server_port :80]} {set server_port {}}
+
+# see if we should use cache copy if it is available
+set no_cache 0
+if {[info exists env(HTTP_PRAGMA)]
+  && [string equal $env(HTTP_PRAGMA) no-cache]} {
+    set no_cache 1
+}
+
+set havequery 0
+# form absolute url from PATH_INFO
+if {[info exists env(PATH_INFO)]} {
+    # we allow encoding in PATH_INFO so that an encoded
+    #  QUERY_STRING can be passed through to the graph server
+    set path_info [webdot::unencode $env(PATH_INFO)]
+
+    # ugly hack for apache-2 servers that won't allow
+    #  "//" in PATH_INFO strings.  They translate "//" to "/".
+    regsub -- {http:/([^/])} $path_info {http://\1} path_info
+
+    if {[scan $path_info {/%[^:]://%[^/]%s} protocol serverport path] == 3} {
+        if {![string equal $protocol http]} {
+            toperror "Invalid URL. Only http protocol is allowed to upstream graph server."
+        }
+    } {
+        set serverport $env(SERVER_NAME)$server_port
+        set path $path_info
+    }
+    if {[scan $path {%[^\?]?%s} path through_query] == 2} {
+	set havequery 1
+    }
+} {
+    set serverport $env(SERVER_NAME)$server_port
+    set path /
+}
+
+#puts $f_debug "serverport=$serverport"
+#puts $f_debug "path_info=$path_info"
+#puts $f_debug "path=$path"
+#puts $f_debug "havequery=$havequery"
+
+if {[string equal $path /blue.png] || [string equal $path /green.png]} {
+    set png [string trim $path /]
+    if {! [file exists $CACHE_ROOT/$png]} {
+	webdot::load_tcldot
+	# create blue.png and green.png for navigation and zoom bars
+	set gd [gd create 10 10]
+	set blue [gd color new $gd 0 0 255]
+	gd fill $gd $blue 5 5
+        if {[catch {open $CACHE_ROOT/blue.png w} f_out]} {
+            error "Unable to open cache file for write: blue.png"
+        }
+	gd writePNG $gd $f_out
+        close $f_out
+
+	set green [gd color new $gd 0 255 0]
+	gd fill $gd $green 5 5
+	if {[catch {open $CACHE_ROOT/green.png w} f_out]} {
+            error "Unable to open cache file for write: blue.png"
+        }
+	gd writePNG $gd $f_out
+        close $f_out
+
+	gd destroy $gd
+    }
+    if {[catch {open $CACHE_ROOT/$png r} f]} {
+        error "Unable to open cache file for read: $png"
+    }
+    puts "Content-Type: $MIME(png)"
+    puts "Content-Length: [file size $CACHE_ROOT/$png]"
+    puts ""
+    flush stdout
+    if {! [string equal $env(REQUEST_METHOD) HEAD]} {
+        fconfigure $f -translation binary
+        fconfigure stdout -translation binary
+        fcopy $f stdout
+        flush stdout
+        puts {}
+    }
+    close $f
+    exit
+}
+	    
+# analyze the filename.extension(s)
+#
+# we want to deal with the following possible patterns of extensions:
+#
+#	filename.html					process <webdot>
+#
+#	filename.dot					(short for filename.dot.dot.dot)
+#
+#	filename.dot.<type>				(short for filename.dot.dot.<type>)
+#	filename.dot.<eng>.<type>			convert to <type> using <eng>
+#	filename.dot.<eng>.gq.<viewport>		graphquest (gq) request (html)
+#	filename.dot.<eng>.png.<viewport>		   image for graphquest
+#
+#	filename.dot.<type>.help			(short for filename.dot.dot.<type>.help)
+#	filename.dot.<eng>.<type>.help			put <eng> result in a help page
+#
+# <eng> is one of: dot neato twopi ...
+# <type> is one of: png gif jpg ....
+# <viewport> is of the form: X,Y or X,Y,Z,x,y   
+#     where X, Y, Z, x, y are all integers.
+
+# "set help help" if .help is found at the end, otherwise "set help {}"
+set parts [split [file tail $path] .]
+if {[string equal [lindex $parts end] help]} {
+	set help help
+	set parts [lrange $parts 0 end-1]
+} {
+	set help {}
+}
+
+# if not enough parts, default to index.html
+if {[llength $parts] < 2} {set parts {index html}}
+
+# use first two parts as filename for cache
+#   also, srctype may be used later if mimetype not understood
+foreach {srcname srctype} $parts {break}
+set dpath [file dirname $path]
+if {[string equal $dpath /]} {
+        set path /$srcname.$srctype
+} {
+        set path $dpath/$srcname.$srctype
+}
+set parts [lrange $parts 2 end]
+
+# extract target type, engine, viewport
+switch -- [llength $parts] {
+        0 {
+		set engine dot
+		set type dot
+		set viewport {}}
+        1 {
+		set engine dot
+		set type $parts
+		set viewport {}}
+	2 {
+		foreach {engine type} $parts {break}
+		set viewport {}
+	}
+	default {
+		foreach {engine type} $parts {break}
+		set viewport [join [lrange $parts 2 end] .] 	
+	}
+}
+
+# nasty hack to work around bugs in Apache/2.0.36 and later
+set wd [file tail $argv0]
+set s $env(SCRIPT_NAME)
+set SCRIPT_NAME [string range $s 0 [expr {[string first $wd $s]-1}]]$wd
+# end hack
+
+#puts $f_debug "SCRIPT_NAME = $SCRIPT_NAME"
+
+# form url for upstream get 
+# and form SELF url to used in the href for help attached to the signature
+if {$LOCALHOSTONLY} {
+	set SELF $SCRIPT_NAME
+} {
+	set SELF http://$env(SERVER_NAME)$server_port$SCRIPT_NAME
+}
+# url is used in maps, so needs to keep public address of server
+if {$havequery} {
+	set url http://$serverport$path?$through_query
+} {
+	set url http://$serverport$path
+}
+
+# create a directory name for the cache
+set dirname [file dirname $path]
+
+# clean up type
+switch -- $type {
+    ismap {
+        # type ismap is deprecated - retained for backward compatibility
+        set type map
+    }
+    jpg {
+        # use canonical type name
+        set type jpeg
+    }
+    {} {
+	# shouldn't happen, but just in case
+        toperror "Missing type specification"
+    }
+}
+
+# deal with help requests of the form:
+#    http://a.b.c.d/cgi-bin/webdot/http://w.x.y.z/path/x.dot.<type>.help
+#or:
+#    http://a.b.c.d/cgi-bin/webdot/http://w.x.y.z/path/x.dot.<eng>.<type>.help
+# originated from the "Graph by WebDot" signatures.
+if {[string length $help]} {
+    webdot::send_help $url $type $engine $viewport
+    exit
+}
+
+###########################################################################
+# OK so maybe we have real work to do!
+
+# get source file into cache (may already be there)
+if {[catch {webdot::get_url $url $no_cache} res]} {
+	toperror $res
+}
+foreach {file_cache_dir LastModified Expires ContentType} $res {break}
+
+# some types (e.g. vrml) result in multiple files, so cd to target directory
+cd $file_cache_dir
+
+# deal with html pages containing <webdot...> tags
+if {[string equal $ContentType $MIME(html)]
+       || [string equal $srctype html]} {
+    webdot::filter_html $serverport $dirname $no_cache
+    exit
+}
+
+if {! ([string equal $ContentType $MIME(dot)]
+       || [string equal $ContentType $MIME(gv)]
+       || [string equal $srctype gv]
+       || [string equal $srctype dot])} {
+    toperror "Unrecognized MIME type for graph: $ContentType\nand unrecognized file extension: $srctype"
+}
+
+# Support for client-side caching
+#
+# We could do this in webdot::get_url, but we must make sure src is in cache
+# even if not-modified-since because the html processing will
+# need it.  The output html may be modified by embedded webdot images even
+# if the source html hasn't been changed.  To fix that would require
+# buffering of the html while testing all of the embedded webdots, then
+# only if no changes to the resulting html would not-modified
+# be sent to the client. Basically this is all very messy for little benefit.
+#
+# Make sure an update is forced if Tcldot has changed
+#
+if {[info exists env(HTTP_IF_MODIFIED_SINCE)]} {
+    if {[catch {clock scan $Expires -gmt 1} t]} {
+       toperror "failed to parse time in env(HTTP_IF_MODIFIED_SINCE): $env(HTTP_IF_MODIFIED_SINCE)"
+    }
+    if {$t >= $LastModified && $t > $SELFMTIME} {
+        puts "Status: 304 Not Modified\n"
+        exit
+    }
+}
+
+# convert the graph
+if {[catch {webdot::make_product $url $type $engine $viewport $no_cache} err]} {
+    toperror $err
+}
+# now the product is in the cache and we can ship it
+switch -- $type {
+    src {
+	set cachename src
+    }
+    default {
+	if {[string equal $viewport {}]} {
+            set cachename $engine.$type
+	} {
+            set cachename $engine.$type.$viewport
+	}
+    }
+}
+if {[catch {open $cachename r} f]} {
+    toperror "Unable to open cache file for read: $file_cache_dir/$cachename"
+}
+set contentLength [file size $cachename]
+
+# start preparing result http header
+lappend header "Content-Type: $MIME($type)"
+switch -- $type {
+	svgz {
+		lappend header "Content-Encoding: gzip"
+	}
+}
+if {[string length $Expires]} {
+    lappend header "Expires: $Expires"
+}
+if {[string length $LastModified]} {
+    lappend header "Last-Modified: $LastModified"
+}
+
+# send output header
+switch -- $type {
+    gv - dot - xdot - png - gif - jpeg - mif - ps - ps2 - epsi - pdf - hpgl - pic - pcl - vrml - vtx - fig - svg - svgz - src - imap - cmap - gq - gqpng {
+        puts [join $header \n]
+    }
+    tcl {
+        lappend header "Pragma: no-cache"
+        puts [join $header \n]
+    }
+    map {
+        if {![info exists env(QUERY_STRING)]
+          || ![string length $env(QUERY_STRING)]} {
+            puts [join $header \n]
+            set x {}
+            set y {}
+        } {
+            foreach {x y} [split $env(QUERY_STRING) ,] {break}
+        }
+    }
+    tclmap {
+        if {![info exists env(QUERY_STRING)]
+          || ![string length $env(QUERY_STRING)]} {
+            puts [join $header \n]
+            set query {}
+        } {
+            set query $env(QUERY_STRING)
+        }
+    }
+    default {toperror "I don't know how to make type: $type"}
+}
+
+if {[string equal $type map] && [string length $x]} {
+    # deal with server-side mapping (ismap)
+    set defaulturl {}
+    foreach l [split [read $f] \n] {
+        if {[scan $l {rectangle (%d,%d) (%d,%d) %s %s} x1 y1 x2 y2 xy_url xy_label]} {
+            if {(($x >= $x1 && $x <= $x2) || ($x <= $x1 && $x >= $x2))
+		 && (($y >= $y1 && $y <= $y2) || ($y <= $y1 && $y >= $y2))} {
+                puts "Location: $xy_url\n"
+                set defaulturl {}
+                break
+            }
+        } {
+            scan $l {default %s} defaulturl
+        }
+    }
+    if {[string length $defaulturl]} {
+        puts "Location: $defaulturl\n"
+    } {
+	# no default - want this to do nothing
+        puts "Status: 204 No URL for this location\n"
+    }
+} elseif {[string equal $type tclmap] && [string length $query]} {
+    array set urls [read $f]
+    if {[info exists urls($query)]} {
+        puts "Location: $urls($query)\n"
+    } {
+	# no default - want this to do nothing
+        puts "Status: 204 No URL for this location\n"
+    }
+} else {
+    puts "Content-Length: $contentLength"
+    puts {}
+    if {![string equal $env(REQUEST_METHOD) HEAD]} {
+        flush stdout
+        fconfigure $f -translation binary
+        fconfigure stdout -translation binary
+        fcopy $f stdout
+        flush stdout
+        puts {}
+    }
+}
+close $f
+
+#close $f_debug

@@ -1,0 +1,18 @@
+digraph G {
+  graph [rankdir=LR nodesep=0.1 size="3,4"]
+  node [shape=box height=0.1]
+  subgraph cluster_graphviz {
+    graph [label=graphviz style=filled fillcolor=lightblue color=black URL="http://www.graphviz.org/"]
+    node [URL="http://www.graphviz.org/"]
+    {gd gdtclft dot neato twopi dotneato pathplan tclstubs tclhandle "graph" cdt}->libtcldot
+  }
+  libfreetype [URL="http://www.freetype.org/"]
+  libjpeg [URL="http://www.ijg.org/"]
+  libpng [URL="http://www.libpng.org/pub/png/"]
+  libz [URL="http://www.gzip.org/zlib/"]
+  {libfreetype libjpeg libpng libz}->libtcldot
+  webdot [style=filled fillcolor=yellow color=black URL="$HTMLBASE"]
+  tclsh [URL="http://tcl.activestate.com/"]
+  httpd [URL="http://httpd.apache.org/"]
+  {libtcldot tclsh httpd}->webdot
+}

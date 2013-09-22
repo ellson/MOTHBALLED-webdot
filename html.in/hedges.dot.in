@@ -1,0 +1,6 @@
+digraph G {
+        graph [URL="default.html"]
+        node [URL="\N.html"]
+        a -> b -> c
+        a -> c [URL="\E.html", label="\E"]
+}

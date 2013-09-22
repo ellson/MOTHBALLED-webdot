@@ -1,0 +1,18 @@
+<p>
+<a href="$CGIBASE$BASE/$SELF.dot.dot.map">
+<img src="$CGIBASE$BASE/$SELF.dot.dot.png" border="0" ismap>
+</a>
+<p>
+Dot supports a "\N" substitution so that the URLs of the nodes can be
+based on the node name.  Edges can also have URLs, and \E, \H, \T can be used
+to substitute the edgename, head_node name, tail_node name respectively. Because
+of the limited abilities of image maps, a label must exist and the
+URL is attached to it.
+$DOT
+<p>
+The box around the clickable image can be suppressed with "border=0"
+<table border="1"><tr><td><pre>
+&lt;a href="$CGIBASE$BASE/$SELF.dot.dot.map"&gt;
+&lt;img src="$CGIBASE$BASE/$SELF.dot.dot.png" border="0" ismap&gt;
+&lt;/a&gt;
+</pre></td></tr></table>

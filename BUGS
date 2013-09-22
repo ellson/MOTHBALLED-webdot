@@ -1,0 +1,5 @@
+- running fix_graph_urls after layout result in silent crash
+
+- neato screws up on webdot_libs.dot
+
+- map format doesn't deal with \N on edges correctly

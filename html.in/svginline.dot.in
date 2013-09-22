@@ -1,0 +1,4 @@
+graph G {
+        node [URL="$HTMLBASE/\N.html"]
+        a -- b -- c; b -- d;
+}

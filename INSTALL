@@ -1,0 +1,12 @@
+Prequisites:
+
+	tcl (8.3 or later)
+	graphviz (1.7 or later from http://www.graphviz.org/ )
+
+Install:
+	./configure
+	make
+	make install
+
+Test:
+	firefox http://localhost/webdot/

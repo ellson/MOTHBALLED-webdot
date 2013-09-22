@@ -1,0 +1,32 @@
+<p>
+<img src="$CGIBASE$BASE/$SELF.dot.neato.png">
+<p>
+Given a description of a graph in the dot language, for example this graph:
+$DOT
+in a file that can be served by your web server, in this case:
+<a href="$BASE/$SELF.dot">$BASE/$SELF.dot</a>
+<p>
+Then this img tag in an html web page:
+<table border=1><tr><td><pre>
+&lt;img src="$CGIBASE<b>$BASE/$SELF.dot</b>.neato<b>.png</b>"&gt;
+</pre></td></tr></table>
+<p>
+will produce the graph layout at the top of this page.
+<p>
+The URL in the img src reference consists of four parts:
+<table border=1><tr>
+<td>$CGIBASE</td><td>The WebDot CGI server
+<br>(can be a full URL, or a relative URL like this if
+webdot is on the same server as the html source.)</td>
+</tr><tr>
+<td><b>$BASE/$SELF.dot</b></td><td>The graph source file
+<br>(can be a full URL, or a relative URL like this if
+the graph source is on the same server as webdot.
+<br>If it is to be a full URL of a different server than the
+webdot cgi is on, then the webdot cgi must be configured
+for public graph serving.)</td>
+</tr><tr>
+<td>.neato</td><td>The layout engine<br>(can be either: ".dot", ".neato", or ".twopi")</td>
+</tr><tr>
+<td><b>.png</b></td><td>The output format<br>(other bitmap formats are: ".gif")</td>
+</tr></table>

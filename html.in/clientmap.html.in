@@ -1,0 +1,42 @@
+<p>
+<webdot src="$BASE/$SELF.dot" engine="neato" type="png" target="new">
+<p>
+In order to support client-side maps, WebDot can filter an
+html page and replace all occurrences of &lt;webdot...&gt; tags
+with a client-side map and an image reference.  
+
+For example, $SELF.dot contains:
+$DOT
+and the source of this page contains (for the graph on the right):
+<table border=1><tr><td><pre>
+&lt;webdot src="$BASE/$SELF.dot" engine="neato" type="png" target="new"&gt;
+</pre></td></tr></table>
+<p>
+after serving this page through $CGIBASE, this &lt;webdot...&gt;
+tag is replaced by:
+<table border=1><tr><td><pre>
+&lt;map name="webdot0"&gt;
+&lt;area shape="rect" href="/cgi-bin/webdot/http://localhost/cgi-bin/webdot/webdot/clientmap.dot.neato.png.help" title="Graph by WebDot" alt="Graph by WebDot" coords="147,240,235,228"&gt;
+&lt;area shape="rect" href="http://localhost/webdot/a.html" title="a" alt="" coords="8,132,37,161" target="new"&gt;
+&lt;area shape="rect" href="http://localhost/webdot/b.html" title="b" alt="" coords="108,105,137,135" target="new"&gt;
+&lt;area shape="rect" href="http://localhost/webdot/c.html" title="c" alt="" coords="180,179,209,208" target="new"&gt;
+&lt;area shape="rect" href="http://localhost/webdot/d.html" title="d" alt="" coords="135,7,164,36" target="new"&gt;
+&lt;/map&gt;
+&lt;img src="/cgi-bin/webdot/http://localhost/cgi-bin/webdot/webdot/clientmap.dot.neato.png"
+        width="235" height="240" border="0"
+        usemap="#webdot0"
+        alt="Graph by WebDot">
+</pre></td></tr></table>
+<p>
+The advantages of this mode of WebDot are the much simpler authoring and
+the responsiveness of client-side mapping.  Notice that the URL that
+would be reached by clicking on a node is flashed into the
+status bar at the bottom of the browser.
+<p>
+The disadvantages are that the html source now contains non-standard markup and 
+the page has to be served through the $CGIBASE program.
+Care must be taken that relative URLs in the html don't also get served
+through the WebDot cgi program so it is important to use "rooted" hrefs
+in documents and graphs served this way.
+<p>
+Embedded SVG is probably a better choice assuming SVG clients are available.
