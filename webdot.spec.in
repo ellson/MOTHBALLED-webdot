@@ -1,7 +1,7 @@
 # @configure_input@
                                                                                 
 Name:           webdot
-Summary:        A CGI graph server script that uses tcldot from graphviz-tcl.
+Summary:        A CGI graph server script that uses tcldot from graphviz-lang-tcl.
 Version:        @PACKAGE_VERSION@
 
 %define truerelease 1
@@ -13,7 +13,7 @@ Release: %{?release}
 Group:          Applications/Multimedia
 License:        BSD-style
 URL:            http://www.graphviz.org/
-Requires:       graphviz-tcl >= 2.9 graphviz-gd ghostscript tcl >= 8.4 httpd
+Requires:       graphviz-lang-tcl graphviz-plugin-gd ghostscript tcl >= 8.4 httpd
 Source:         http://www.graphviz.org/pub/graphviz/development/SOURCES/%{name}-%{version}.tar.gz
 BuildArchitectures: noarch
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
