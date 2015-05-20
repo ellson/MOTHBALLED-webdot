@@ -20,7 +20,7 @@ WEBDOT_VERSION_MICRO=webdot_version_micro()
 #NB: "stable" or "development"
 WEBDOT_COLLECTION=webdot_collection()
 
-#NB: date/time of last commit - or "now"
+#NB: date/time of last commit - or "0"
 WEBDOT_VERSION_DATE=webdot_version_date()
 
 #NB: git commit hash of last commit
@@ -43,10 +43,6 @@ AC_CONFIG_AUX_DIR(config)
 
 # Checks for system type
 AC_CANONICAL_TARGET
-
-AC_DEFINE_UNQUOTED(BUILDDATE,"`date -u`",[Date (usually date of extraction from CVS).])
-BUILDDATE="`date -u`"
-AC_SUBST(BUILDDATE)
 
 AC_PREFIX_DEFAULT([/usr/local])
 if test "x${prefix}" = "xNONE"; then
