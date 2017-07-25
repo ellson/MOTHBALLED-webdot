@@ -75,10 +75,12 @@ distname=webdot-$(VERSION)
 .PHONY: dist
 dist: genfiles
 	rm -rf $(distname)*
-	mkdir -p $(distname)/cgi-bin $(distname)/config $(distname)/html.in
+	mkdir -p $(distname)/cgi-bin $(distname)/config $(distname)/html.in $(distname)/redhat
 	mkdir -p $(distname)/html/webdot/graphs/directed $(distname)/html/webdot/graphs/undirected
 	cp AUTHORS CHANGES COPYING INSTALL README $(distname)/
 	cp configure.ac configure Makefile.in Makefile webdot.spec.in webdot.spec $(distname)/
+	cp redhat/webdot.spec.fedora.in redhat/webdot.spec.fedora $(distname)/redhat/
+	cp redhat/webdot.spec.rhel.in redhat/webdot.spec.rhel $(distname)/redhat/
 	cp genindex.tcl linktut.tcl scaffold.tcl $(distname)/
 	cp config/config.guess config/config.sub config/install-sh $(distname)/config/
 	cp cgi-bin/webdot $(distname)/cgi-bin/

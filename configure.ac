@@ -65,4 +65,6 @@ AC_SUBST(BUILD_DIR)
 # Generate Makefiles
 AC_OUTPUT(Makefile
 	webdot.spec
+	redhat/webdot.spec.fedora
+	redhat/webdot.spec.rhel
 	)
